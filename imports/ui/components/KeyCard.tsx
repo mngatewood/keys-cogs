@@ -19,11 +19,11 @@ export const KeyCard = () => {
 				<div className='key key-right'>family</div>
 				<div className='key key-bottom'>soldier</div>
 			</div>
-			<div className='key-center-buttons'>
-				<button onClick={(event) => rotateKey(event, "clockwise")} className='key-button'>
+			<div className='center-buttons key-center-buttons'>
+				<button onClick={(event) => rotateKey(event, "clockwise")} className='key-button rotate-button'>
 					<img className='key-img' src='/clockwise-arrow.png' />
 				</button>
-				<button onClick={(event) => rotateKey(event, "counter clockwise")} className='key-button'>
+				<button onClick={(event) => rotateKey(event, "counter clockwise")} className='key-button rotate-button'>
 					<img className='key-img' src='/counter-clockwise-arrow.png' />
 				</button>
 			</div>
