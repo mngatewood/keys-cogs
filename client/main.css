@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
+
 html, #react-target {
 	height: 100%;
 }
@@ -35,11 +37,6 @@ input, input::placeholder {
 .cog-container {
 	width: 100%;
 	aspect-ratio: 1 / 1;
-	/* display: grid;
-	grid-template-columns: 10% 80% 10%;
-	grid-template-rows: 10% 80% 10%;
-	aspect-ratio: 1 / 1;
-	width: 100%; */
 	margin: 0;
 	padding: 0;
 }
@@ -78,17 +75,21 @@ input, input::placeholder {
 .clue {
 	text-align: center;
 	margin: 1vmin;
-	background-color:floralwhite;
 	font-size: 5vmin;
-	box-shadow: rgb(161, 255, 211) 5px 5px 5px;
+	font-family: "Permanent Marker", cursive;
 }
 
 .cog-input {
 	width: 100%;
 	height: 100%;
+	font-family: "Permanent Marker", cursive;
 	border: none;
-	background-color: floralwhite;
-	box-shadow: rgb(161, 255, 211) 5px 5px 5px;
+	background-color: transparent;
+}
+
+.cog-input::placeholder {
+	font-style: italic;
+	font-family: sans-serif;
 }
 
 .cog-top {
@@ -96,6 +97,8 @@ input, input::placeholder {
 	grid-row-end: 1;
 	grid-column-start: 2;
 	grid-column-end: 2;
+	background-color:rgba(255, 250, 240, 0.7);
+	box-shadow: rgb(161, 255, 211) 5px 5px 5px;
 }
 
 .cog-left {
@@ -281,6 +284,54 @@ input, input::placeholder {
 	display: none;
 }
 
+/* X slide enter */
+.slideX-enter {
+	opacity: 0;
+	transform: translateX(-150px);
+	z-index: 1;
+}
+
+.slideX-enter.slideX-enter-active {
+	opacity: 1;
+	transform: translateX(0);
+	transition: opacity 500ms linear 250ms, transform 500ms ease-in-out 250ms;
+}
+
+/* X slide exit */
+.slideX-exit {
+	opacity: 0;
+}
+
+.slideX-exit.slideX-exit-active {
+	opacity: 0;
+}
+
+/* Y slide enter */
+.slideY-enter {
+	opacity: 0;
+	transform: translateY(-150px);
+	z-index: 1;
+}
+
+.slideY-enter.slideY-enter-active {
+	opacity: 1;
+	transform: translateY(0);
+	transition: opacity 500ms linear 250ms, transform 500ms ease-in-out 250ms;
+}
+
+/* Y slide exit */
+.slideY-exit {
+	opacity: 0;
+}
+
+.slideY-exit.slideY-exit-active {
+	opacity: 0;
+}
+
+.card-container {
+	background-color: transparent;
+}
+
 @media only screen and (min-width: 768px) {
 
 	input, input::placeholder {
@@ -313,7 +364,7 @@ input, input::placeholder {
 
 	.clue {
 		margin: 0.5rem;
-		font-size: 1.5rem;
+		font-size: 2rem;
 	}
 
 	.cog-cards-container .key-card-outer {
@@ -344,7 +395,7 @@ input, input::placeholder {
 	}
 
 	input, input::placeholder, .clue {
-		font-size: 1.5rem;
+		font-size: 1rem;
 	}
 
 	.cog-cards-container .key-card-outer {
@@ -356,10 +407,6 @@ input, input::placeholder {
 		font-size: 1.2rem;
 	}
 
-	/* .cards-container .key {
-		font-size: 1rem;
-	}
- */
 	.cog-cards-container .key-button {
 		margin: 6px;
 	}
@@ -427,6 +474,12 @@ input, input::placeholder {
 	}
 
 	.cog-cards-container .key {
+		font-size: 1.5rem;
+	}
+
+	input,
+	input::placeholder,
+	.clue {
 		font-size: 1.5rem;
 	}
 
