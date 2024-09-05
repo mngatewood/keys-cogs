@@ -1,8 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
+
+html, #react-target {
+	height: 100%;
+}
+
 body {
 	margin: 0;
 	padding: 0;
+	height: 100%;
 	font-family: sans-serif;
-	background-color: bisque;
+	background-color: white;
 }
 
 input, input::placeholder {
@@ -13,20 +20,25 @@ input, input::placeholder {
 .app {
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
 	align-items: center;
 	max-width: 768px;
+	height: 100%;
 	margin: auto;
 	background-color: white;
 }
 
+.game-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
 .cog-container {
-	display: grid;
-	grid-template-columns: 10% 80% 10%;
-	grid-template-rows: 10% 80% 10%;
-	aspect-ratio: 1 / 1;
 	width: 100%;
-	margin-bottom: 1rem;
+	aspect-ratio: 1 / 1;
+	margin: 0;
+	padding: 0;
 }
 
 .cog-cards-container {
@@ -39,6 +51,8 @@ input, input::placeholder {
 	grid-template-columns: 50% 50%;
 	grid-template-rows: 50% 50%;
 	aspect-ratio: 1 / 1;
+	transform: rotate(0turn);
+	transition: transform 1s;
 }
 
 .cards-container {
@@ -47,11 +61,44 @@ input, input::placeholder {
 	justify-content: space-evenly;
 }
 
+.cog {
+	display: grid;
+	grid-template-columns: 10% 80% 10%;
+	grid-template-rows: 10% 80% 10%;
+	aspect-ratio: 1 / 1;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	margin-bottom: 1rem;
+}
+
+.clue {
+	text-align: center;
+	margin: 1vmin;
+	font-size: 5vmin;
+	font-family: "Permanent Marker", cursive;
+}
+
+.cog-input {
+	width: 100%;
+	height: 100%;
+	font-family: "Permanent Marker", cursive;
+	border: none;
+	background-color: transparent;
+}
+
+.cog-input::placeholder {
+	font-style: italic;
+	font-family: sans-serif;
+}
+
 .cog-top {
 	grid-row-start: 1;
 	grid-row-end: 1;
 	grid-column-start: 2;
 	grid-column-end: 2;
+	background-color:rgba(255, 250, 240, 0.7);
+	box-shadow: rgb(161, 255, 211) 5px 5px 5px;
 }
 
 .cog-left {
@@ -81,10 +128,27 @@ input, input::placeholder {
 	rotate: 180deg;
 }
 
-.cog-input {
-	width: 100%;
-	height: 100%;
-	border: none;
+.center-buttons {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+	aspect-ratio: 1 / 1;
+	background-color: white;
+}
+
+.cog-center-buttons {
+	width: 5vmin;
+	height: 5vmin;
+	left: 47.5%;
+	top: -52%;
+	z-index: 1;
+	background-color: transparent;
+}
+
+.key-center-buttons {
+	left: 30%;
 }
 
 .key-card {
@@ -95,8 +159,8 @@ input, input::placeholder {
 .key-card-outer {
 	display: grid;
 	aspect-ratio: 1 / 1;
-	grid-template-columns: 15% 70% 15%;
-	grid-template-rows: 15% 70% 15%;
+	grid-template-columns: 20% 60% 20%;
+	grid-template-rows: 20% 60% 20%;
 	text-align: center;
 	background-color: aqua;
 	border-radius: 20%;
@@ -121,6 +185,10 @@ input, input::placeholder {
 .cards-container .key-card-outer {
 	margin: 1vmin;
 	font-size: 3vmin;
+}
+
+.cards-container .key-card {
+	margin: 1vmin;
 }
 
 .key-top {
@@ -151,17 +219,6 @@ input, input::placeholder {
 	border-radius: 10%;
 }
 
-.key-center-buttons {
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	align-items: center;
-	position: relative;
-	left: 30%;
-	aspect-ratio: 1 / 1;
-	background-color: white;
-}
-
 .cog-cards-container .key-center-buttons {
 	top: -70%;
 	width: 40%;
@@ -170,6 +227,7 @@ input, input::placeholder {
 .cards-container .key-center-buttons {
 	top: -50%;
 	width: 40%;
+	height: 0;
 }
 
 .key-right {
@@ -194,6 +252,17 @@ input, input::placeholder {
 	height: 5vmin;
 	margin: 2vmin;
 	padding:0;
+	background-color: transparent;
+	border: none;
+	cursor: pointer;
+}
+
+.cog-button {
+	width: 8vmin;
+	height: 8vmin;
+	margin: 2vmin;
+	padding: 0;
+	background-color: transparent;
 	border: none;
 	cursor: pointer;
 }
@@ -201,16 +270,76 @@ input, input::placeholder {
 .key-img {
 	width: 5vmin;
 	height: 5vmin;
+	background-color: transparent;
+}
+
+.cog-img {
+	width: 8vmin;
+	background-color: transparent;
+	height: 8vmin;
+	background-color: transparent;
+}
+
+.cards-container .rotate-button {
+	display: none;
+}
+
+/* X slide enter */
+.slideX-enter {
+	opacity: 0;
+	transform: translateX(-150px);
+	z-index: 1;
+}
+
+.slideX-enter.slideX-enter-active {
+	opacity: 1;
+	transform: translateX(0);
+	transition: opacity 500ms linear 250ms, transform 500ms ease-in-out 250ms;
+}
+
+/* X slide exit */
+.slideX-exit {
+	opacity: 0;
+}
+
+.slideX-exit.slideX-exit-active {
+	opacity: 0;
+}
+
+/* Y slide enter */
+.slideY-enter {
+	opacity: 0;
+	transform: translateY(-150px);
+	z-index: 1;
+}
+
+.slideY-enter.slideY-enter-active {
+	opacity: 1;
+	transform: translateY(0);
+	transition: opacity 500ms linear 250ms, transform 500ms ease-in-out 250ms;
+}
+
+/* Y slide exit */
+.slideY-exit {
+	opacity: 0;
+}
+
+.slideY-exit.slideY-exit-active {
+	opacity: 0;
+}
+
+.card-container {
+	background-color: transparent;
 }
 
 @media only screen and (min-width: 768px) {
 
-	input, input::placeholder, .cog-cards-container .key {
-		font-size: 1.8rem;
+	input, input::placeholder {
+		font-size: 2.5rem;
 	}
 
-	.cards-container .key {
-		font-size: 1.5rem;
+	.cog-cards-container .key {
+		font-size: 1.8rem;
 	}
 
 	.key-card-outer {
@@ -219,8 +348,147 @@ input, input::placeholder {
 	}
 
 	.key-button, .key-img {
+		width: 2.5rem;
+		height: 2.5rem;
+	}
+
+	.cog-center-buttons {
+		top: -51%;
+		left: 46.5%;
+	}
+	
+	.cog-img, .cog-button, .cog-center-buttons {
+		width: 3.5rem;
+		height: 3.5rem;
+	}
+
+	.clue {
+		margin: 0.5rem;
+		font-size: 2rem;
+	}
+
+	.cog-cards-container .key-card-outer {
+		margin: 1rem;
+		padding: 0.5rem;
+		font-size: 2.5rem;
+	}
+
+	.cards-container .key-card-outer {
+		margin: 0.5rem;
+		font-size: 1.5rem;
+	}
+
+	.cards-container .key-card {
+		margin: 0.5rem;
+	}
+
+	.key-button {
+		margin: 1rem;
+	}
+
+}
+
+@media only screen and (min-width: 900px) {
+	.app {
+		max-width: unset;
+		justify-content: center;
+	}
+
+	input, input::placeholder, .clue {
+		font-size: 1rem;
+	}
+
+	.cog-cards-container .key-card-outer {
+		margin: 6px;
+		padding: 2px;
+	}
+	
+	.cog-cards-container .key {
+		font-size: 1.2rem;
+	}
+
+	.cog-cards-container .key-button {
+		margin: 6px;
+	}
+
+	.cog-container .key-img {
+		width: 1.5rem;
+		height: 1.5rem;
+	}
+
+	.cog-center-buttons {
+		top: -58%;
+		left: 46%;
+	}
+
+	.cog-img,
+	.cog-button,
+	.cog-center-buttons {
 		width: 2rem;
 		height: 2rem;
 	}
 
+	.game-container {
+		flex-direction: row;
+	}
+
+	.cog-container, .cog {
+		width: 400px;
+		height: 400px;
+	}
+
+	.cards-container {
+		flex-basis: 45%;
+		height: 400px;
+		overflow-y: scroll;
+	}
+
+	.key-card {
+		min-width: unset;
+	}
+}
+
+@media only screen and (min-width: 1024px) {
+
+	.cards-container {
+		width: 400px;
+		height: 600px;
+		flex-basis: unset;
+	}
+
+	.cog-container, .cog {
+		width: 600px;
+		height: 600px;
+	}
+
+	.cog-center-buttons {
+		top: -56%;
+		left: 47%;
+	}
+	
+	.cog-img,
+	.cog-button,
+	.cog-center-buttons {
+		width: 2.5rem;
+		height: 2.5rem;
+	}
+
+	.cog-cards-container .key {
+		font-size: 1.5rem;
+	}
+
+	input,
+	input::placeholder,
+	.clue {
+		font-size: 1.5rem;
+	}
+
+}	
+
+@media only screen and (min-width: 1200px) {
+
+	.game-container {
+		width: 1200px;
+		justify-content: space-evenly;
+	}
 }
