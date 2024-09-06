@@ -1,25 +1,23 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { KeyCard } from './KeyCard';
+import { useEffect, useState } from 'react';
+import type { Card } from '../App';
 
-export class CardsContainer extends Component<{ selectedCards: Array<Card> }> {
-	state = {
-		cards: []
-  	};
+export const CardsContainer = ( { dealtCards }: { dealtCards: Card[] }) => {
+	const [cards, setCards] = useState<React.JSX.Element[]>([]);
+	useEffect(() => {
+		const loadData = () => {
+			const keyCards = dealtCards.map((card) => {
+				return <KeyCard key={card._id} {...card} />;
+			});
+			setCards(keyCards);
+		};
+		loadData();
+	}, [dealtCards]);
 
-	componentDidMount() {
-		const { selectedCards } = this.props;
-		console.log("selectedCards in CardsContainer", selectedCards)
-		const cards = selectedCards.map((card) => {
-			return <KeyCard key={card._id} {...card} />;
-		});
-		this.setState({ cards });
-	}
-
-	render() {
-		return (
-			<div className='cards-container'>
-				{this.state.cards}
-			</div>
-		);
-	}
+	return (
+		<div className='cards-container'>
+			{cards}
+		</div>
+	);
 	}

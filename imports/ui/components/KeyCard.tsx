@@ -1,12 +1,7 @@
 import React from 'react';
 import { WordsCollection } from '/imports/api/words/WordsCollection';
-// import { useTracker } from 'meteor/react-meteor-data';
 import { useEffect, useState } from 'react';
-
-export type Card = {
-	_id: string;
-	wordIds: Array<string>;
-}
+import type { Card } from '../App';
 
 export const KeyCard =  (card: Card) => {
 	const [keywords, setKeywords] = useState<string[]>([]);
@@ -15,7 +10,6 @@ export const KeyCard =  (card: Card) => {
 		const loadData = async () => {
 			let words = [];
 			for (const id of card.wordIds) {
-				console.log("card", card);
 				const word = await WordsCollection.findOneAsync({ _id: id });
 				words.push(word?.text);
 			}
@@ -27,7 +21,6 @@ export const KeyCard =  (card: Card) => {
 	if (!keywords.length) {
 		return <div>Loading...</div>;
 	}
-	console.log("keywords", keywords)
 
 	let turn = 0;
 
