@@ -1,6 +1,28 @@
 import React from 'react';
+import { WordsCollection } from '/imports/api/words/WordsCollection';
+import { useEffect, useState } from 'react';
+import type { Card } from '../App';
 
-export const KeyCard = () => {
+export const KeyCard =  (card: Card) => {
+	const [keywords, setKeywords] = useState<string[]>([]);
+
+	useEffect(() => {
+		const loadData = async () => {
+			let words = [];
+			for (const id of card.wordIds) {
+				console.log("card", card);
+				const word = await WordsCollection.findOneAsync({ _id: id });
+				words.push(word?.text);
+			}
+			setKeywords(words);
+		};
+		loadData();
+	}, []);
+
+	if (!keywords.length) {
+		return <div>Loading...</div>;
+	}
+	console.log("keywords", keywords)
 
 	let turn = 0;
 
@@ -13,11 +35,11 @@ export const KeyCard = () => {
 	return (
 		<div className='key-card'>
 			<div className='key-card-outer'>
-				<div className='key key-top'>butterfly</div>
-				<div className='key key-left'>dinosaur</div>
+				<div className='key key-top'>{keywords[0]}</div>
+				<div className='key key-left'>{keywords[3]}</div>
 				<div className='key key-center'></div>
-				<div className='key key-right'>family</div>
-				<div className='key key-bottom'>soldier</div>
+				<div className='key key-right'>{keywords[1]}</div>
+				<div className='key key-bottom'>{keywords[2]}</div>
 			</div>
 			<div className='center-buttons key-center-buttons'>
 				<button onClick={(event) => rotateKey(event, "clockwise")} className='key-button rotate-button'>

@@ -1,23 +1,46 @@
 import React from 'react';
 import { KeyCard } from './KeyCard';
 import { TransitionGroup, CSSTransition } from "react-transition-group";
+import { useEffect, useState } from 'react';
+import type { Card } from '../App';
 
-export const Cog = () => {
+export const Cog = ( { playedCards }: { playedCards: Card[] }) => {
+	const [cards, setCards] = useState<React.JSX.Element[]>([]);
+	const [keys, setKeys] = useState(["", "", "", ""]);
+	const [rotation, setRotation] = useState(0);
+	useEffect(() => {
+		const loadData = () => {
+			console.log("cards in Cog", cards)
+			const keyCards = playedCards.map((card) => {
+				return <KeyCard key={card._id} {...card} />;
+			});
+			console.log("keyCards in CardsContainer", keyCards)
+			setCards(keyCards);
+		};
+		loadData();
+	}, [playedCards]);
 
-	const [turn, setTurn] = React.useState(0);
-	const [key1, setKey1] = React.useState("");
-	const [key2, setKey2] = React.useState("");
-	const [key3, setKey3] = React.useState("");
-	const [key4, setKey4] = React.useState("");
+	// top key
+	const key1 = keys[0];
+	// right key
+	const key2 = keys[1];
+	// bottom key
+	const key3 = keys[2];
+	// left key
+	const key4 = keys[3];
 
+	const setKey1 = (key: string) => {
+		keys[0] = key;
+		setKeys(keys);
+	}
+	
 	const rotateCog = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		const keyCardOuter = (e.target as HTMLElement).closest(".cog-container")?.querySelector(".cog-cards-container");
-		setTurn(turn + 0.25);
-		setKey1(key4);
-		setKey2(key1);
-		setKey3(key2);
-		setKey4(key3);
-		(keyCardOuter as HTMLElement).style.transform = "rotate(" + turn + "turn)";
+
+		setRotation(rotation + 0.25 );
+		keys.push(keys.shift() ?? '');
+		setKeys(keys);
+		(keyCardOuter as HTMLElement).style.transform = "rotate(" + rotation + "turn)";
 	}
 	return (
 		<div className='cog-container'>
@@ -29,7 +52,13 @@ export const Cog = () => {
 							timeout={1000}
 							classNames="slideX"
 						>
-							<input type="text" className='cog-input' placeholder='*hint*' value={key1} onChange={(e) => setKey1(e.target.value)} />
+							<input 
+								type="text" 
+								className='cog-input' 
+								placeholder='*hint*' 
+								value={key1} 
+								onChange={(e) => setKey1(e.target.value)} 
+							/>
 						</CSSTransition>
 					</TransitionGroup>
 				</div>
@@ -45,10 +74,7 @@ export const Cog = () => {
 					</TransitionGroup>
 				</div>
 				<div className='cog-cards-container'>
-					<KeyCard />
-					<KeyCard />
-					<KeyCard />
-					<KeyCard />
+					{cards}
 				</div>
 				<div className='clue cog-right'>
 					<TransitionGroup className="card-container">
