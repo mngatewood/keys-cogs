@@ -1,37 +1,36 @@
 import { Meteor } from 'meteor/meteor';
-import { Link, LinksCollection } from '/imports/api/links';
+import { WordsCollection } from '/imports/api/words/WordsCollection';
+import { CardsCollection } from '/imports/api/cards/CardsCollection';
+import { words, cards } from '/server/seedData';
 
-async function insertLink({ title, url }: Pick<Link, 'title' | 'url'>) {
-  await LinksCollection.insertAsync({ title, url, createdAt: new Date() });
-}
+const insertWord = (word: string) => WordsCollection.insertAsync({ text: word });
+const insertCard = (card: Array<string>) => CardsCollection.insertAsync({ wordIds: card });
 
-Meteor.startup(async () => {
-  // If the Links collection is empty, add some data.
-  if (await LinksCollection.find().countAsync() === 0) {
-    await insertLink({
-      title: 'Do the Tutorial',
-      url: 'https://www.meteor.com/tutorials/react/creating-an-app',
-    });
+Meteor.startup(async() => {
+	console.log("startup")
 
-    await insertLink({
-      title: 'Follow the Guide',
-      url: 'https://guide.meteor.com',
-    });
+	if (await WordsCollection.find().countAsync() === 0) {
+		console.log("inserting words")
+		words.forEach(insertWord)
+	}
 
-    await insertLink({
-      title: 'Read the Docs',
-      url: 'https://docs.meteor.com',
-    });
+	if (await CardsCollection.find().countAsync() === 0) {
+		console.log("inserting cards");
+		await Promise.all(cards.map(async (card) => {
+			const wordIdArray = await Promise.all(card.map(async (word) => {
+				const record = await WordsCollection.findOneAsync({ text: word });
+				if (record) {
+					return record._id;
+				}
+			}));
+			insertCard(wordIdArray);
+		}));
+	}
+	// Meteor.publish("words", function () {
+	// 	console.log("publishing words");
+	// 	console.log(WordsCollection.find().count())
+	// 	return WordsCollection.find();
+	// });
 
-    await insertLink({
-      title: 'Discussions',
-      url: 'https://forums.meteor.com',
-    });
-  }
-
-  // We publish the entire Links collection to all clients.
-  // In order to be fetched in real-time to the clients
-  Meteor.publish("links", function () {
-    return LinksCollection.find();
-  });
+	
 });
