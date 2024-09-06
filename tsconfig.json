@@ -36,7 +36,8 @@
     "resolveJsonModule": true,
     "types": ["node", "mocha"],
     "esModuleInterop": true,
-    "preserveSymlinks": true
+    "preserveSymlinks": true,
+    "typeRoots": ["node_modules/@types"],
   },
   "exclude": [
     "./.meteor/**",

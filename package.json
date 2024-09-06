@@ -15,6 +15,7 @@
     "react-transition-group": "^4.4.5"
   },
   "devDependencies": {
+    "@types/meteor": "^2.9.8",
     "@types/mocha": "^8.2.3",
     "@types/node": "^18.13.0",
     "@types/react": "^18.0.26",

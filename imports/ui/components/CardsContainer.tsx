@@ -1,16 +1,25 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { KeyCard } from './KeyCard';
 
+export class CardsContainer extends Component<{ selectedCards: Array<Card> }> {
+	state = {
+		cards: []
+  	};
 
-export const CardsContainer = () => {
+	componentDidMount() {
+		const { selectedCards } = this.props;
+		console.log("selectedCards in CardsContainer", selectedCards)
+		const cards = selectedCards.map((card) => {
+			return <KeyCard key={card._id} {...card} />;
+		});
+		this.setState({ cards });
+	}
 
-	return (
-		<div className='cards-container'>
-			<KeyCard />
-			<KeyCard />
-			<KeyCard />
-			<KeyCard />
-			<KeyCard />
-		</div>
-	);
-};
+	render() {
+		return (
+			<div className='cards-container'>
+				{this.state.cards}
+			</div>
+		);
+	}
+	}
