@@ -17,15 +17,18 @@ export const App = () => {
 	useEffect(() => {
 		const loadData = async () => {
 			const allCards = CardsCollection.find({}).fetch() as Card[];
+			// console.log("allCards in App", allCards)
 			const selectedIndices = shuffleArray(Array.from(Array(allCards.length).keys())).slice(0, 5);
+			// console.log("selectedIndices in App", selectedIndices)
 			const dealtCards = selectedIndices.map((index) => allCards[index]);
+			// console.log("dealtCards in App", dealtCards)
 			setDealtCards(dealtCards);
 
 			// get played cards from local storage, then...
 			setPlayedCards([]);
 		};
 		loadData();
-	}, []);	
+	}, []);
 
 	return (
 		<div className='app'>

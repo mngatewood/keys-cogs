@@ -10,6 +10,7 @@ export const KeyCard =  (card: Card) => {
 		const loadData = async () => {
 			let words = [];
 			for (const id of card.wordIds) {
+				console.log("card", card);
 				const word = await WordsCollection.findOneAsync({ _id: id });
 				words.push(word?.text);
 			}
@@ -21,6 +22,7 @@ export const KeyCard =  (card: Card) => {
 	if (!keywords.length) {
 		return <div>Loading...</div>;
 	}
+	console.log("keywords", keywords)
 
 	let turn = 0;
 

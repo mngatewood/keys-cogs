@@ -10,9 +10,11 @@ export const Cog = ( { playedCards }: { playedCards: Card[] }) => {
 	const [rotation, setRotation] = useState(0);
 	useEffect(() => {
 		const loadData = () => {
+			console.log("cards in Cog", cards)
 			const keyCards = playedCards.map((card) => {
 				return <KeyCard key={card._id} {...card} />;
 			});
+			console.log("keyCards in CardsContainer", keyCards)
 			setCards(keyCards);
 		};
 		loadData();
