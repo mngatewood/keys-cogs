@@ -24,6 +24,7 @@ export const Game = () => {
 
 	useEffect(() => {
 		const loadData = () => {
+			// console.log("loading data");
 			const playCardsData = cardsData.filter((card) => card.position === 5);
 			const cogCardsData = cardsData.filter((card) => card.position !== 5);
 
@@ -57,18 +58,27 @@ export const Game = () => {
 		keys[0] = data;
 		setKeys(keys);
 	}
+
+	const moveCard = (cardData: Card, origin: number, destination: number) => {
+		let updatedCard,updatedPlayCards, updatedCogCards;
+		updatedCard = <WordCard key={cardData.key} {...cardData} position={destination} />;
+		if(origin === 5) { // moving from play to cog
+			updatedPlayCards = playCards.filter((card) => card.key !== cardData._id);
+			updatedCogCards = [...cogCards, <WordCard key={cardData.key} {...cardData} position={destination} />];
+		} else { // moving from cog to cog
+			updatedPlayCards = playCards;
+			updatedCogCards = cogCards;
+		}
+		setPlayCards(updatedPlayCards);
+		setCogCards(updatedCogCards)
+	}
 	
 	const handleDragEnd = (event: any) => {
 		const movedCardData = cardsData.find((card) => card._id === event.active.id) as Card;
 		const origin = movedCardData.position;
 		const destination = parseInt(event.over.id);
+		moveCard(movedCardData, origin, destination);
 		movedCardData.position = destination;
-		const updatedCard = <WordCard key={movedCardData._id} {...movedCardData} position={destination} />;
-		const updatedPlayCards = origin === 5 ? playCards.filter((card) => card.key !== movedCardData._id) : playCards;
-		const updatedCogCards = origin === 5 ? [...cogCards, updatedCard] : cogCards;
-
-		setPlayCards(updatedPlayCards);
-		setCogCards(updatedCogCards)
 		setCardsData(cardsData.slice());
 	}
 
