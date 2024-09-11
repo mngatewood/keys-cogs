@@ -127,6 +127,15 @@ body {
 	cursor: grab;
 }
 
+.word-card-placeholder {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	background-color: transparent;
+	cursor: default;
+}
+
 .card-word {
 	display: flex;
 	justify-content: center;
@@ -201,8 +210,10 @@ body {
 	background-color: transparent;
 }
 
-.cog-container .word-card {
+.cog-container .word-card,
+.cog-container .word-card-placeholder {
 	width: 90%;
+	height: 90%;
 }
 
 .z-top {
@@ -214,12 +225,3 @@ body {
 }
  */
 
-@keyframes fadeIn {
-	0% {
-		opacity: 0;
-	}
-
-	100% {
-		opacity: 1;
-	}
-}
