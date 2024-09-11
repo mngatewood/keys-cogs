@@ -156,8 +156,10 @@ export const Game = () => {
 	const handleDragEnd = (event: any) => {
 		const movedCardData = cardsData.find((card) => card._id === event.active.id) as Card;
 		const origin = movedCardData.position;
-		const destination = cardsData.find((card) => card._id === event.over.id)?.position || 0;
-		moveCard(movedCardData, origin, destination);
+		if(event.over?.id) {			
+			const destination = cardsData.find((card) => card._id === event.over.id)?.position || 0;
+			moveCard(movedCardData, origin, destination);
+		}
 		document.getElementById(movedCardData._id)?.classList.remove("z-top");
 	}
 
