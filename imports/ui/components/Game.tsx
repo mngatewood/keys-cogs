@@ -7,7 +7,7 @@ import { WordCardDraggable } from './WordCardDraggable';
 import { WordCardSortable } from './WordCardSortable';
 import { Droppable } from './Droppable';
 import { DndContext, rectIntersection, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { SortableContext, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+import { SortableContext, sortableKeyboardCoordinates, rectSwappingStrategy } from '@dnd-kit/sortable';
 
 export type Card = {
 	_id: string;
@@ -24,9 +24,6 @@ export const Game = () => {
 	const [keys, setKeys] = useState<string[]>(["", "", "", ""]);
 	const cogContainers = [1, 2, 3, 4];
 	const pointerSensor = useSensor(PointerSensor, {
-		// activationConstraint: {
-		// 	distance: 20,
-		// },
 	});
 	const keyboardSensor = useSensor(KeyboardSensor, {
 		coordinateGetter: sortableKeyboardCoordinates,
@@ -136,9 +133,6 @@ export const Game = () => {
 		} else { 
 		// moving from cog to cog
 
-			console.log("updatedCard", updatedCard);
-			console.log("cardToShift", cardToShiftData);
-			console.log("origin", origin);
 			if(cardToShiftData) {
 				cardToShiftData.position = origin;
 			}
@@ -154,50 +148,35 @@ export const Game = () => {
 		setCogCards(sortByPosition(updatedCogCards));
 	}
 
-	// const resolveCollision = (movedCardData: Card, origin: number, destination: number) => {
-	// 	const collidingCard = cardsData.find((card) => card._id !== movedCardData._id && card.position === destination);
-	// 	if(collidingCard) {			
-	// 		collidingCard.position = origin;
-	// 		setCardsData(cardsData.slice());
-	// 	}
-	// }
-
-	// const handleDragStart = (event: any) => {
-	// 	const { id } = event.active;
-	// 	document.getElementById(id)?.classList.add("z-top");
-	// }
+	const handleDragStart = (event: any) => {
+		const { id } = event.active;
+		document.getElementById(id)?.classList.add("z-top");
+	}
 	
 	const handleDragEnd = (event: any) => {
-		// const { active, over } = event;
 		const movedCardData = cardsData.find((card) => card._id === event.active.id) as Card;
 		const origin = movedCardData.position;
 		const destination = cardsData.find((card) => card._id === event.over.id)?.position || 0;
 		moveCard(movedCardData, origin, destination);
-		// document.getElementById(movedCardData._id)?.classList.remove("z-top");
+		document.getElementById(movedCardData._id)?.classList.remove("z-top");
 	}
 
 	return (
-		<DndContext sensors={sensors} collisionDetection={rectIntersection} onDragEnd={handleDragEnd}>
-			<div className="startGameContainer">
-				<button className='startGameButton' onClick={startGame}>Start Game</button>
-			</div>
+		<DndContext sensors={sensors} collisionDetection={rectIntersection} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+			{ !isPlaying &&			
+				<div className="startGameContainer">
+					<button className='startGameButton' onClick={startGame}>Start Game</button>
+				</div>
+			}
 			<div className="cog-container">
 				<CogKeys updateKeys={handleKeyUpdate} keys={keys}/>
-				<SortableContext items={cogCards.map((card) => card.key || "")} >
+				<SortableContext items={cogCards.map((card) => card.key || "")} strategy={rectSwappingStrategy} >
 					<div className="droppable-container">
 						{ cogCards.map((card) => (
 							<Droppable key={card.key ?? ""} id={card.key ?? ""}>
 								{ card }
 							</Droppable>
 						))}
-						{/* {cogContainers.map((id) => (
-							<Droppable key={id} id={id}>
-								{ cogCards.find((card) => card.props.position.toString() === id) 
-									? cogCards.find((card) => card.props.position.toString() === id)
-									: "Drop Here"
-								}
-							</Droppable>
-						))} */}
 					</div>
 				</SortableContext>
 			</div>
