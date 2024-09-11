@@ -3,7 +3,7 @@ import { useDraggable } from '@dnd-kit/core';
 import {CSS} from '@dnd-kit/utilities';
 import type { Card } from './Game';
 
-export const WordCard = (card: Card) => {
+export const WordCardDraggable = (card: Card) => {
 	const keywords = card.words;
 
 	const { attributes, listeners, setNodeRef, transform } = useDraggable({
