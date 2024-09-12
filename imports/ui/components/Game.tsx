@@ -21,15 +21,15 @@ export const Game = () => {
 	const [cardsData, setCardsData] = useState<Card[]>([]);
 	const [playCards, setPlayCards] = useState<React.JSX.Element[]>([]);
 	const [cogCards, setCogCards] = useState<React.JSX.Element[]>([]);
-	const [keys, setKeys] = useState<string[]>(["", "", "", ""]);
+	const [keys, setKeys] = useState<string[]>(["test", "clue", "word", "done"]);
 	const cogContainers = [1, 2, 3, 4];
 	const pointerSensor = useSensor(PointerSensor, {
+		activationConstraint: { distance: 5 }
 	});
 	const keyboardSensor = useSensor(KeyboardSensor, {
 		coordinateGetter: sortableKeyboardCoordinates,
 	});
 	const sensors = useSensors( pointerSensor, keyboardSensor);
-
 
 	useEffect(() => {
 		const loadData = () => {
@@ -75,9 +75,8 @@ export const Game = () => {
 		setIsPlaying(true);
 	}
 
-	const handleKeyUpdate = (data: string) => {
-		keys[0] = data;
-		setKeys(keys);
+	const handleKeyUpdate = (data: string[]) => {
+		setKeys(data);
 	}
 
 	const moveCard = (cardData: Card, origin: number, destination: number) => {
@@ -182,7 +181,7 @@ export const Game = () => {
 					</div>
 				</SortableContext>
 			</div>
-			<div className="word-card-container">
+			<div className="draw-container">
 				{ playCards }
 			</div>
 		</DndContext>
