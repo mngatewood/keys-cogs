@@ -24,6 +24,7 @@ export const Game = () => {
 	const [keys, setKeys] = useState<string[]>(["", "", "", ""]);
 	const cogContainers = [1, 2, 3, 4];
 	const pointerSensor = useSensor(PointerSensor, {
+		activationConstraint: { distance: 5 }
 	});
 	const keyboardSensor = useSensor(KeyboardSensor, {
 		coordinateGetter: sortableKeyboardCoordinates,
@@ -182,7 +183,7 @@ export const Game = () => {
 					</div>
 				</SortableContext>
 			</div>
-			<div className="word-card-container">
+			<div className="draw-container">
 				{ playCards }
 			</div>
 		</DndContext>

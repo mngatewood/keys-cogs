@@ -15,11 +15,16 @@ export const WordCardDraggable = (card: Card) => {
 	}
 
 	return (
-		<div className='word-card' id={card._id} ref={setNodeRef} style={style} {...listeners} {...attributes}>
-			<div className='card-word card-top'>{keywords[0]}</div>
-			<div className='card-word card-left'>{keywords[3]}</div>
-			<div className='card-word card-center'></div>
-			<div className='card-word card-right'>{keywords[1]}</div>
-			<div className='card-word card-bottom'>{keywords[2]}</div>
+		<div className='word-card-wrapper' id={card._id} ref={setNodeRef} style={style} {...listeners} {...attributes}>
+			<div className="word-card">
+				<div className='card-word card-top'>{keywords[0]}</div>
+				<div className='card-word card-left'>{keywords[3]}</div>
+				<div className='card-word card-center'></div>
+				<div className='card-word card-right'>{keywords[1]}</div>
+				<div className='card-word card-bottom'>{keywords[2]}</div>
+			</div>
+			<div className="card-panel">
+				
+			</div>
 		</div>
 }
