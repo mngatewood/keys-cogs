@@ -21,6 +21,7 @@ body {
 	display: grid;
 	grid-template-columns: 10% 15% 50% 15% 10%;
 	grid-template-rows: 10% 15% 50% 15% 10%;
+	position: relative;
 	aspect-ratio: 1 / 1;
 	width: 100%;
 	margin: 0;
@@ -90,6 +91,37 @@ body {
 	writing-mode: vertical-rl;
 	text-orientation: mixed;
 	rotate: 180deg;
+}
+
+.cog-panel {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-evenly;
+	align-items: center;
+	position: absolute;
+	background-color: rgba(165, 42, 42, 0.2);
+	z-index: 1000;
+	width: 12vmin;
+	aspect-ratio: 1 / 1;
+	top: calc(50% - 6vmin);
+	left: calc(50% - 6vmin);
+	border-radius: 40%;
+}
+
+.cog-button {
+	width: 5vmin;
+	height: 5vmin;
+	margin: 2vmin;
+	padding: 0;
+	background-color: transparent;
+	border: none;
+	cursor: pointer;
+}
+
+.cog-img {
+	width: 5vmin;
+	height: 5vmin;
+	background-color: transparent;
 }
 
 .draw-container {
@@ -228,6 +260,17 @@ body {
 	background-color: transparent;
 }
 
+.card-panel {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-evenly;
+	align-items: center;
+	position: absolute;
+	background-color: transparent;
+	width: 17vmin;
+	aspect-ratio: 1 / 1;
+}
+
 .card-button {
 	width: 5vmin;
 	height: 5vmin;
@@ -242,18 +285,6 @@ body {
 	width: 5vmin;
 	height: 5vmin;
 	background-color: transparent;
-}
-
-.card-panel {
-	display: flex;
-	flex-direction: column;
-	justify-content: space-evenly;
-	align-items: center;
-	position: absolute;
-	background-color: transparent;
-	/* z-index: 10; */
-	width: 17vmin;
-	aspect-ratio: 1 / 1;
 }
 
 .z-top {

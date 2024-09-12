@@ -7,10 +7,9 @@ interface CogKeysProps {
 }
 
 export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, keys}) => {
-	const [inputValue, setInputValue] = useState(keys[0]);
-	
+
 	const handleKeyUpdate = () => {
-		updateKeys(inputValue)
+		updateKeys(keys);
 	}
 
 	return (
@@ -22,14 +21,7 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, keys}) => {
 						timeout={1000}
 						classNames="slideX"
 					>
-						<input
-							type="text"
-							className='key-input'
-							placeholder='*hint*'
-							value={inputValue}
-							onChange={(e) => setInputValue(e.target.value)}
-							onBlur={handleKeyUpdate}
-						/>
+						<div className="animate-key">{keys[0]}</div>
 					</CSSTransition>
 				</TransitionGroup>
 			</div>
@@ -51,7 +43,7 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, keys}) => {
 						timeout={1000}
 						classNames="slideX"
 					>
-						<div className="animate-key">{keys[2]}</div>
+						<div className="animate-key">{keys[2]}}</div>
 					</CSSTransition>
 				</TransitionGroup>
 			</div>
@@ -62,9 +54,14 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, keys}) => {
 						timeout={1000}
 						classNames="slideY"
 					>
-						<div className="animate-key">{keys[4]}</div>
+						<div className="animate-key">{keys[3]}}</div>
 					</CSSTransition>
 				</TransitionGroup>
+			</div>
+			<div className="cog-panel">
+				<button className='cog-button'>
+					<img className='cog-img' src='/clockwise-arrow.png' />  // TODO
+				</button>
 			</div>
 		</>
 	)
