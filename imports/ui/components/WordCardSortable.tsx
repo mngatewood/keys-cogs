@@ -8,7 +8,13 @@ export const WordCardSortable = (card: Card) => {
 	const [turn, setTurn] = useState(0);
 	const isPlaceholder = ["1", "2", "3", "4"].includes(card._id);
 
-	const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: card._id });
+	const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ 
+		id: card._id,
+		transition: { 
+			duration: 0,
+			easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
+		},
+	});
 
 	const style = {
 		transform: CSS.Transform.toString(transform),
