@@ -31,7 +31,10 @@ body {
 }
 
 .start-game-container {
+	display: flex;
 	margin-bottom: 1rem;
+	justify-content: space-around;
+	width: 100%;
 }
 
 .droppable-container {
