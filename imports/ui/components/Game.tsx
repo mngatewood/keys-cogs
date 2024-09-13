@@ -8,6 +8,7 @@ import { WordCardSortable } from './WordCardSortable';
 import { Droppable } from './Droppable';
 import { DndContext, rectIntersection, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, rectSwappingStrategy } from '@dnd-kit/sortable';
+import { demoCards, demoKeys } from '/imports/api/demoData';
 
 export type Card = {
 	_id: string;
@@ -35,6 +36,7 @@ export const Game = () => {
 		const loadData = () => {
 			const playCardsData = cardsData.filter((card) => card.position === 5);
 			const cogCardsData = cardsData.filter((card) => card.position !== 5);
+			console.log(playCardsData, cogCardsData);
 
 			const playCardElements = playCardsData.map((card) => {
 				return <WordCardDraggable key={card._id} {...card} />;
@@ -62,17 +64,29 @@ export const Game = () => {
 
 	const startGame = () => {
 		const allCardData = CardsCollection.find({}).fetch() as Card[];
-		const randomIndexes = shuffleArray(Array.from(Array(allCardData.length).keys())).slice(0, 5);
-		const startingCardData = randomIndexes.map((value) => {
-			let card = allCardData[value];
-			card.position = 5;
-			return card;
-		});
-		const placeholderCards = cogContainers.map((container) => {
-			return { _id: container.toString(), words: ["", "", "", ""], position: container }
-		})
-		setCardsData([...startingCardData, ...placeholderCards]);
-		setIsPlaying(true);
+		dealCards(allCardData);
+	}
+
+	const startDemo = () => {
+		const allCardData = demoCards as Card[];
+		setKeys(demoKeys);
+		dealCards(allCardData)
+	}
+
+	const dealCards = (allCardData?: Card[]) => {
+		if(allCardData) {
+			const randomIndexes = shuffleArray(Array.from(Array(allCardData.length).keys())).slice(0, 5);
+			const startingCardData = randomIndexes.map((value) => {
+				let card = allCardData[value];
+				card.position = 5;
+				return card;
+			});
+			const placeholderCards = cogContainers.map((container) => {
+				return { _id: container.toString(), words: ["", "", "", ""], position: container }
+			})
+			setCardsData([...startingCardData, ...placeholderCards]);
+			setIsPlaying(true);
+		}
 	}
 
 	const moveCard = (cardData: Card, origin: number, destination: number) => {
@@ -167,6 +181,7 @@ export const Game = () => {
 			{ !isPlaying &&	
 				<div className="start-game-container">
 					<button className='start-game-button' onClick={startGame}>Start Game</button>
+					<button className='start-game-button' onClick={startDemo}>Start Demo</button>
 				</div>
 			}
 			{ isPlaying &&
