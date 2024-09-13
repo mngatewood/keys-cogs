@@ -1,66 +1,108 @@
 import React, { useState } from 'react';
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 
+import { EditKey } from './EditKey';
+
 interface CogKeysProps {
 	updateKeys: Function
 	keys: Array<string>
 }
 
 export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, keys}) => {
+	const [isEditing, setIsEditing] = useState(0);
 
-	const handleKeyUpdate = () => {
-		updateKeys(keys);
+	const handleClickEdit = (keyId: number) => {
+		document.getElementById(`key-${keyId}`)?.classList.add("highlighted-key");
+		setIsEditing(keyId);
+	}
+
+	const handleFormUpdate = (operation: string, keyId: number, value: string) => {
+		if (operation === "save") {
+			const updatedKeys = keys.map((key, index) => index === (keyId - 1) ? value :key);
+			updateKeys(updatedKeys);
+		}
+		document.getElementById(`key-${keyId}`)?.classList.remove("highlighted-key");
+		setIsEditing(0);
+	}
+
+	const keyDisplayContent = (key: string) => {
+		if (key === "") {
+			return {content: "click to add a key", class: "animate-key key-placeholder"}
+		} else {
+			return {content: key, class: "animate-key"}
+		}
 	}
 
 	return (
 		<>
-			<div className="key cog-top">
+			{isEditing !== 0 && <EditKey updateForm={handleFormUpdate} keyId={isEditing} keyValue={keys[isEditing - 1]} />}
+			<div className="key cog-top" onClick={() => handleClickEdit(1)}>
 				<TransitionGroup>
 					<CSSTransition
 						key={keys[0]}
 						timeout={1000}
-						classNames="slideX"
+						classNames="slideY"
 					>
-						<div className="animate-key">{keys[0]}</div>
+						<div id="key-1" className={keyDisplayContent(keys[0]).class} >{keyDisplayContent(keys[0]).content}</div>
 					</CSSTransition>
 				</TransitionGroup>
 			</div>
-			<div className="key cog-right">
+			<div className="cog-top-edit cog-edit">
+				{/* <button className="cog-button" onClick={() => handleClickEdit(1)}>
+					<img className='cog-img' src='/edit-icon.png' />
+				</button> */}
+			</div>
+			<div className="key cog-right" onClick={() => handleClickEdit(2)}>
 				<TransitionGroup>
 					<CSSTransition
 						key={keys[1]}
 						timeout={1000}
-						classNames="slideY"
+						classNames="slideX"
 					>
-						<div className="animate-key">{keys[1]}</div>
+						<div id="key-2" className={keyDisplayContent(keys[1]).class} >{keyDisplayContent(keys[1]).content}</div>
 					</CSSTransition>
 				</TransitionGroup>
 			</div>
-			<div className="key cog-bottom">
+			<div className="cog-right-edit cog-edit">
+				{/* <button className="cog-button" onClick={() => handleClickEdit(2)}>
+					<img className='cog-img' src='/edit-icon.png' />
+				</button> */}
+			</div>
+			<div className="key cog-bottom" onClick={() => handleClickEdit(3)}>
 				<TransitionGroup>
 					<CSSTransition
 						key={keys[2]}
 						timeout={1000}
-						classNames="slideX"
+						classNames="slideY"
 					>
-						<div className="animate-key">{keys[2]}}</div>
+						<div id="key-3" className={keyDisplayContent(keys[2]).class} >{keyDisplayContent(keys[2]).content}</div>
 					</CSSTransition>
 				</TransitionGroup>
 			</div>
-			<div className="key cog-left">
+			<div className="cog-bottom-edit cog-edit">
+				{/* <button className="cog-button" onClick={() => handleClickEdit(3)}>
+					<img className='cog-img' src='/edit-icon.png' />
+				</button> */}
+			</div>
+			<div className="key cog-left" onClick={() => handleClickEdit(4)}>
 				<TransitionGroup>
 					<CSSTransition
 						key={keys[3]}
 						timeout={1000}
-						classNames="slideY"
+						classNames="slideX"
 					>
-						<div className="animate-key">{keys[3]}}</div>
+						<div id="key-4" className={keyDisplayContent(keys[3]).class} >{keyDisplayContent(keys[3]).content}</div>
 					</CSSTransition>
 				</TransitionGroup>
 			</div>
+			<div className="cog-left-edit cog-edit">
+				{/* <button className="cog-button" onClick={() => handleClickEdit(4)}>
+					<img className='cog-img' src='/edit-icon.png' />
+				</button> */}
+			</div>
 			<div className="cog-panel">
 				<button className='cog-button'>
-					<img className='cog-img' src='/clockwise-arrow.png' />  // TODO
+					{/* <img className='cog-img' src='/clockwise-arrow.png' /> */}
 				</button>
 			</div>
 		</>

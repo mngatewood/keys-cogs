@@ -21,7 +21,7 @@ export const Game = () => {
 	const [cardsData, setCardsData] = useState<Card[]>([]);
 	const [playCards, setPlayCards] = useState<React.JSX.Element[]>([]);
 	const [cogCards, setCogCards] = useState<React.JSX.Element[]>([]);
-	const [keys, setKeys] = useState<string[]>(["test", "clue", "word", "done"]);
+	const [keys, setKeys] = useState<string[]>(["", "", "", ""]);
 	const cogContainers = [1, 2, 3, 4];
 	const pointerSensor = useSensor(PointerSensor, {
 		activationConstraint: { distance: 5 }
@@ -73,10 +73,6 @@ export const Game = () => {
 		})
 		setCardsData([...startingCardData, ...placeholderCards]);
 		setIsPlaying(true);
-	}
-
-	const handleKeyUpdate = (data: string[]) => {
-		setKeys(data);
 	}
 
 	const moveCard = (cardData: Card, origin: number, destination: number) => {
@@ -147,6 +143,10 @@ export const Game = () => {
 		setCogCards(sortByPosition(updatedCogCards));
 	}
 
+	const handleKeyUpdate = (data: string[]) => {
+		setKeys(data);
+	}
+
 	const handleDragStart = (event: any) => {
 		const { id } = event.active;
 		document.getElementById(id)?.classList.add("z-top");
@@ -164,26 +164,30 @@ export const Game = () => {
 
 	return (
 		<DndContext sensors={sensors} collisionDetection={rectIntersection} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-			{ !isPlaying &&			
-				<div className="startGameContainer">
-					<button className='startGameButton' onClick={startGame}>Start Game</button>
+			{ !isPlaying &&	
+				<div className="start-game-container">
+					<button className='start-game-button' onClick={startGame}>Start Game</button>
 				</div>
 			}
-			<div className="cog-container">
-				<CogKeys updateKeys={handleKeyUpdate} keys={keys}/>
-				<SortableContext items={cogCards.map((card) => card.key || "")} strategy={rectSwappingStrategy} >
-					<div className="droppable-container">
-						{ cogCards.map((card) => (
-							<Droppable key={card.key ?? ""} id={card.key ?? ""}>
-								{ card }
-							</Droppable>
-						))}
-					</div>
-				</SortableContext>
-			</div>
-			<div className="draw-container">
-				{ playCards }
-			</div>
+			{ isPlaying &&
+				<div className="cog-container">
+					<CogKeys updateKeys={handleKeyUpdate} keys={keys}/>
+					<SortableContext items={cogCards.map((card) => card.key || "")} strategy={rectSwappingStrategy} >
+						<div className="droppable-container">
+							{ cogCards.map((card) => (
+								<Droppable key={card.key ?? ""} id={card.key ?? ""}>
+									{ card }
+								</Droppable>
+							))}
+						</div>
+					</SortableContext>
+				</div>
+				}
+			{ isPlaying &&
+				<div className="draw-container">
+					{ playCards }
+				</div>
+			}
 		</DndContext>
 	)
 }
