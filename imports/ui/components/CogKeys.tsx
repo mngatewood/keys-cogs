@@ -5,10 +5,11 @@ import { EditKey } from './EditKey';
 
 interface CogKeysProps {
 	updateKeys: Function
+	resetCards: Function
 	keys: Array<string>
 }
 
-export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, keys}) => {
+export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, keys}) => {
 	const [isEditing, setIsEditing] = useState(0);
 
 	const handleClickEdit = (keyId: number) => {
@@ -47,11 +48,6 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, keys}) => {
 					</CSSTransition>
 				</TransitionGroup>
 			</div>
-			<div className="cog-top-edit cog-edit">
-				{/* <button className="cog-button" onClick={() => handleClickEdit(1)}>
-					<img className='cog-img' src='/edit-icon.png' />
-				</button> */}
-			</div>
 			<div className="key cog-right" onClick={() => handleClickEdit(2)}>
 				<TransitionGroup>
 					<CSSTransition
@@ -62,11 +58,6 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, keys}) => {
 						<div id="key-2" className={keyDisplayContent(keys[1]).class} >{keyDisplayContent(keys[1]).content}</div>
 					</CSSTransition>
 				</TransitionGroup>
-			</div>
-			<div className="cog-right-edit cog-edit">
-				{/* <button className="cog-button" onClick={() => handleClickEdit(2)}>
-					<img className='cog-img' src='/edit-icon.png' />
-				</button> */}
 			</div>
 			<div className="key cog-bottom" onClick={() => handleClickEdit(3)}>
 				<TransitionGroup>
@@ -79,11 +70,6 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, keys}) => {
 					</CSSTransition>
 				</TransitionGroup>
 			</div>
-			<div className="cog-bottom-edit cog-edit">
-				{/* <button className="cog-button" onClick={() => handleClickEdit(3)}>
-					<img className='cog-img' src='/edit-icon.png' />
-				</button> */}
-			</div>
 			<div className="key cog-left" onClick={() => handleClickEdit(4)}>
 				<TransitionGroup>
 					<CSSTransition
@@ -95,14 +81,9 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, keys}) => {
 					</CSSTransition>
 				</TransitionGroup>
 			</div>
-			<div className="cog-left-edit cog-edit">
-				{/* <button className="cog-button" onClick={() => handleClickEdit(4)}>
-					<img className='cog-img' src='/edit-icon.png' />
-				</button> */}
-			</div>
 			<div className="cog-panel">
 				<button className='cog-button'>
-					{/* <img className='cog-img' src='/clockwise-arrow.png' /> */}
+					<img className='cog-img' src='/reset-icon.png' onClick={resetCards}/>
 				</button>
 			</div>
 		</>

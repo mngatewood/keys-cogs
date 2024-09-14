@@ -3,7 +3,12 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { Card } from './Game';
 
-export const WordCardSortable = (card: Card) => {
+interface WordCardSortableProps {
+	card: Card
+	removeCard: Function
+}
+
+export const WordCardSortable: React.FC<WordCardSortableProps> = ({card, removeCard}) => {
 	const keywords = card.words;
 	const [turn, setTurn] = useState(0);
 	const isPlaceholder = ["1", "2", "3", "4"].includes(card._id);
@@ -46,12 +51,17 @@ export const WordCardSortable = (card: Card) => {
 					<div className='card-word card-bottom'>{keywords[2]}</div>
 				</div>
 				<div className="card-panel nodrag">
-					<button onClick={(event) => rotateCard(event, "clockwise")} className='card-button rotate-button'>
-						<img className='card-img' src='/clockwise-arrow.png' />
-					</button>
-					<button onClick={(event) => rotateCard(event, "counterclockwise")} className='card-button rotate-button'>
-						<img className='card-img' src='/counter-clockwise-arrow.png' />
-					</button>
+					<div className='card-panel-buttons-container'>
+						<button onClick={(event) => rotateCard(event, "counterclockwise")} className='card-button rotate-button'>
+							<img className='card-img' src='/counter-clockwise-arrow.png' />
+						</button>
+						<button onClick={(event) => rotateCard(event, "clockwise")} className='card-button rotate-button'>
+							<img className='card-img' src='/clockwise-arrow.png' />
+						</button>
+					</div>
+					<div className='card-panel-buttons-container'>
+						<button className='card-button remove-button' onClick={() => removeCard(card._id)}><img className='card-img' src='/minus-icon.png' /></button>
+					</div>
 				</div>
 			</div>
 		)
