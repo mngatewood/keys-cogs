@@ -38,7 +38,7 @@ export const Game = () => {
 			const cogCardsData = cardsData.filter((card) => card.position !== 5);
 
 			const playCardElements = playCardsData.map((card) => {
-				return <WordCardDraggable key={card._id} {...card} />;
+				return <WordCardDraggable key={card._id} card={card} addCard={handleAddCard} />;
 			});
 			setPlayCards(sortByPosition(playCardElements));
 
@@ -168,7 +168,7 @@ export const Game = () => {
 
 		const updatedPlayCardData = cardsData.filter((cardData) => cardData.position === 5);;
 		const updatedCogCardData = cardsData.filter((cardData) => cogContainers.includes(cardData.position));
-		let updatedPlayCards = updatedPlayCardData.map((cardData) => <WordCardDraggable key={cardData._id} {...cardData} />);
+		let updatedPlayCards = updatedPlayCardData.map((cardData) => <WordCardDraggable key={cardData._id} card={cardData} addCard={handleAddCard} />;
 		const updatedCogCards = updatedCogCardData.map((cardData) => <WordCardSortable key={cardData._id} card={cardData} removeCard={handleRemoveCard}/>);
 
 		// strip out any placeholder cards
@@ -220,7 +220,7 @@ export const Game = () => {
 			}
 
 		const updatedCogCards = updatedCogCardsData.map((cardData) => <WordCardSortable key={cardData._id} card={cardData} removeCard={handleRemoveCard} />);
-		const updatedPlayCards = updatedPlayCardsData.map((cardData) => <WordCardDraggable key={cardData._id} {...cardData} />); 
+		const updatedPlayCards = updatedPlayCardsData.map((cardData) => <WordCardDraggable key={cardData._id} card={cardData} addCard={handleAddCard} />); 
 
 		setPlayCards(sortByPosition(updatedPlayCards));
 		setCogCards(sortByPosition(updatedCogCards));
@@ -262,6 +262,17 @@ export const Game = () => {
 		if (updatedCard) {
 			moveCard(updatedCard, updatedCard.position, 5);
 		}
+	}
+
+	const handleAddCard = (cardId: string) => {
+		let destination = 4;
+		const cardData = cardsData.find((card) => card._id === cardId) as Card;
+		const cogCardData = cardsData.filter((card) => cogContainers.includes(card.position));
+		const cogPlaceholders = cogCardData.filter((card) => cogContainers.includes(parseInt(card._id)));
+		if (cogPlaceholders.length) {
+			destination = cardsData.find((card) => card._id === cogPlaceholders[0]._id)?.position || 4;
+		}
+		moveCard(cardData, cardData.position, destination);
 	}
 
 	return (

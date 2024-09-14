@@ -3,8 +3,13 @@ import { useDraggable } from '@dnd-kit/core';
 import {CSS} from '@dnd-kit/utilities';
 import type { Card } from './Game';
 
-export const WordCardDraggable = (card: Card) => {
-	const keywords = card.words;
+interface WordCardDraggableProps {
+	card: Card
+	addCard: Function
+}
+
+export const WordCardDraggable: React.FC<WordCardDraggableProps> = ({card, addCard}) => {
+	const keywords = (card as any).words;
 
 	const { attributes, listeners, setNodeRef, transform } = useDraggable({
 		id: card._id,
@@ -24,7 +29,11 @@ export const WordCardDraggable = (card: Card) => {
 				<div className='card-word card-bottom'>{keywords[2]}</div>
 			</div>
 			<div className="card-panel">
-				
+				<div className='card-panel-buttons-container'>
+					<button className='card-button remove-button' onClick={() => addCard(card._id)}>
+						<img className='card-img' src='/add-icon.png' />
+					</button>
+				</div>
 			</div>
 		</div>
 }
