@@ -32,9 +32,9 @@ body {
 
 .start-game-container {
 	display: flex;
-	margin-bottom: 1rem;
 	justify-content: space-around;
 	width: 100%;
+	margin-bottom: 1rem;
 }
 
 .droppable-container {
@@ -52,7 +52,7 @@ body {
 	height: 100%;
 	background-color: white;
 	border: 2px solid brown;
-	border-radius: 10%;
+	border-radius: 12%;
 	overflow: hidden;
 	z-index: 10;
 }
@@ -101,12 +101,6 @@ body {
 	rotate: 180deg;
 }
 
-.cog-edit {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
-
 .cog-top-edit {
 	grid-row-start: 1;
 	grid-row-end: 1;
@@ -152,10 +146,17 @@ body {
 	z-index: 11;
 }
 
+.card-panel-buttons-container {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-evenly;
+	width: 100%;
+}
+
 .cog-button {
-	width: 5vmin;
-	height: 5vmin;
-	margin: 2vmin;
+	width: 10vmin;
+	height: 10vmin;
+	margin: 0;
 	padding: 0;
 	background-color: transparent;
 	border: none;
@@ -163,8 +164,8 @@ body {
 }
 
 .cog-img {
-	width: 5vmin;
-	height: 5vmin;
+	width: 10vmin;
+	height: 10vmin;
 	background-color: transparent;
 }
 
