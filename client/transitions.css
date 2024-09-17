@@ -1,0 +1,39 @@
+/* Y slide enter */
+.slideY-enter {
+	opacity: 0;
+	transform: translateY(50px);
+	/* z-index: 1; */
+}
+
+.slideY-enter.slideY-enter-active {
+	opacity: 1;
+	transform: translateY(0);
+	transition: opacity 250ms linear 250ms, transform 250ms ease-in-out 250ms;
+}
+
+/* Y slide exit */
+.slideY-exit, slideY-exit-active {
+	opacity: 0;
+}
+
+/* X slide enter */
+.slideX-enter {
+	opacity: 0;
+	transform: translateX(-50px);
+	/* z-index: 1; */
+}
+
+.slideX-enter.slideX-enter-active {
+	opacity: 1;
+	transform: translateX(0);
+	transition: opacity 250ms linear 250ms, transform 250ms ease-in-out 250ms;
+}
+
+/* X slide exit */
+.slideX-exit, .slideX-exit.slideX-exit-active {
+	opacity: 0;
+}
+
+.card-container {
+	background-color: transparent;
+}
