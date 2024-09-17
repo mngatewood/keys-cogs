@@ -1,5 +1,6 @@
 @import "transitions.css";
 @import "game.css";
+@import "login.css";
 
 @tailwind base;
 @tailwind components;
