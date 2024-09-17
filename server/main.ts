@@ -4,7 +4,8 @@ import { WordsCollection } from '/imports/api/words/WordsCollection';
 import { CardsCollection } from '/imports/api/cards/CardsCollection';
 import { words, cards } from '/server/seedData';
 
-const SEED_USERNAME = 'admin';
+const SEED_USERNAME = 'admin@gmail.com';
+const SEED_USEREMAIL = 'admin@gmail.com';
 const SEED_PASSWORD = 'password';
 
 const insertWord = (word: string) => WordsCollection.insertAsync({ text: word });
@@ -17,6 +18,7 @@ Meteor.startup(async() => {
 		Accounts.createUser({
 			username: SEED_USERNAME,
 			password: SEED_PASSWORD,
+			email: SEED_USEREMAIL
 		});
 
 	if (await WordsCollection.find().countAsync() === 0) {
