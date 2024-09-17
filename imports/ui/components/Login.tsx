@@ -60,14 +60,12 @@ export const Login = () => {
 				<form action="#">
 					<div className="mb-4">
 						<label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-						<input onChange={handleChangeEmail} type="email" id="email" className="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="your@email.com" required>
-						</input>
+						<input onChange={handleChangeEmail} type="email" id="email" className="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="your@email.com" required />
 						<p className="error pl-2 text-sm text-red-500">{emailError}</p>
 					</div>
 					<div className="mb-4">
 						<label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-						<input onChange={handleChangePassword} type="password" id="password" className="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Enter your password" required>
-						</input>
+						<input onChange={handleChangePassword} type="password" id="password" className="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Enter your password" required />
 						<p className="error pl-2 text-sm text-red-500">{passwordError}</p>
 					</div>
 					<div className="flex items-center justify-between mb-4">
