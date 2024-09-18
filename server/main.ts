@@ -1,7 +1,8 @@
 import { Meteor } from 'meteor/meteor';
 import { Accounts } from 'meteor/accounts-base';
-import { WordsCollection } from '/imports/api/words/WordsCollection';
-import { CardsCollection } from '/imports/api/cards/CardsCollection';
+import { WordsCollection, WordsCollectionSchema } from '/imports/api/words/WordsCollection';
+import { CardsCollection, CardsCollectionSchema } from '/imports/api/cards/CardsCollection';
+import { AccountsSchema } from '/imports/api/accounts/AccountsSchema';
 import { words, cards } from '/server/seedData';
 
 // Meteor methods
@@ -18,21 +19,42 @@ Meteor.startup(async() => {
 	console.log("startup")
 
 	if (!(await Accounts.findUserByUsername(SEED_USERNAME))) {
-		Accounts.createUser({
+		const defaultUser = {
 			username: SEED_USERNAME,
 			password: SEED_PASSWORD,
 			email: SEED_USEREMAIL
-		});
+		}
+		AccountsSchema.validate(defaultUser);
+		if (AccountsSchema.isValid()) {
+			console.log("inserting default user")
+			Accounts.createUser(defaultUser);
+		} else {
+			console.log("invalid default user", defaultUser)
+		}
 	}
 
 	if (await WordsCollection.find().countAsync() === 0) {
 		console.log("inserting words")
-		words.forEach(insertWord)
+		words.forEach((word) => {
+			WordsCollectionSchema.validate({text: word});
+			if (WordsCollectionSchema.isValid()) {
+				insertWord(word);
+			} else {
+				console.log("invalid word", word)
+			}
+		})
 	}
 
 	if (await CardsCollection.find().countAsync() === 0) {
 		console.log("inserting cards");
-		cards.forEach(insertCard);
+		cards.forEach((card) => {
+			CardsCollectionSchema.validate({words: card});
+			if (CardsCollectionSchema.isValid()) {
+				insertCard(card);
+			} else {
+				console.log("invalid card", card)
+			}
+		});
 	}
 	
 });
