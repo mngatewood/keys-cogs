@@ -6,3 +6,9 @@ import '../../api/cards/CardsMethods';
 
 // Cards Collection Publications
 import '../../api/cards/server/CardsPublication';
+
+// Games Collection Methods
+import '../../api/games/GamesMethods';
+
+// Games Collection Publications
+import '../../api/games/server/GamesPublication';
