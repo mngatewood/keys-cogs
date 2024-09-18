@@ -276,17 +276,12 @@ export const Game = () => {
 		moveCard(cardData, cardData.position, destination);
 	}
 
-	const logout =() => {
-		Meteor.logout();
-	}
-
 	return (
 		<DndContext sensors={sensors} collisionDetection={rectIntersection} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
 			{ !isPlaying &&	
 				<div className="start-game-container">
 					<button className='start-game-button' onClick={startGame}>Start Game</button>
 					<button className='start-game-button' onClick={startDemo}>Start Demo</button>
-					<button className='start-game-button' onClick={logout}>Logout</button>
 				</div>
 			}
 			{ isPlaying &&

@@ -22,3 +22,15 @@ body {
 	padding: 1rem;
 	background-color: white;
 }
+
+.navbar > ul {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-evenly;
+	align-items: center;
+	width: 100%;
+	max-width: 768px;
+	margin: auto;
+	padding: 1rem;
+	background-color: white;
+}

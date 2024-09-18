@@ -66,7 +66,7 @@ export const Login = () => {
 								Forgot Password?
 							</a>
 						</div>
-						<a href="#" className="text-xs text-indigo-500 hover:text-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+						<a href="/register" className="text-xs text-indigo-500 hover:text-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
 							Create Account
 						</a>
 					</div>
