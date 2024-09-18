@@ -17,7 +17,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.26.2",
-    "react-transition-group": "^4.4.5"
+    "react-transition-group": "^4.4.5",
+    "simpl-schema": "^3.4.6"
   },
   "devDependencies": {
     "@types/meteor": "^2.9.8",
