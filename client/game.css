@@ -167,7 +167,7 @@
 	/* flex-direction: column; */
 	position:relative;
 	aspect-ratio: 1 / 1;
-	cursor: grab;
+	cursor: grab !important;
 	touch-action: none;
 }
 
