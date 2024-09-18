@@ -4,6 +4,9 @@ import { WordsCollection } from '/imports/api/words/WordsCollection';
 import { CardsCollection } from '/imports/api/cards/CardsCollection';
 import { words, cards } from '/server/seedData';
 
+// Meteor methods
+import "../imports/startup/server/index";
+
 const SEED_USERNAME = 'admin@gmail.com';
 const SEED_USEREMAIL = 'admin@gmail.com';
 const SEED_PASSWORD = 'password';
@@ -20,6 +23,7 @@ Meteor.startup(async() => {
 			password: SEED_PASSWORD,
 			email: SEED_USEREMAIL
 		});
+	}
 
 	if (await WordsCollection.find().countAsync() === 0) {
 		console.log("inserting words")
@@ -29,21 +33,6 @@ Meteor.startup(async() => {
 	if (await CardsCollection.find().countAsync() === 0) {
 		console.log("inserting cards");
 		cards.forEach(insertCard);
-		// await Promise.all(cards.map(async (card) => {
-		// 	const wordIdArray = await Promise.all(card.map(async (word) => {
-		// 		const record = await WordsCollection.findOneAsync({ text: word });
-		// 		if (record) {
-		// 			return record._id;
-		// 		}
-		// 	}));
-		// 	insertCard(wordIdArray);
-		// }));
 	}
-	// Meteor.publish("words", function () {
-	// 	console.log("publishing words");
-	// 	console.log(WordsCollection.find().count())
-	// 	return WordsCollection.find();
-	// });
-
 	
 });

@@ -2,18 +2,20 @@ import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { CardsCollection } from './CardsCollection';
 
+
 Meteor.methods({
-	'cards.getRandom'(quantity: number) {
-			
+	async 'cards.getRandom'(quantity: number) {
 		check(quantity, Number);
 
-		const ids = CardsCollection.find({}).map((card) => card._id);
+		if (!Meteor.userId()) {
+			throw new Meteor.Error('not-authorized');
+		}
+
+		const cards = await CardsCollection.find({}).fetchAsync();
+		const ids = cards.map((card) => card._id);
 		const shuffled = ids.sort(() => 0.5 - Math.random());
 		const selected = shuffled.slice(0, quantity);
-		console.log(selected)
 		return selected
-
-
 	}	
 
 });
