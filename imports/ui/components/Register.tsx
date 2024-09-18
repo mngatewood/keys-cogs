@@ -91,7 +91,8 @@ export const Register = () => {
 			const userId = await Meteor.callAsync("accounts.insert", firstName, lastName, email, password);
 			console.log("userId", userId);
 		} catch (error) {
-			console.log("error", error);
+			const typedError = error as Meteor.Error;
+			setRegisterError(typedError.reason as string);
 		}
 	};
 
@@ -139,7 +140,10 @@ export const Register = () => {
 				</form>
 				<div className="mt-4 text-center">
 					<span className="text-sm mx-2 text-gray-500">Already have an account? </span>
-					<a href="#" className="text-blue-500 hover:text-blue-600">Sign Up</a>
+					<a href="/login" className="text-blue-500 hover:text-blue-600">Log In</a>
+				</div>
+				<div className="error mt-4 text-red-500 text-sm text-center whitespace-pre-line">
+					{registerError}
 				</div>
 			</div >
 		</div >
