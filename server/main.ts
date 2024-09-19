@@ -20,6 +20,8 @@ Meteor.startup(async() => {
 
 	if (!(await Accounts.findUserByUsername(SEED_USERNAME))) {
 		const defaultUser = {
+			firstName: "Admin",
+			lastName: "User",
 			username: SEED_USERNAME,
 			password: SEED_PASSWORD,
 			email: SEED_USEREMAIL
@@ -27,7 +29,17 @@ Meteor.startup(async() => {
 		AccountsSchema.validate(defaultUser);
 		if (AccountsSchema.isValid()) {
 			console.log("inserting default user")
-			Accounts.createUser(defaultUser);
+			Meteor.callAsync("accounts.insert", 
+				defaultUser.firstName, 
+				defaultUser.lastName, 
+				defaultUser.username,
+				defaultUser.email, 
+				defaultUser.password
+			).then((result) => {
+				console.log("result", result)
+			}).catch((error) => {
+				console.log("error", error)
+			});
 		} else {
 			console.log("invalid default user", defaultUser)
 		}

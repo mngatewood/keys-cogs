@@ -26,6 +26,8 @@ export const Register = () => {
 		if (isValid) {
 			setFirstNameError("");
 			setFirstName(e.target.value);
+		} else if (e.target.value === "") {
+			setFirstNameError("");
 		} else {
 			setFirstNameError("Only letters and hyphens are allowed.");
 		}
@@ -38,6 +40,8 @@ export const Register = () => {
 		if (isValid) {
 			setLastNameError("");
 			setLastName(e.target.value);
+		} else if (e.target.value === "") {
+			setLastNameError("");
 		} else {
 			setLastNameError("Only letters and hyphens are allowed.");
 		}
@@ -90,10 +94,11 @@ export const Register = () => {
 
 	const handleSubmit = async (e: React.SyntheticEvent) => {
 		e.preventDefault();
-		// console.log("submit", firstName, lastName, email, password);
+		console.log("submit", firstName, lastName, email /* username */, email, password);
 		try {
-			const userId = await Meteor.callAsync("accounts.insert", firstName, lastName, email, password);
-			console.log("userId", userId);
+			Meteor.callAsync("accounts.insert", firstName, lastName, email /* username */, email, password);
+			setRegisterError("");
+			navigate("/login");
 		} catch (error) {
 			const typedError = error as Meteor.Error;
 			setRegisterError(typedError.reason as string);
