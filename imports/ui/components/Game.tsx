@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { CogKeys } from './CogKeys';
 import { CardsCollection } from '/imports/api/cards/CardsCollection';
+// import { GamesCollection } from '/imports/api/games/GamesCollection';
 import { shuffleArray } from '/imports/helpers/shuffle';
+import { useSubscribe } from 'meteor/react-meteor-data';
 
 import { WordCardDraggable } from './WordCardDraggable';
 import { WordCardSortable } from './WordCardSortable';
 import { Droppable } from './Droppable';
+import { Lobby } from './Lobby';
 import { DndContext, rectIntersection, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, rectSwappingStrategy } from '@dnd-kit/sortable';
 import { demoCards, demoKeys } from '/imports/api/demoData';
@@ -17,8 +20,19 @@ export type Card = {
 	position: number;
 }
 
-export const Game = () => {
+export type Game = {
+	_id: string;
+	round: number;
+	players: Array<any>;
+	cards: Array<string>;
+	completed: boolean;
+	started: boolean;
+};
 
+export const Game = ({gameId}: {gameId: string}) => {
+	const [game, setGame] = useState<any>(undefined);
+	const [gameStarted, setGameStarted] = useState(false);
+	const [gameCompleted, setGameCompleted] = useState(false);
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [cardsData, setCardsData] = useState<Card[]>([]);
 	const [playCards, setPlayCards] = useState<React.JSX.Element[]>([]);
@@ -32,9 +46,15 @@ export const Game = () => {
 		coordinateGetter: sortableKeyboardCoordinates,
 	});
 	const sensors = useSensors( pointerSensor, keyboardSensor);
+	const isLoading = useSubscribe("games");
+	console.log("isLoading", isLoading());
 
 	useEffect(() => {
 		const loadData = () => {
+			if (gameId) {
+				Meteor.callAsync("games.get", gameId).then((result) => { setGame(result) });
+			}
+
 			const playCardsData = cardsData.filter((card) => card.position === 5);
 			const cogCardsData = cardsData.filter((card) => card.position !== 5);
 
@@ -51,7 +71,7 @@ export const Game = () => {
 			validateCardsState();
 		};
 		loadData();
-	}, [cardsData]);
+	}, [cardsData, gameId]);
 
 	const sortByPosition = (array: React.JSX.Element[]) => {
 		return array.sort((a: any, b: any) => {
@@ -277,32 +297,39 @@ export const Game = () => {
 	}
 
 	return (
-		<DndContext sensors={sensors} collisionDetection={rectIntersection} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-			{ !isPlaying &&	
-				<div className="start-game-container">
-					<button className='start-game-button' onClick={startGame}>Start Game</button>
-					<button className='start-game-button' onClick={startDemo}>Start Demo</button>
-				</div>
+		<>
+			{ gameStarted && !gameCompleted
+				?
+					<DndContext sensors={sensors} collisionDetection={rectIntersection} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+						{ !isPlaying &&	
+							<div className="start-game-container">
+								<button className='start-game-button' onClick={startGame}>Start Game</button>
+								<button className='start-game-button' onClick={startDemo}>Start Demo</button>
+							</div>
+						}
+						{ isPlaying &&
+							<div className="cog-container">
+								<CogKeys updateKeys={handleKeyUpdate} resetCards={handleResetCards}keys={keys}/>
+								<SortableContext items={cogCards.map((card) => card.key || "")} strategy={rectSwappingStrategy} >
+									<div className="droppable-container">
+										{ cogCards.map((card) => (
+											<Droppable key={card.key ?? ""} id={card.key ?? ""}>
+												{ card }
+											</Droppable>
+										))}
+									</div>
+								</SortableContext>
+							</div>
+							}
+						{ isPlaying &&
+							<div className="draw-container">
+								{ playCards }
+							</div>
+						}
+					</DndContext>
+				:
+					<Lobby game={game}/>
 			}
-			{ isPlaying &&
-				<div className="cog-container">
-					<CogKeys updateKeys={handleKeyUpdate} resetCards={handleResetCards}keys={keys}/>
-					<SortableContext items={cogCards.map((card) => card.key || "")} strategy={rectSwappingStrategy} >
-						<div className="droppable-container">
-							{ cogCards.map((card) => (
-								<Droppable key={card.key ?? ""} id={card.key ?? ""}>
-									{ card }
-								</Droppable>
-							))}
-						</div>
-					</SortableContext>
-				</div>
-				}
-			{ isPlaying &&
-				<div className="draw-container">
-					{ playCards }
-				</div>
-			}
-		</DndContext>
+		</>
 	)
 }
