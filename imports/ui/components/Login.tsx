@@ -58,7 +58,7 @@ export const Login = () => {
 		<>
 			{!Meteor.user() &&
 				<div className="min-h-screen flex items-center justify-center w-full">
-					<div className="bg-white shadow-md border border-gray-300 rounded-lg px-8 py-6 w-5/6 max-w-md">
+					<div className="bg-white shadow-lg border border-gray-300 rounded-lg px-8 py-6 w-5/6 max-w-md">
 						<h1 className="text-2xl font-bold text-center mb-4">Login</h1>
 						<form action="#">
 							<div className="mb-4">
