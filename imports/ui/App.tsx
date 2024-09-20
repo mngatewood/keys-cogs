@@ -12,16 +12,10 @@ import { PrivateRoutes } from './components/PrivateRoutes';
 export const App = () => {
 	const [gameId, setGameId] = useState<string | undefined>(undefined);
 	const isLoading = useSubscribe("cards");
-	console.log("isLoading", isLoading());
+	// TODO render loading component
 	
-	const cards = useTracker(() => CardsCollection.find().fetch());
-	console.log("cards", cards.length);
+	// const cards = useTracker(() => CardsCollection.find().fetch());
 	const user = useTracker(() => Meteor.user());
-	// console.log("user", user);
-
-	// Meteor.callAsync("cards.getRandom", 5).then((result) => {
-	// 	console.log(result);
-	// });
 
 	const handleGameUpdate = (data: string) => {
 		setGameId(data);
