@@ -1,3 +1,6 @@
+// Accounts Publications
+import '../../api/accounts/server/AccountsPublication';
+
 // Accounts Collection Methods
 import '../../api/accounts/AccountsMethods';
 
