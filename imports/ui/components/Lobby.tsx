@@ -1,25 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { useSubscribe } from 'meteor/react-meteor-data';
-import { useNavigate } from 'react-router-dom';
 import { type Game } from './Game';
 
-export const Lobby= ({game}: {game: Game}) => {
+interface LobbyProps {
+	game: Game,
+	endGame: Function,
+	startGame: Function,
+	removePlayer: Function,
+	leaveGame: Function,
+}
+
+// Add first and last name to Meteor User collection per Accounts schema
+interface ExtendedUser extends Meteor.User {
+	firstName: string,
+	lastName: string,
+}
+
+export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlayer, leaveGame}) => {
 	const [players, setPlayers] = useState<any[]>([]);
-	const navigate = useNavigate();
 	const isLoading = useSubscribe("users.user");
+	// TODO render loading component
 
 	useEffect(() => {
-		if (game) {
+		console.log("useEffect Lobby");
+		// TODO redirect if no game or game completed
+
+		const loadLobbyPlayers = () => {
 			const updatedPlayers = game.players.map((player) => {
-				const playerDoc = Meteor.users.findOne(player._id);
-				console.log("playerDoc", playerDoc);
+				const playerDoc = Meteor.users.findOne(player._id) as ExtendedUser | undefined;
+
 				const fullName = () => {
 					const firstName = playerDoc?.firstName || "";
 					const lastName = playerDoc?.lastName || "";
 					const lastInitial = lastName ? lastName.charAt(0) : "";
 					return firstName + (lastInitial ? " " + lastInitial : "");
 				}
+
 				const status = () => {
 					// TODO: get player online status and connected to current game
 					return "Ready"
@@ -31,17 +48,36 @@ export const Lobby= ({game}: {game: Game}) => {
 					email: playerDoc?.emails?.[0]?.address,
 					status: status(),
 				}
-				console.log("updatedPlayer", updatedPlayer);
+
 				return updatedPlayer;
 			})
 			setPlayers(updatedPlayers || []);
-		// } else {
-		// 	navigate("/");
+		};
+
+		if (game) {
+			loadLobbyPlayers();
 		}
 	}, [game]);
 
+	const handleClickPlayer = (e) => {
+		const playerId = e.target.closest(".player-card").id;
+		const userIsHost = game.hostId === Meteor.userId();
+		const playerIsHost = playerId === game.hostId;
+
+		if (userIsHost && playerIsHost) {
+			// TODO end game and remove all players
+			endGame(game._id);
+		} else if (userIsHost && !playerIsHost) {
+			// TODO remove player and update game
+			removePlayer(playerId);
+		} else if (playerId === Meteor.userId()) {
+			// TODO leave game
+			leaveGame(game._id);
+		}
+	}
+
 	const handleStartGame = () => {
-		console.log("start game")
+		startGame(game._id);
 	}
 
 	return (
@@ -50,25 +86,33 @@ export const Lobby= ({game}: {game: Game}) => {
 				<h1 className="text-2xl font-bold text-center mb-4">Lobby</h1>
 				<ul className="overflow-scroll">
 					{players.map((player) => (
-						<li key={player._id} className="border border-gray-300 shadow-md">
+						<li key={player._id} id={player._id} className="player-card border border-gray-300 shadow-md">
 							<div className="px-4 py-5 sm:px-6">
-								<div className="flex items-center justify-between">
+								<div className="flex items-center justify-between h-6">
 									<h3 className="text-lg leading-6 font-medium text-gray-900">{player.fullName}</h3>
-									<p className="text-sm font-medium text-gray-500">Status: <span className="text-green-600">{player.status}</span></p>
+									<button onClick={handleClickPlayer} className="font-medium text-indigo-600 hover:text-indigo-500">
+										{game.hostId === Meteor.userId() && (
+											player._id === game.hostId ? "End Game" : "Remove"
+										)}
+										{game.hostId !== Meteor.userId() && player._id === Meteor.userId() && "Leave"}
+									</button>
 								</div>
-								<div className="mt-4 flex items-center justify-between">
-									<p className="mt-1 max-w-2xl text-sm text-gray-500">{player.email}</p>
-									{player.status === "Ready"
-										? <button className="font-medium text-indigo-600 hover:text-indigo-500">Leave</button>
-										: <button className="font-medium text-indigo-600 hover:text-indigo-500">Remove</button>
-									}
+								<div className="mt-4 flex items-center justify-between h-6">
+									<p className="mt-1 max-w-2xl text-sm text-gray-500">
+										{player._id === Meteor.userId() && "You"}
+										{player._id !== Meteor.userId() && player._id === game.hostId && "Host"}
+										{player._id !== Meteor.userId() && player._id !== game.hostId && "Player"}
+									</p>
+									<p className="text-sm font-medium text-gray-500">Status: <span className="text-green-600">{player.status}</span></p>
 								</div>
 							</div>
 						</li>
 					))}
 				</ul>
 				<div className="flex flex-col items-center justify-center">
-					<button onClick={handleStartGame} type="submit" disabled={players.length < 2} className="w-full flex justify-center mt-4 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 disabled:bg-gray-200 disabled:text-gray-400 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+					{/* next line to enable start game button */}
+					<button onClick={handleStartGame} type="submit" className="w-full flex justify-center mt-4 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 disabled:bg-gray-200 disabled:text-gray-400 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+					{/* <button onClick={handleStartGame} type="submit" disabled={players.length < 2} className="w-full flex justify-center mt-4 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 disabled:bg-gray-200 disabled:text-gray-400 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"> */}
 						"Start Game"
 					</button>
 					<div className="error mt-4 text-red-500 text-sm text-center whitespace-pre-line">
