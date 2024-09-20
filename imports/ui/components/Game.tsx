@@ -1,40 +1,76 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Meteor } from 'meteor/meteor';
-import { CogKeys } from './CogKeys';
-import { CardsCollection } from '/imports/api/cards/CardsCollection';
-import { shuffleArray } from '/imports/helpers/shuffle';
-
-import { WordCardDraggable } from './WordCardDraggable';
-import { WordCardSortable } from './WordCardSortable';
-import { Droppable } from './Droppable';
+import { useSubscribe } from 'meteor/react-meteor-data';
 import { DndContext, rectIntersection, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, rectSwappingStrategy } from '@dnd-kit/sortable';
+
+// Collections
+import { CardsCollection } from '/imports/api/cards/CardsCollection';
+// import { GamesCollection } from '/imports/api/games/GamesCollection';
+
+// Components
+import { Lobby } from './Lobby';
+import { Droppable } from './Droppable';
+import { CogKeys } from './CogKeys';
+import { WordCardDraggable } from './WordCardDraggable';
+import { WordCardSortable } from './WordCardSortable';
+
+// Utilities
+import { shuffleArray } from '/imports/helpers/shuffle';
 import { demoCards, demoKeys } from '/imports/api/demoData';
 
 export type Card = {
 	_id: string;
-	words: Array<string>;
-	position: number;
+	words: Array<string>,
+	position: number,
 }
 
-export const Game = () => {
+export type Game = {
+	_id: string,
+	hostId: string,
+	round: number,
+	players: Array<any>,
+	cards: Array<string>,
+	completed: boolean,
+	started: boolean,
+};
 
+export const Game = ({gameId}: {gameId: string}) => {
+	// State
+	const [game, setGame] = useState<any>(undefined);
+	const [gameStarted, setGameStarted] = useState(false);
+	const [gameCompleted, setGameCompleted] = useState(false);
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [cardsData, setCardsData] = useState<Card[]>([]);
 	const [playCards, setPlayCards] = useState<React.JSX.Element[]>([]);
 	const [cogCards, setCogCards] = useState<React.JSX.Element[]>([]);
 	const [keys, setKeys] = useState<string[]>(["", "", "", ""]);
-	const cogContainers = [1, 2, 3, 4];
-	const pointerSensor = useSensor(PointerSensor, {
-		activationConstraint: { distance: 5 }
-	});
-	const keyboardSensor = useSensor(KeyboardSensor, {
-		coordinateGetter: sortableKeyboardCoordinates,
-	});
+
+	// Hooks
+	const pointerSensor = useSensor(PointerSensor, { activationConstraint: { distance: 5 }});
+	const keyboardSensor = useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates });
 	const sensors = useSensors( pointerSensor, keyboardSensor);
+	const navigate = useNavigate();
+
+	const cogContainers = [1, 2, 3, 4];
+	const isLoading = useSubscribe("games");
+	// console.log("isLoading", isLoading());
 
 	useEffect(() => {
-		const loadData = () => {
+		console.log("useEffect Game")
+		const loadGameCards = () => {
+
+			// Game was cancelled in Lobby
+			if (!gameStarted && gameCompleted) {
+				navigate("/");
+			}
+
+			// Game is pending
+			if (gameId) {
+				Meteor.callAsync("games.get", gameId).then((result) => { setGame(result) });
+			}
+
 			const playCardsData = cardsData.filter((card) => card.position === 5);
 			const cogCardsData = cardsData.filter((card) => card.position !== 5);
 
@@ -50,8 +86,8 @@ export const Game = () => {
 
 			validateCardsState();
 		};
-		loadData();
-	}, [cardsData]);
+		loadGameCards();
+	}, [cardsData, gameId, gameStarted, gameCompleted]);
 
 	const sortByPosition = (array: React.JSX.Element[]) => {
 		return array.sort((a: any, b: any) => {
@@ -102,27 +138,27 @@ export const Game = () => {
 		if (origin === 5 && placeholderCardData) { 
 		// moving from play to empty cog space
 
-			console.log("moving from play to empty cog space");
+			// console.log("moving from play to empty cog space");
 			placeholderCardData.position = 5;
 			cardData.position = destination;
 		
 		} else if(origin === 5 && !placeholderCardData) { 
 		// moving from play to non-empty cog space
 
-			console.log("moving from play to non-empty cog space");
+			// console.log("moving from play to non-empty cog space");
 			const cogPlaceholders = cogCards.filter((card) => ["1", "2", "3", "4"].includes(card?.key as string));
 
 			if(cogPlaceholders.length > 0) { 
 			// shift to empty space if possible
 
-				console.log("empty space found, shifting card to shift to empty space");
+				// console.log("empty space found, shifting card to shift to empty space");
 				const cogPlaceholdersData = cogPlaceholders.map((card) => cards.find((cardData) => cardData._id === card.key));
 				const emptyCogSpaces = cogPlaceholdersData.map((placeholderData) => placeholderData?.position);
 
 				if(emptyCogSpaces.includes(destination + 1)) { 
 				// shift to next space if empty
 
-					console.log("shifting card to next space")
+					// console.log("shifting card to next space")
 					placeholderCardData = cards.find((card) => {
 						return cogContainers.includes(parseInt(card._id)) && card.position === destination + 1;
 					});
@@ -133,7 +169,7 @@ export const Game = () => {
 				} else if (emptyCogSpaces[0] !== undefined) { 
 				// shift to first empty space for now
 
-					console.log("shifting card to first empty space")
+					// console.log("shifting card to first empty space")
 					placeholderCardData = cardsData.find((card) => card._id === emptyCogSpaces[0]?.toString());
 					if (placeholderCardData) placeholderCardData.position = 5;
 					if (cardToShiftData) cardToShiftData.position = emptyCogSpaces[0];
@@ -143,7 +179,7 @@ export const Game = () => {
 			} else { 
 			// shift to play space if no empty spaces
 
-				console.log("shifting card to play space")
+				// console.log("shifting card to play space")
 				if (cardToShiftData) cardToShiftData.position = 5;
 				cardData.position = destination;
 
@@ -152,7 +188,7 @@ export const Game = () => {
 		} else if (destination === 5) {
 		// moving from cog to play
 
-			console.log("moving from cog to play")
+			// console.log("moving from cog to play")
 			placeholderCardData = cardsData.find((card) => card._id === origin.toString());
 			if (placeholderCardData) placeholderCardData.position = origin;
 			cardData.position = destination;
@@ -161,7 +197,7 @@ export const Game = () => {
 		} else { 
 		// moving from cog to cog
 
-			console.log("moving from cog to cog")
+			// console.log("moving from cog to cog")
 			if(cardToShiftData) cardToShiftData.position = origin;
 			cardData.position = destination;
 
@@ -276,33 +312,78 @@ export const Game = () => {
 		moveCard(cardData, cardData.position, destination);
 	}
 
+	const handleStartGame = (gameId: string) => {
+		Meteor.callAsync("game.start", game._id).then((result) => {
+			setGame(result);
+			setGameStarted(true);
+			// TODO replace next line with start game call
+			startDemo();
+		}).catch((error) => {
+			console.log("error", error)
+		});
+	}
+
+	const handleEndGame = (gameId: string) => {
+		Meteor.callAsync("game.complete", game._id).then((result) => {
+			setGame(result);
+			setGameCompleted(true);
+		}).catch((error) => {
+			console.log("error", error)
+		});
+	}
+
+	const handleRemovePlayer = (playerId: string) => {
+		console.log("removing player", playerId);
+		// TODO remove player
+		return true;
+	}
+
+	const handleLeaveGame = (playerId: string) => {
+		console.log("leaving game", playerId);
+		// TODO leave game
+		return true;
+	}
+
 	return (
-		<DndContext sensors={sensors} collisionDetection={rectIntersection} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-			{ !isPlaying &&	
-				<div className="start-game-container">
-					<button className='start-game-button' onClick={startGame}>Start Game</button>
-					<button className='start-game-button' onClick={startDemo}>Start Demo</button>
-				</div>
-			}
-			{ isPlaying &&
-				<div className="cog-container">
-					<CogKeys updateKeys={handleKeyUpdate} resetCards={handleResetCards}keys={keys}/>
-					<SortableContext items={cogCards.map((card) => card.key || "")} strategy={rectSwappingStrategy} >
-						<div className="droppable-container">
-							{ cogCards.map((card) => (
-								<Droppable key={card.key ?? ""} id={card.key ?? ""}>
-									{ card }
-								</Droppable>
-							))}
+		<>
+			{ gameStarted && !gameCompleted &&
+				<DndContext sensors={sensors} collisionDetection={rectIntersection} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+					{ !isPlaying &&	
+						<div className="start-game-container">
+							<button className='start-game-button' onClick={startGame}>Start Game</button>
+							<button className='start-game-button' onClick={startDemo}>Start Demo</button>
 						</div>
-					</SortableContext>
-				</div>
-				}
-			{ isPlaying &&
-				<div className="draw-container">
-					{ playCards }
-				</div>
+					}
+					{ isPlaying &&
+						<div className="cog-container">
+							<CogKeys updateKeys={handleKeyUpdate} resetCards={handleResetCards}keys={keys}/>
+							<SortableContext items={cogCards.map((card) => card.key || "")} strategy={rectSwappingStrategy} >
+								<div className="droppable-container">
+									{ cogCards.map((card) => (
+										<Droppable key={card.key ?? ""} id={card.key ?? ""}>
+											{ card }
+										</Droppable>
+									))}
+								</div>
+							</SortableContext>
+						</div>
+						}
+					{ isPlaying &&
+						<div className="draw-container">
+							{ playCards }
+						</div>
+					}
+				</DndContext>
 			}
-		</DndContext>
+			{ !gameStarted && !gameCompleted &&
+				<Lobby 
+					game={game} 
+					endGame={handleEndGame} 
+					startGame={handleStartGame} 
+					removePlayer={handleRemovePlayer}
+					leaveGame={handleLeaveGame}
+				/>
+			}
+		</>
 	)
 }
