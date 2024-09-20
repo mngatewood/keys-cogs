@@ -20,44 +20,46 @@ interface ExtendedUser extends Meteor.User {
 
 export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlayer, leaveGame}) => {
 	const [players, setPlayers] = useState<any[]>([]);
-	const isLoading = useSubscribe("users.user");
+	const isLoading = useSubscribe("users.all");
 
 	useEffect(() => {
 		console.log("useEffect Lobby");
-		// TODO redirect if no game or game completed
-
-		const loadLobbyPlayers = () => {
-			const updatedPlayers = game.players.map((player) => {
-				const playerDoc = Meteor.users.findOne(player._id) as ExtendedUser | undefined;
-
-				const fullName = () => {
-					const firstName = playerDoc?.firstName || "";
-					const lastName = playerDoc?.lastName || "";
-					const lastInitial = lastName ? lastName.charAt(0) : "";
-					return firstName + (lastInitial ? " " + lastInitial : "");
-				}
-
-				const status = () => {
-					// TODO: get player online status and connected to current game
-					return "Ready"
-				}
-
-				const updatedPlayer = {
-					...player,
-					fullName: fullName(),
-					email: playerDoc?.emails?.[0]?.address,
-					status: status(),
-				}
-
-				return updatedPlayer;
-			})
-			setPlayers(updatedPlayers || []);
-		};
 
 		if (game) {
 			loadLobbyPlayers();
 		}
-	}, [game]);
+	}, [game, isLoading()]);
+
+	const loadLobbyPlayers = () => {
+		const updatedPlayers = game.players.map((player) => {
+			const playerDoc = Meteor.users.findOne(player._id) as ExtendedUser | undefined;
+
+			const fullName = () => {
+				const firstName = playerDoc?.firstName || "";
+				const lastName = playerDoc?.lastName || "";
+				const lastInitial = lastName ? lastName.charAt(0) : "";
+				return firstName + (lastInitial ? " " + lastInitial : "");
+			}
+
+			const status = () => {
+				// TODO: get player online status and connected to current game
+				return "Ready"
+			}
+
+			const updatedPlayer = {
+				...player,
+				fullName: fullName(),
+				email: playerDoc?.emails?.[0]?.address,
+				status: status(),
+			}
+
+			return updatedPlayer;
+
+		});
+
+		setPlayers(updatedPlayers || []);
+
+	};
 
 	const handleClickPlayer = (e) => {
 		const playerId = e.target.closest(".player-card").id;
