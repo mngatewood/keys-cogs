@@ -12,3 +12,16 @@ Meteor.publish('users.user', function () {
 		}
 	});
 });
+
+Meteor.publish('users.all', function () {
+	return Meteor.users.find({}, {
+		fields: {
+			_id: 1,
+			createdAt: 1,
+			username: 1,
+			emails: 1,
+			firstName: 1,
+			lastName: 1,
+		}
+	});
+})
