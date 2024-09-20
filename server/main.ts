@@ -36,7 +36,7 @@ Meteor.startup(async() => {
 				defaultUser.email, 
 				defaultUser.password
 			).then((result) => {
-				console.log("result", result)
+				console.log("insert default user result", result)
 			}).catch((error) => {
 				console.log("error", error)
 			});

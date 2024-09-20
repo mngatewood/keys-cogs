@@ -17,14 +17,10 @@ export const Home:React.FC<HomeProps> = ({setGameId}) => {
 	const user = Meteor.user();
 
 	const startGame = () => {
-		console.log("start game")
-
 		Meteor.callAsync("games.insert", user?._id).then((result) => {
-			console.log(result);
 			setGameId(result);
 			navigate("/play");
 		});
-
 	}
 
 	return (

@@ -48,7 +48,6 @@ export const Login = () => {
 			if (error) {
 				setLoginError((error as Meteor.Error).reason ?? "Unknown error");
 			} else {
-				console.log("login success");
 				navigate("/");
 			}
 		});

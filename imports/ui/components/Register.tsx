@@ -94,7 +94,6 @@ export const Register = () => {
 
 	const handleSubmit = async (e: React.SyntheticEvent) => {
 		e.preventDefault();
-		console.log("submit", firstName, lastName, email /* username */, email, password);
 		try {
 			Meteor.callAsync("accounts.insert", firstName, lastName, email /* username */, email, password);
 			setRegisterError("");
