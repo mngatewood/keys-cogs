@@ -15,6 +15,7 @@ import { Droppable } from './Droppable';
 import { CogKeys } from './CogKeys';
 import { WordCardDraggable } from './WordCardDraggable';
 import { WordCardSortable } from './WordCardSortable';
+import { Loading } from './Loading';
 
 // Utilities
 import { shuffleArray } from '/imports/helpers/shuffle';
@@ -55,7 +56,6 @@ export const Game = ({gameId}: {gameId: string}) => {
 
 	const cogContainers = [1, 2, 3, 4];
 	const isLoading = useSubscribe("games");
-	// console.log("isLoading", isLoading());
 
 	useEffect(() => {
 		console.log("useEffect Game")
@@ -205,7 +205,7 @@ export const Game = ({gameId}: {gameId: string}) => {
 
 		const updatedPlayCardData = cardsData.filter((cardData) => cardData.position === 5);;
 		const updatedCogCardData = cardsData.filter((cardData) => cogContainers.includes(cardData.position));
-		let updatedPlayCards = updatedPlayCardData.map((cardData) => <WordCardDraggable key={cardData._id} card={cardData} addCard={handleAddCard} />;
+		let updatedPlayCards = updatedPlayCardData.map((cardData) => <WordCardDraggable key={cardData._id} card={cardData} addCard={handleAddCard} />);
 		const updatedCogCards = updatedCogCardData.map((cardData) => <WordCardSortable key={cardData._id} card={cardData} removeCard={handleRemoveCard}/>);
 
 		// strip out any placeholder cards
@@ -313,7 +313,7 @@ export const Game = ({gameId}: {gameId: string}) => {
 	}
 
 	const handleStartGame = (gameId: string) => {
-		Meteor.callAsync("game.start", game._id).then((result) => {
+		Meteor.callAsync("game.start", gameId).then((result) => {
 			setGame(result);
 			setGameStarted(true);
 			// TODO replace next line with start game call
@@ -324,7 +324,7 @@ export const Game = ({gameId}: {gameId: string}) => {
 	}
 
 	const handleEndGame = (gameId: string) => {
-		Meteor.callAsync("game.complete", game._id).then((result) => {
+		Meteor.callAsync("game.complete", gameId).then((result) => {
 			setGame(result);
 			setGameCompleted(true);
 		}).catch((error) => {
@@ -346,7 +346,8 @@ export const Game = ({gameId}: {gameId: string}) => {
 
 	return (
 		<>
-			{ gameStarted && !gameCompleted &&
+			{isLoading() && <Loading />}
+			{!isLoading() &&gameStarted && !gameCompleted &&
 				<DndContext sensors={sensors} collisionDetection={rectIntersection} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
 					{ !isPlaying &&	
 						<div className="start-game-container">
@@ -375,7 +376,7 @@ export const Game = ({gameId}: {gameId: string}) => {
 					}
 				</DndContext>
 			}
-			{ !gameStarted && !gameCompleted &&
+			{!isLoading() && !gameStarted && !gameCompleted &&
 				<Lobby 
 					game={game} 
 					endGame={handleEndGame} 
