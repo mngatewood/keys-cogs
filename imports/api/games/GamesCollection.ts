@@ -4,6 +4,9 @@ import SimpleSchema from "simpl-schema";
 export const GamesCollection = new Mongo.Collection('games');
 
 export const GamesCollectionSchema = new SimpleSchema({
+	hostId: {
+		type: String
+	},
 	started: {
 		type: Boolean
 	},
