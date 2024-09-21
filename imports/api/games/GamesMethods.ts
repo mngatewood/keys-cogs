@@ -26,16 +26,17 @@ Meteor.methods({
 			]
 		};
 
-		GamesCollectionSchema.validate(game);
+		const cleanDoc = GamesCollectionSchema.clean(game);
+		GamesCollectionSchema.validate(cleanDoc);
 		if (GamesCollectionSchema.isValid()) {
-			const gameId = GamesCollection.insertAsync(game);
+			const gameId = GamesCollection.insertAsync(cleanDoc);
 			return gameId;
 		} else {
 			console.log("invalid game", game, GamesCollectionSchema.validationErrors())
 		}
 	},
 
-	async 'games.get'(gameId: string) {
+	async 'game.get'(gameId: string) {
 		check(gameId, String);
 		if (!Meteor.userId()) {
 			throw new Meteor.Error('not-authorized');

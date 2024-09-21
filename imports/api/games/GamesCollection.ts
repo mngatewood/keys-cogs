@@ -1,3 +1,4 @@
+import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from "simpl-schema";
 
@@ -5,13 +6,15 @@ export const GamesCollection = new Mongo.Collection('games');
 
 export const GamesCollectionSchema = new SimpleSchema({
 	hostId: {
-		type: String
+		type: String,
 	},
 	started: {
-		type: Boolean
+		type: Boolean,
+		defaultValue: false
 	},
 	completed: {
-		type: Boolean
+		type: Boolean,
+		defaultValue: false
 	},
 	round: {
 		type: Number,
@@ -24,12 +27,26 @@ export const GamesCollectionSchema = new SimpleSchema({
 	cards: {
 		type: Array
 	},
+	createdAt: {
+		type: Number,
+		autoValue: function() {
+			if(!this.isSet) {
+				return new Date().valueOf();
+			}
+		}
+	},
+	updatedAt: {
+		type: Number,
+		autoValue: function() {
+			return new Date().valueOf();
+		}
+	},
 
 	"players.$": {
 		type: Object,
 	},
 	"players.$._id": {
-		type: String
+		type: String,
 	},
 
 	"players.$.keys": {
@@ -122,23 +139,23 @@ export const GamesCollectionSchema = new SimpleSchema({
 		defaultValue: 0,
 		min: -0.75, 
 		max: 0.75
-	}
+	},
+},
 
+{
+	clean: {
+		autoConvert: false,
+		extendAutoValueContext: {
+			userId: function() {
+				return Meteor.userId();
+			}
+		},
+		filter: false,
+		getAutoValues: true,
+		removeEmptyStrings: false,
+		removeNullsFromArrays: true,
+		trimStrings: true,
+	},
+	humanizeAutoLabels: false,
+	requiredByDefault: true,
 }).newContext();
-
-// for reference only
-
-// export const defaultGame = {
-// 	started: false,
-// 	completed: false,
-// 	round: 0,
-// 	players: [
-// 		{
-// 			_id: Meteor.userId(),
-// 			keys: [],
-// 			cards: [],
-// 			results: []
-// 		}
-// 	],
-// 	cards: []
-// }
