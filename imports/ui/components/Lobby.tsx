@@ -34,6 +34,7 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 		const updatedPlayers = game.players.map((player) => {
 			const playerDoc = Meteor.users.findOne(player._id) as ExtendedUser | undefined;
 
+			// TODO: move fullName to helpers and import
 			const fullName = () => {
 				const firstName = playerDoc?.firstName || "";
 				const lastName = playerDoc?.lastName || "";
@@ -61,8 +62,8 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 
 	};
 
-	const handleClickPlayer = (e) => {
-		const playerId = e.target.closest(".player-card").id;
+	const handleClickPlayer = (e:React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+		const playerId = (e.target as HTMLElement).closest(".player-card")?.id;
 		const userIsHost = game.hostId === Meteor.userId();
 		const playerIsHost = playerId === game.hostId;
 
