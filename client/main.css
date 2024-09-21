@@ -37,3 +37,8 @@ body {
 	padding: 1rem;
 	background-color: white;
 }
+
+a {
+	color: -webkit-link;
+	text-decoration: underline;
+}

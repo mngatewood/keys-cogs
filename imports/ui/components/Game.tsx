@@ -68,7 +68,7 @@ export const Game = ({gameId}: {gameId: string}) => {
 
 			// Game is pending
 			if (gameId) {
-				Meteor.callAsync("games.get", gameId).then((result) => { setGame(result) });
+				Meteor.callAsync("game.get", gameId).then((result) => { setGame(result) });
 			}
 
 			const playCardsData = cardsData.filter((card) => card.position === 5);
