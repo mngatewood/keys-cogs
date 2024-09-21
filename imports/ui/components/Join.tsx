@@ -5,6 +5,7 @@ import { type Game } from './Game';
 import { Loading } from './Loading';
 import { GamesCollection } from '/imports/api/games/GamesCollection';
 import { useNavigate } from 'react-router-dom';
+import {fullName } from '/imports/helpers/reducers';
 
 interface JoinProps {
 	setGameId: Function,
@@ -38,17 +39,9 @@ export const Join:React.FC<JoinProps> = ({setGameId}) => {
 			// TODO: detect host presence
 			const host = Meteor.users.findOne(game.hostId) as ExtendedUser || undefined;
 
-			// TODO: move fullName to helpers and import (or create reducer on collection)
-			const fullName = () => {
-				const firstName = host?.firstName || "";
-				const lastName = host?.lastName || "";
-				const lastInitial = lastName ? lastName.charAt(0) : "";
-				return firstName + (lastInitial ? " " + lastInitial : "");
-			}
-
 			const updatedGame:ExtendedGame = {
 				...game,
-				hostName: fullName(),
+				hostName: fullName(host),
 				playerCount: game.players.length
 			}
 

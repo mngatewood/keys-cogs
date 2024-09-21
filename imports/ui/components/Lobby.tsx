@@ -3,6 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { useSubscribe } from 'meteor/react-meteor-data';
 import { type Game } from './Game';
 import { Loading } from './Loading';
+import { fullName } from '/imports/helpers/reducers';
 
 interface LobbyProps {
 	game: Game,
@@ -34,14 +35,6 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 		const updatedPlayers = game.players.map((player) => {
 			const playerDoc = Meteor.users.findOne(player._id) as ExtendedUser | undefined;
 
-			// TODO: move fullName to helpers and import
-			const fullName = () => {
-				const firstName = playerDoc?.firstName || "";
-				const lastName = playerDoc?.lastName || "";
-				const lastInitial = lastName ? lastName.charAt(0) : "";
-				return firstName + (lastInitial ? " " + lastInitial : "");
-			}
-
 			const status = () => {
 				// TODO: get player online status and connected to current game
 				return "Ready"
@@ -49,7 +42,7 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 
 			const updatedPlayer = {
 				...player,
-				fullName: fullName(),
+				fullName: fullName(playerDoc),
 				email: playerDoc?.emails?.[0]?.address,
 				status: status(),
 			}
