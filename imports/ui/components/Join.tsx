@@ -23,6 +23,7 @@ interface ExtendedGame extends Meteor.User {
 
 export const Join:React.FC<JoinProps> = ({setGameId}) => {
 	const [games, setGames] = useState<ExtendedGame[]>([]);
+	const [joinError, setJoinError] = useState<string | undefined>(undefined);
 	const isLoading = useSubscribe("games.pending");
 	const userSub = useSubscribe("users.all");
 	const pendingGames = useTracker(() => GamesCollection.find().fetch() as Game[]);
@@ -54,8 +55,18 @@ export const Join:React.FC<JoinProps> = ({setGameId}) => {
 
 	const handleJoinGame = (e:React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		const gameId = (e.target as HTMLElement).closest(".game-card")?.id;
-		setGameId(gameId);
-		navigate("/play");
+		if (gameId) {
+			Meteor.callAsync("game.join", gameId, Meteor.userId()).then((result) => {
+				console.log("updatedGame", result)
+				setGameId(gameId);
+				navigate("/play");
+			}).catch((error) => {
+				console.log("joinError", error)
+				setJoinError(error.reason);
+			});
+		} else {
+			setJoinError("Something went wrong. Please try again.");
+		}
 	}
 
 	return (
@@ -83,7 +94,7 @@ export const Join:React.FC<JoinProps> = ({setGameId}) => {
 						</ul>
 						<div className="flex flex-col items-center justify-center">
 							<div className="error mt-4 text-red-500 text-sm text-center whitespace-pre-line">
-								TBD
+								{joinError}
 							</div>
 						</div>
 					</>
