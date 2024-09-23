@@ -2,12 +2,19 @@ import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { GamesCollection, GamesCollectionSchema } from './GamesCollection';
 
+type Player = {
+	_id: string
+	keys: string[]
+	cards: any[]
+	results: any[]
+}
+
 
 Meteor.methods({
 	async 'games.insert'(host: string) {
 		check(host, String);
 		if (!Meteor.userId()) {
-			throw new Meteor.Error('not-authorized');
+			throw new Meteor.Error(401, 'not authorized', 'You are not authorized to perform this operation.  Please log in.');
 		}
 
 		const game = {
@@ -39,7 +46,7 @@ Meteor.methods({
 	async 'game.get'(gameId: string) {
 		check(gameId, String);
 		if (!Meteor.userId()) {
-			throw new Meteor.Error('not-authorized');
+			throw new Meteor.Error(401, 'not authorized', 'You are not authorized to perform this operation.  Please log in.');
 		}
 
 		const game = await GamesCollection.findOneAsync({_id: gameId});
@@ -53,7 +60,7 @@ Meteor.methods({
 	async 'game.complete'(gameId: string) {
 		check(gameId, String);
 		if (!Meteor.userId()) {
-			throw new Meteor.Error('not-authorized');
+			throw new Meteor.Error(401, 'not authorized', 'You are not authorized to perform this operation.  Please log in.');
 		}
 
 		const game = await GamesCollection.findOneAsync({_id: gameId});
@@ -79,7 +86,7 @@ Meteor.methods({
 	async 'game.start'(gameId: string) {
 		check(gameId, String);
 		if (!Meteor.userId()) {
-			throw new Meteor.Error('not-authorized');
+			throw new Meteor.Error(401, 'not authorized', 'You are not authorized to perform this operation.  Please log in.');
 		}
 
 		const game = await GamesCollection.findOneAsync({_id: gameId});
@@ -100,6 +107,45 @@ Meteor.methods({
 		} else {
 			throw new Meteor.Error('game-not-found');
 		}
-	}
+	},
+
+	async 'game.join'(gameId: string, playerId: string) {
+		check(gameId, String);
+		check(playerId, String);
+		if (!Meteor.userId()) {
+			throw new Meteor.Error('not authorized', 'You are not authorized to perform this operation.  Please log in.');
+		}
+
+		const game = await GamesCollection.findOneAsync({_id: gameId});
+		const playerIds = game?.players.map((player: Player) => player._id) || [];
+		if (playerIds.includes(playerId)) {
+			throw new Meteor.Error('player-already-in-game', 'An error occurred.  You are already in this game.');
+		}
+
+		console.log("joining game", game)
+		if (game) {
+			const update = {
+				$push: {
+					players: {
+						_id: playerId,
+						keys: [],
+						cards: [],
+						results: [],
+					}
+				}
+			}
+			const response = await GamesCollection.updateAsync(gameId, update);
+			if (response === 1) {
+				game.players.push({_id: playerId});
+				return game;
+			} else {
+				throw new Meteor.Error('unable-to-join-game', 'An error occurred.  Please try again.');
+			}
+		} else {
+			throw new Meteor.Error('game-not-found', 'Game not found.  Please try again.');
+		}
+	},
+
+	// TODO: update all errors to include ("error-name", "error reason")
 
 });
