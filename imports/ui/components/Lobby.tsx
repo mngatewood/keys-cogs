@@ -88,19 +88,19 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 									<div className="px-4 py-5 sm:px-6">
 										<div className="flex items-center justify-between h-6">
 											<h3 className="text-lg leading-6 font-medium text-gray-900">{player.fullName}</h3>
+											<p className="mt-1 max-w-2xl text-sm text-gray-500">
+												{player._id === Meteor.userId() && "You"}
+												{player._id !== Meteor.userId() && player._id === game.hostId && "Host"}
+												{player._id !== Meteor.userId() && player._id !== game.hostId && "Player"}
+											</p>
+										</div>
+										<div className="mt-4 flex items-center justify-between h-6">
 											<button onClick={handleClickPlayer} className="font-medium text-indigo-600 hover:text-indigo-500">
 												{game.hostId === Meteor.userId() && (
 													player._id === game.hostId ? "End Game" : "Remove"
 												)}
 												{game.hostId !== Meteor.userId() && player._id === Meteor.userId() && "Leave"}
 											</button>
-										</div>
-										<div className="mt-4 flex items-center justify-between h-6">
-											<p className="mt-1 max-w-2xl text-sm text-gray-500">
-												{player._id === Meteor.userId() && "You"}
-												{player._id !== Meteor.userId() && player._id === game.hostId && "Host"}
-												{player._id !== Meteor.userId() && player._id !== game.hostId && "Player"}
-											</p>
 											<p className="text-sm font-medium text-gray-500">Status: <span className="text-green-600">{player.status}</span></p>
 										</div>
 									</div>
