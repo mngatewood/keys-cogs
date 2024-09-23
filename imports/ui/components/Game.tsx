@@ -340,7 +340,12 @@ export const Game = ({gameId}: {gameId: string}) => {
 
 	const handleLeaveGame = (playerId: string) => {
 		console.log("leaving game", playerId);
-		// TODO leave game
+		Meteor.callAsync("game.leave", gameId, playerId).then((result) => {
+			setGame(result);
+			navigate("/join");
+		}).catch((error) => {
+			console.log("error", error)
+		})
 		return true;
 	}
 
