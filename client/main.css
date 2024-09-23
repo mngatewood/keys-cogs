@@ -4,6 +4,7 @@
 @import "home.css";
 @import "lobby.css";
 @import "loading.css";
+@import "join.css";
 
 @tailwind base;
 @tailwind components;

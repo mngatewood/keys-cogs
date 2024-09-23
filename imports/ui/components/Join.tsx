@@ -70,12 +70,12 @@ export const Join:React.FC<JoinProps> = ({setGameId}) => {
 	}
 
 	return (
-		<div className="join-container min-h-screen flex items-center justify-center w-full">
-			<div className=" bg-white shadow-lg overflow-hidden border border-gray-300 rounded-lg px-8 py-6 max-w-md w-5/6 mx-w-md">
+		<div className="join-container flex items-center justify-center w-full">
+			<div className="join-games-container bg-white shadow-lg overflow-hidden border border-gray-300 rounded-lg px-8 py-6 max-w-md w-5/6 mx-w-md">
 				<h1 className="text-2xl font-bold text-center mb-4">Join a Game</h1>
 				{isLoading() ? <Loading /> :
 					<>
-						<ul className="overflow-scroll">
+						<ul className="overflow-auto">
 							{games.map((game) => (
 								<li key={game._id} id={game._id} className="game-card border border-gray-300 shadow-md my-4">
 									<div className="flex px-4 py-5 sm:px-6">
