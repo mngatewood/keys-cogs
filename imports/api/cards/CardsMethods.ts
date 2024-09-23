@@ -8,7 +8,7 @@ Meteor.methods({
 		check(quantity, Number);
 
 		if (!Meteor.userId()) {
-			throw new Meteor.Error('not-authorized');
+			throw new Meteor.Error('not authorized', 'You are not authorized to perform this operation.  Please log in.');
 		}
 
 		const cards = await CardsCollection.find({}).fetchAsync();
