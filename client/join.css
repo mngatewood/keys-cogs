@@ -1,0 +1,11 @@
+.join-container {
+	min-height: calc(100vh - 57px);
+}
+
+.join-games-container {
+	max-height: calc(100vh - 57px - 60px);
+}
+
+.join-games-container > ul {
+	max-height: calc(100vh - 57px - 60px - 180px);
+}

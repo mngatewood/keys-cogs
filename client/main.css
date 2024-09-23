@@ -1,13 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @import "transitions.css";
 @import "game.css";
 @import "login.css";
 @import "home.css";
 @import "lobby.css";
 @import "loading.css";
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "join.css";
 
 body {
 	margin: 0;
@@ -36,4 +37,9 @@ body {
 	margin: auto;
 	padding: 1rem;
 	background-color: white;
+}
+
+a {
+	color: -webkit-link;
+	text-decoration: underline;
 }

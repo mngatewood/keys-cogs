@@ -68,7 +68,7 @@ export const Game = ({gameId}: {gameId: string}) => {
 
 			// Game is pending
 			if (gameId) {
-				Meteor.callAsync("games.get", gameId).then((result) => { setGame(result) });
+				Meteor.callAsync("game.get", gameId).then((result) => { setGame(result) });
 			}
 
 			const playCardsData = cardsData.filter((card) => card.position === 5);
@@ -340,7 +340,12 @@ export const Game = ({gameId}: {gameId: string}) => {
 
 	const handleLeaveGame = (playerId: string) => {
 		console.log("leaving game", playerId);
-		// TODO leave game
+		Meteor.callAsync("game.leave", gameId, playerId).then((result) => {
+			setGame(result);
+			navigate("/join");
+		}).catch((error) => {
+			console.log("error", error)
+		})
 		return true;
 	}
 

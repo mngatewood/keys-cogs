@@ -7,12 +7,13 @@ import { useTracker, useSubscribe } from 'meteor/react-meteor-data';
 import { CardsCollection } from '../api/cards/CardsCollection';
 
 // Components
-import { Game } from './components/Game';
-import { Login } from './components/Login';
-import { Register } from './components/Register';
-import { Home } from './components/Home';
 import { PrivateRoutes } from './components/PrivateRoutes';
 import { Loading } from './components/Loading';
+import { Home } from './components/Home';
+import { Login } from './components/Login';
+import { Register } from './components/Register';
+import { Join } from './components/Join';
+import { Game } from './components/Game';
 
 export const App = () => {
 	const [gameId, setGameId] = useState<string | undefined>(undefined);
@@ -38,7 +39,8 @@ export const App = () => {
 				{ isLoading() ? <Loading /> :
 					<Routes>
 						<Route element={<PrivateRoutes />}>
-							<Route path="/play" element={<Game gameId={gameId}/>} />
+							<Route path="/join" element={<Join setGameId={handleGameUpdate} />} />
+							<Route path="/play" element={<Game gameId={gameId ?? ""} />} />
 						</Route>
 						<Route path="/login" element={<Login />} />
 						<Route path="/register" element={<Register />} />

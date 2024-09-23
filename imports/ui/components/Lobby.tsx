@@ -3,6 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { useSubscribe } from 'meteor/react-meteor-data';
 import { type Game } from './Game';
 import { Loading } from './Loading';
+import { fullName } from '/imports/helpers/reducers';
 
 interface LobbyProps {
 	game: Game,
@@ -34,13 +35,6 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 		const updatedPlayers = game.players.map((player) => {
 			const playerDoc = Meteor.users.findOne(player._id) as ExtendedUser | undefined;
 
-			const fullName = () => {
-				const firstName = playerDoc?.firstName || "";
-				const lastName = playerDoc?.lastName || "";
-				const lastInitial = lastName ? lastName.charAt(0) : "";
-				return firstName + (lastInitial ? " " + lastInitial : "");
-			}
-
 			const status = () => {
 				// TODO: get player online status and connected to current game
 				return "Ready"
@@ -48,7 +42,7 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 
 			const updatedPlayer = {
 				...player,
-				fullName: fullName(),
+				fullName: fullName(playerDoc),
 				email: playerDoc?.emails?.[0]?.address,
 				status: status(),
 			}
@@ -61,8 +55,8 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 
 	};
 
-	const handleClickPlayer = (e) => {
-		const playerId = e.target.closest(".player-card").id;
+	const handleClickPlayer = (e:React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+		const playerId = (e.target as HTMLElement).closest(".player-card")?.id;
 		const userIsHost = game.hostId === Meteor.userId();
 		const playerIsHost = playerId === game.hostId;
 
@@ -94,19 +88,19 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 									<div className="px-4 py-5 sm:px-6">
 										<div className="flex items-center justify-between h-6">
 											<h3 className="text-lg leading-6 font-medium text-gray-900">{player.fullName}</h3>
+											<p className="mt-1 max-w-2xl text-sm text-gray-500">
+												{player._id === Meteor.userId() && "You"}
+												{player._id !== Meteor.userId() && player._id === game.hostId && "Host"}
+												{player._id !== Meteor.userId() && player._id !== game.hostId && "Player"}
+											</p>
+										</div>
+										<div className="mt-4 flex items-center justify-between h-6">
 											<button onClick={handleClickPlayer} className="font-medium text-indigo-600 hover:text-indigo-500">
 												{game.hostId === Meteor.userId() && (
 													player._id === game.hostId ? "End Game" : "Remove"
 												)}
 												{game.hostId !== Meteor.userId() && player._id === Meteor.userId() && "Leave"}
 											</button>
-										</div>
-										<div className="mt-4 flex items-center justify-between h-6">
-											<p className="mt-1 max-w-2xl text-sm text-gray-500">
-												{player._id === Meteor.userId() && "You"}
-												{player._id !== Meteor.userId() && player._id === game.hostId && "Host"}
-												{player._id !== Meteor.userId() && player._id !== game.hostId && "Player"}
-											</p>
 											<p className="text-sm font-medium text-gray-500">Status: <span className="text-green-600">{player.status}</span></p>
 										</div>
 									</div>
