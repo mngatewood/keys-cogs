@@ -160,15 +160,16 @@ Meteor.methods({
 		if (!game) {
 			throw new Meteor.Error('game-not-found', 'Game not found.  Please try again.');
 		}
-
 		const updatedPlayers = game?.players.filter((player: Player) => player._id !== playerId) || [];
 		if (updatedPlayers?.length > 0) {
 			const update = {
-				$set: {
-					players: updatedPlayers
+				$pull: {
+					players: {
+							_id: playerId
+					}
 				}
 			}
-			const response = await GamesCollection.updateAsync(gameId, update);
+			const response = await GamesCollection.updateAsync({_id: gameId}, update);
 			if (response === 1) {
 				game.players = updatedPlayers;
 				return game;
