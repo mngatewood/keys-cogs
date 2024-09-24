@@ -5,12 +5,19 @@ import { type Game } from './Game';
 import { Loading } from './Loading';
 import { fullName } from '/imports/helpers/reducers';
 
+type Player = {
+	_id: string
+	keys: string[]
+	cards: any[]
+	results: any[]
+}
+
 interface LobbyProps {
 	game: Game,
 	endGame: Function,
 	startGame: Function,
 	removePlayer: Function,
-	leaveGame: Function,
+	leaveGame: Function
 }
 
 // Add first and last name to Meteor User collection per Accounts schema
@@ -26,13 +33,21 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 	useEffect(() => {
 		console.log("useEffect Lobby");
 
-		if (game) {
+		const inPendingGame = () => {
+			const playerIds = game.players.map((player: Player) => player._id);
+			const inGame = playerIds.includes(Meteor.userId() ?? "");
+			return inGame && !game.started && !game.completed;
+		}
+
+		if (game && inPendingGame()) {
 			loadLobbyPlayers();
+		} else if (game) {
+			leaveGame();
 		}
 	}, [game, isLoading()]);
 
 	const loadLobbyPlayers = () => {
-		const updatedPlayers = game.players.map((player) => {
+		const updatedPlayers = game.players.map((player: Player) => {
 			const playerDoc = Meteor.users.findOne(player._id) as ExtendedUser | undefined;
 
 			const status = () => {
@@ -63,28 +78,30 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 		if (userIsHost && playerIsHost) {
 			// TODO end game and remove all players
 			endGame(game._id);
-		} else if (userIsHost && !playerIsHost) {
-			// TODO remove player and update game
-			removePlayer(playerId);
-		} else if (playerId === Meteor.userId()) {
-			// TODO leave game
-			leaveGame(game._id);
+		} else {
+			removePlayer(game._id, playerId);
 		}
 	}
 
 	const handleStartGame = () => {
+		console.log("startGame");
 		startGame(game._id);
+	}
+
+	const isHost = () => {
+		if (!game) return false;
+		return game.hostId === Meteor.userId();
 	}
 
 	return (
 		<div className="lobby-container min-h-screen flex items-center justify-center w-full">
 			<div className=" bg-white shadow-lg overflow-hidden border border-gray-300 rounded-lg px-8 py-6 max-w-md w-5/6 mx-w-md">
-				<h1 className="text-2xl font-bold text-center mb-4">Lobby</h1>
+				<h1 className="text-2xl font-bold text-center">Lobby</h1>
 				{ isLoading() ? <Loading /> : 
 					<>
 						<ul className="overflow-scroll">
 							{players.map((player) => (
-								<li key={player._id} id={player._id} className="player-card border border-gray-300 shadow-md">
+								<li key={player._id} id={player._id} className="player-card border border-gray-300 my-4 shadow-md">
 									<div className="px-4 py-5 sm:px-6">
 										<div className="flex items-center justify-between h-6">
 											<h3 className="text-lg leading-6 font-medium text-gray-900">{player.fullName}</h3>
@@ -108,11 +125,16 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 							))}
 						</ul>
 						<div className="flex flex-col items-center justify-center">
-							{/* next line to enable start game button */}
-							<button onClick={handleStartGame} type="submit" className="w-full flex justify-center mt-4 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 disabled:bg-gray-200 disabled:text-gray-400 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-							{/* <button onClick={handleStartGame} type="submit" disabled={players.length < 2} className="w-full flex justify-center mt-4 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 disabled:bg-gray-200 disabled:text-gray-400 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"> */}
-								"Start Game"
-							</button>
+							{ isHost()
+								?
+									<button onClick={handleStartGame} type="submit" disabled={players.length < 2} className="w-full flex justify-center mt-4 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 disabled:bg-gray-200 disabled:text-gray-400 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+										Start Game
+									</button>
+								: 
+									<div className="flex flex-col items-center justify-center">
+										<p className="text-sm font-medium text-gray-500">Waiting for the host to start game.</p>
+									</div>
+							}
 							<div className="error mt-4 text-red-500 text-sm text-center whitespace-pre-line">
 								{game?.players?.length < 2 && "Not enough players"}
 							</div>
