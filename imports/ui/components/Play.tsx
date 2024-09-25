@@ -49,11 +49,11 @@ export const Play = () => {
 	}
 
 	const startGame = (gameId: string) => {
-		Meteor.callAsync("game.start", gameId).then(() => {
-			// setGame(result);
-			// setGameStarted(true);
-
-			console.log("startGame", gameId)
+		Meteor.callAsync("game.start", gameId).then((result) => {
+			const updatedGame = result as Game;
+			if (updatedGame._id === gameId) {
+				setGameStarted(true);
+			}
 			// TODO deal cards and render game
 		}).catch((error) => {
 			console.log("error", error)
@@ -108,6 +108,7 @@ export const Play = () => {
 			}
 
 			{!isLoading() && game && gameStarted && !gameCompleted && (
+				// TODO: Render game component
 				<div>Game</div>
 			)}
 		</>

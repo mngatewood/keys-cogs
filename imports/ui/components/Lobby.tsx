@@ -33,17 +33,17 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 	useEffect(() => {
 		console.log("useEffect Lobby");
 
-		const inPendingGame = () => {
-			const playerIds = game.players.map((player: Player) => player._id);
-			const inGame = playerIds.includes(Meteor.userId() ?? "");
-			return inGame && !game.started && !game.completed;
-		}
+		const playerIds = game.players.map((player: Player) => player._id);
+		const inGame = playerIds.includes(Meteor.userId() ?? "");
 
-		if (game && inPendingGame()) {
+		if (inGame && !game?.started && !game?.completed) {	// player is in pending game
 			loadLobbyPlayers();
-		} else if (game) {
+		} else if (inGame && game.started && !game?.completed) { // player is in active game
+			startGame(game._id);
+		} else if (game) { // player is no longer in game
 			leaveGame();
 		}
+		
 	}, [game, isLoading()]);
 
 	const loadLobbyPlayers = () => {
