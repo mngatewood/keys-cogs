@@ -35,9 +35,9 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 			startGame(game._id);
 		} else if (game) { // player is no longer in game
 			leaveGame();
+			// TODO: notify player if they are removed from the game
 		}
 
-		// TODO: notify player if they are removed from the game
 
 	}, [game, isLoading()]);
 

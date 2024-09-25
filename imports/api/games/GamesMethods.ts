@@ -2,6 +2,8 @@ import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { GamesCollection, GamesCollectionSchema } from './GamesCollection';
 import type { Player } from '../types'
+import { shuffleArray } from '/imports/helpers/shuffle';
+import { CardsCollection } from '../cards/CardsCollection';
 
 Meteor.methods({
 	async 'games.insert'(host: string) {
@@ -83,13 +85,39 @@ Meteor.methods({
 		}
 
 		const game = await GamesCollection.findOneAsync({_id: gameId});
-		console.log("starting game", game)
-		if (game) {
+
+		if (game?.started) {
+			return game;
+		}
+
+		const playerCount = game?.players.length || 0;
+		
+		if (playerCount < 2) {
+			throw new Meteor.Error('not-enough-players', 'There must be at least 2 players.  Please try again.');
+		}
+
+		const allCards = await CardsCollection.find({}).fetchAsync();
+		const gameCardsCount = playerCount * 5;
+		const randomIndexes = shuffleArray(Array.from(Array(allCards.length).keys())).slice(0, gameCardsCount);
+		const startingCardData = randomIndexes.map((value) => {
+			let card = allCards[value as number];
+			card.position = 5;
+			return card;
+		});
+
+		if (game) {			
+			game.cards = startingCardData
+			game.players.map((player: Player, index: number) => {
+				player.cards = startingCardData.slice(index * 5, (index + 1) * 5);
+			})
 			const update = {
 				$set: {
-					started: true
+					cards: startingCardData,
+					players: game.players,
+					started: true,
 				}
 			}
+
 			const response = await GamesCollection.updateAsync(gameId, update);
 			if (response === 1) {
 				game.started = true
