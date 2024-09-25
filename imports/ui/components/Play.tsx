@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSubscribe, useTracker } from 'meteor/react-meteor-data';
 import { Meteor } from 'meteor/meteor';
 
@@ -23,6 +23,12 @@ export const Play = () => {
 	const isLoading = useSubscribe("games");
 	const game = useTracker(() => GamesCollection.findOne(gameId) as GameType);
 	const [cards, setCards] = useState<CardType[]>([]);
+
+	useEffect(() => {
+		if (localStorage.getItem("gameId") !== null) {
+			setGameId(localStorage.getItem("gameId") as string);
+		}
+	}, []);
 
 	// TODO
 	// const startDemo = () => {
@@ -59,6 +65,7 @@ export const Play = () => {
 				});
 
 				setCards([...playerCards, ...placeholderCards]);
+				localStorage.setItem("gameId", gameId);
 				setGameStarted(true);
 			}
 		}).catch((error) => {
@@ -78,11 +85,22 @@ export const Play = () => {
 		Meteor.callAsync("game.leave", gameId, playerId).then(() => {
 			if (playerId === Meteor.userId()) {
 				resetGameState();
+				localStorage.removeItem("gameId");
+			}
+			if (playerId === game?.hostId) {
+				endGame(gameId);
 			}
 		}).catch((error) => {
 			console.log("error", error)
 		})
 		return true;
+	}
+
+	const exitGame = () => {
+		const userId = Meteor.userId();
+		if (userId) {			
+			removePlayer(gameId, userId);
+		}
 	}
 
 	const resetGameState = () => {
@@ -114,7 +132,14 @@ export const Play = () => {
 			}
 
 			{!isLoading() && game && gameStarted && !gameCompleted && (
-				<Game game={game} cards={cards} />
+				<>
+					<div className='game-panel'>
+						<button onClick={exitGame}>
+							<img className='exit-img' src='/exit-icon.png' />
+						</button>
+					</div>
+					<Game game={game} cards={cards} />
+					</>
 			)}
 		</>
 	);
