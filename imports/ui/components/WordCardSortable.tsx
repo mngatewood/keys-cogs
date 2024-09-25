@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import type { Card } from './Game';
+import type { Card } from '../../api/types';
 
 interface WordCardSortableProps {
 	card: Card

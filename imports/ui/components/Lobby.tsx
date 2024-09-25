@@ -1,16 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { useSubscribe } from 'meteor/react-meteor-data';
-import { type Game } from './Game';
+import type { Game, Player } from '../../api/types';
 import { Loading } from './Loading';
 import { fullName } from '/imports/helpers/reducers';
-
-type Player = {
-	_id: string
-	keys: string[]
-	cards: any[]
-	results: any[]
-}
 
 interface LobbyProps {
 	game: Game,
@@ -43,7 +36,9 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 		} else if (game) { // player is no longer in game
 			leaveGame();
 		}
-		
+
+		// TODO: notify player if they are removed from the game
+
 	}, [game, isLoading()]);
 
 	const loadLobbyPlayers = () => {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { useSubscribe, useTracker } from 'meteor/react-meteor-data';
-import { type Game } from './Game';
+import type { Game } from '../../api/types';
 import { Loading } from './Loading';
 import { GamesCollection } from '/imports/api/games/GamesCollection';
 import {fullName } from '/imports/helpers/reducers';

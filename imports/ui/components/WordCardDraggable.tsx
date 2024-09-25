@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import {CSS} from '@dnd-kit/utilities';
-import type { Card } from './Game';
+import type { Card } from '../../api/types';
 
 interface WordCardDraggableProps {
 	card: Card

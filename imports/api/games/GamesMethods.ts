@@ -1,13 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { GamesCollection, GamesCollectionSchema } from './GamesCollection';
-
-type Player = {
-	_id: string
-	keys: string[]
-	cards: any[]
-	results: any[]
-}
+import type { Player } from '../types'
 
 Meteor.methods({
 	async 'games.insert'(host: string) {

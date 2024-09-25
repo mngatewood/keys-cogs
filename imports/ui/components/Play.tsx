@@ -12,16 +12,8 @@ import { Join } from './Join';
 // Collections
 import { GamesCollection } from '/imports/api/games/GamesCollection';
 
-// TODO Consolidate types
-type Game = {
-	_id: string,
-	hostId: string,
-	round: number,
-	players: Array<any>,
-	cards: Array<string>,
-	completed: boolean,
-	started: boolean,
-}
+// Types
+import type { Game } from '../../api/types';
 
 export const Play = () => {
 	const [gameId, setGameId] = useState("");
