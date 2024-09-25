@@ -13,6 +13,8 @@ import { Loading } from './Loading';
 // Types
 import type { CardType, GameType } from '../../api/types';
 
+type CardTypeExtended = CardType & { rotation?: number | null };
+
 interface GameProps {
   game: GameType;
   cards: CardType[];
@@ -20,7 +22,7 @@ interface GameProps {
 
 export const Game = ({ game, cards }: GameProps) => {
 	// State
-	const [cardsData, setCardsData] = useState<CardType[]>(cards);
+	const [cardsData, setCardsData] = useState<CardTypeExtended[]>(cards);
 	const [playCards, setPlayCards] = useState<React.JSX.Element[]>([]);
 	const [cogCards, setCogCards] = useState<React.JSX.Element[]>([]);
 	const [keys, setKeys] = useState<string[]>(["", "", "", ""]);
@@ -37,17 +39,13 @@ export const Game = ({ game, cards }: GameProps) => {
 		console.log("useEffect Game")
 		const loadGameCards = () => {
 
-			const playCardsData = cardsData.filter((card: CardType) => card.position === 5);
-			const cogCardsData = cardsData.filter((card: CardType) => card.position !== 5);
+			const playCardsData = cardsData.filter((card: CardTypeExtended) => card.position === 5);
+			const cogCardsData = cardsData.filter((card: CardTypeExtended) => card.position !== 5);
 
-			const playCardElements = playCardsData.map((card) => {
-				return <WordCardDraggable key={card._id} card={card} addCard={handleAddCard} />;
-			});
+			const playCardElements = playCardsData.map(card => draggableElement(card));
 			setPlayCards(sortByPosition(playCardElements));
 
-			const cogCardElements = cogCardsData.map((card) => {
-				return <WordCardSortable key={card._id} card={card} removeCard={handleRemoveCard}/>;
-			});
+			const cogCardElements = cogCardsData.map(card => sortableElement(card));
 			setCogCards(sortByPosition(cogCardElements));
 
 			validateCardsState();
@@ -68,7 +66,15 @@ export const Game = ({ game, cards }: GameProps) => {
 		});
 	}
 
-	const moveCard = (cardData: CardType, origin: number, destination: number) => {
+	const sortableElement = (card: CardTypeExtended) => {
+		return <WordCardSortable key={card._id} card={card} removeCard={handleRemoveCard} updateGame={updateCardRotation} />;
+	}
+
+	const draggableElement = (card: CardTypeExtended) => {
+		return <WordCardDraggable key={card._id} card={card} addCard={handleAddCard} />;
+	}
+
+	const moveCard = (cardData: CardTypeExtended, origin: number, destination: number) => {
 		// console.log(cardData, origin, destination);
 		let cards = cardsData;
 		const cardToShiftData = cards.find((card) => card.position === destination);
@@ -146,8 +152,8 @@ export const Game = ({ game, cards }: GameProps) => {
 
 		const updatedPlayCardData = cardsData.filter((cardData) => cardData.position === 5);;
 		const updatedCogCardData = cardsData.filter((cardData) => cogContainers.includes(cardData.position));
-		let updatedPlayCards = updatedPlayCardData.map((cardData) => <WordCardDraggable key={cardData._id} card={cardData} addCard={handleAddCard} />);
-		const updatedCogCards = updatedCogCardData.map((cardData) => <WordCardSortable key={cardData._id} card={cardData} removeCard={handleRemoveCard}/>);
+		let updatedPlayCards = updatedPlayCardData.map(cardData => draggableElement(cardData));
+		const updatedCogCards = updatedCogCardData.map(cardData => sortableElement(cardData));
 
 		// strip out any placeholder cards
 		updatedPlayCards = updatedPlayCards.length ? updatedPlayCards.filter((card) => card && !["1","2","3","4"].includes(card.key || "")) : updatedPlayCards
@@ -166,11 +172,11 @@ export const Game = ({ game, cards }: GameProps) => {
 		});
 		const occupiedCogSpaces = updatedCogCardsOnlyData.map((card) => card.position);
 		const emptyCogSpaces = cogContainers.filter((space) => !occupiedCogSpaces.includes(space));
-		let updatedCogCardsData: CardType[] = [];
+		let updatedCogCardsData: CardTypeExtended[] = [];
 		emptyCogSpaces.forEach((space) => {
 			const placeholder = placeholdersData.find((card) => card._id === space.toString());
 			if (placeholder) {
-				updatedCogCardsData.push(placeholdersData.find((card) => card._id === space.toString()) as CardType);
+				updatedCogCardsData.push(placeholdersData.find((card) => card._id === space.toString()) as CardTypeExtended);
 			}
 		});
 		updatedCogCardsData.push(...updatedCogCardsOnlyData)
@@ -196,8 +202,8 @@ export const Game = ({ game, cards }: GameProps) => {
 				console.log("occupiedCogSpaces", occupiedCogSpaces);
 			}
 
-		const updatedCogCards = updatedCogCardsData.map((cardData) => <WordCardSortable key={cardData._id} card={cardData} removeCard={handleRemoveCard} />);
-		const updatedPlayCards = updatedPlayCardsData.map((cardData) => <WordCardDraggable key={cardData._id} card={cardData} addCard={handleAddCard} />); 
+		const updatedCogCards = updatedCogCardsData.map(cardData => sortableElement(cardData));
+		const updatedPlayCards = updatedPlayCardsData.map(cardData => draggableElement(cardData)); 
 
 		setPlayCards(sortByPosition(updatedPlayCards));
 		setCogCards(sortByPosition(updatedCogCards));
@@ -213,7 +219,7 @@ export const Game = ({ game, cards }: GameProps) => {
 	}
 	
 	const handleDragEnd = (event: any) => {
-		const movedCardData = cardsData.find((card) => card._id === event.active.id) as CardType;
+		const movedCardData = cardsData.find((card) => card._id === event.active.id) as CardTypeExtended;
 		const origin = movedCardData.position;
 		if(event.over?.id) {			
 			const destination = cardsData.find((card) => card._id === event.over.id)?.position || 5;
@@ -235,7 +241,7 @@ export const Game = ({ game, cards }: GameProps) => {
 	}
 
 	const handleRemoveCard = (cardId: string) => {
-		const updatedCard = cardsData.find((card) => card._id === cardId) as CardType;
+		const updatedCard = cardsData.find((card) => card._id === cardId) as CardTypeExtended;
 		if (updatedCard) {
 			moveCard(updatedCard, updatedCard.position, 5);
 		}
@@ -243,18 +249,28 @@ export const Game = ({ game, cards }: GameProps) => {
 
 	const handleAddCard = (cardId: string) => {
 		let destination = 4;
-		const cardData = cardsData.find((card) => card._id === cardId) as CardType;
+		const cardData = cardsData.find((card) => card._id === cardId) as CardTypeExtended;
+		cardData.rotation = 0;
 		const cogCardData = cardsData.filter((card) => cogContainers.includes(card.position));
 		const cogPlaceholders = cogCardData.filter((card) => cogContainers.includes(parseInt(card._id)));
 		if (cogPlaceholders.length) {
 			destination = cardsData.find((card) => card._id === cogPlaceholders[0]._id)?.position || 4;
 		}
 		moveCard(cardData, cardData.position, destination);
+
 	}
 
 	const saveGame = () => {
 		console.log("saving game");
 		console.log("cardsData", cardsData);
+	}
+
+	const updateCardRotation = (cardId: string, rotation: number) => {
+		const cardData = cardsData.find((card) => card._id === cardId) as CardTypeExtended;
+		if (cardData) {
+			cardData.rotation = rotation % 1;
+		}
+		setCardsData([...cardsData]);
 	}
 
 	return (

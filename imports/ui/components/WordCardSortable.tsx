@@ -5,10 +5,11 @@ import type { CardType } from '../../api/types';
 
 interface WordCardSortableProps {
 	card: CardType,
-	removeCard: Function
+	removeCard: Function,
+	updateGame: Function
 }
 
-export const WordCardSortable: React.FC<WordCardSortableProps> = ({card, removeCard}) => {
+export const WordCardSortable: React.FC<WordCardSortableProps> = ({card, removeCard, updateGame}) => {
 	const keywords = card.words;
 	const [turn, setTurn] = useState(0);
 	const isPlaceholder = ["1", "2", "3", "4"].includes(card._id);
@@ -32,6 +33,7 @@ export const WordCardSortable: React.FC<WordCardSortableProps> = ({card, removeC
 		const cardOuter = (e.target as HTMLElement).closest(".card-panel")?.previousElementSibling;
 		(cardOuter as HTMLElement).style.transform = "rotate(" + turnValue + "turn)";
 		setTurn(turnValue);
+		updateGame(card._id, turnValue);
 	}
 
 	if(isPlaceholder) {
