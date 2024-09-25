@@ -388,3 +388,25 @@
 .z-top {
 	z-index: 1000;
 }
+
+.cog-save {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+	grid-row-start: 1;
+	grid-row-end: 1;
+	grid-column-start: 5;
+	grid-column-end: 5;
+}
+
+.cog-save button {
+	height: 6vmin;
+	margin: 0 2vmin;
+	cursor: pointer;
+}
+
+.save-img {
+	max-height: 100%;
+}

@@ -6,10 +6,11 @@ import { EditKey } from './EditKey';
 interface CogKeysProps {
 	updateKeys: Function
 	resetCards: Function
+	saveGame: Function
 	keys: Array<string>
 }
 
-export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, keys}) => {
+export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGame,keys}) => {
 	const [isEditing, setIsEditing] = useState(0);
 
 	const handleClickEdit = (keyId: number) => {
@@ -28,6 +29,10 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, keys}) 
 
 	const handleResetCards = () => {
 		resetCards();
+	}
+
+	const handleSaveGame = () => {
+		saveGame();
 	}
 
 	const keyDisplayContent = (key: string) => {
@@ -88,6 +93,11 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, keys}) 
 			<div className="cog-panel">
 				<button className='cog-button' onClick={handleResetCards}>
 					<img className='cog-img' src='/reset-icon.png' />
+				</button>
+			</div>
+			<div className="cog-save">
+				<button onClick={handleSaveGame}>
+					<img className='save-img' src='/save-icon.png' />
 				</button>
 			</div>
 		</>

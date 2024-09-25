@@ -11,6 +11,7 @@
 .game-panel button {
 	height: 6vmin;
 	margin: 0 2vmin;
+	cursor: pointer;
 }
 
 .exit-img {

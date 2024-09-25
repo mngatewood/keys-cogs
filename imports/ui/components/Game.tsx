@@ -252,6 +252,11 @@ export const Game = ({ game, cards }: GameProps) => {
 		moveCard(cardData, cardData.position, destination);
 	}
 
+	const saveGame = () => {
+		console.log("saving game");
+		console.log("cardsData", cardsData);
+	}
+
 	return (
 		<>
 			{isLoading() ? <Loading /> :
@@ -261,7 +266,7 @@ export const Game = ({ game, cards }: GameProps) => {
 						<button className='start-game-button' onClick={startDemo}>Start Demo</button>
 					</div> */}
 					<div className="cog-container">
-						<CogKeys updateKeys={handleKeyUpdate} resetCards={resetCards} keys={keys}/>
+						<CogKeys updateKeys={handleKeyUpdate} resetCards={resetCards} saveGame={saveGame} keys={keys}/>
 						<SortableContext items={cogCards.map((card) => card.key || "")} strategy={rectSwappingStrategy} >
 							<div className="droppable-container">
 								{ cogCards.map((card) => (
