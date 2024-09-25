@@ -1,13 +1,9 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { GamesCollection, GamesCollectionSchema } from './GamesCollection';
-
-type Player = {
-	_id: string
-	keys: string[]
-	cards: any[]
-	results: any[]
-}
+import type { PlayerType } from '../types'
+import { shuffleArray } from '/imports/helpers/shuffle';
+import { CardsCollection } from '../cards/CardsCollection';
 
 Meteor.methods({
 	async 'games.insert'(host: string) {
@@ -89,13 +85,39 @@ Meteor.methods({
 		}
 
 		const game = await GamesCollection.findOneAsync({_id: gameId});
-		console.log("starting game", game)
-		if (game) {
+
+		if (game?.started) {
+			return game;
+		}
+
+		const playerCount = game?.players.length || 0;
+		
+		if (playerCount < 2) {
+			throw new Meteor.Error('not-enough-players', 'There must be at least 2 players.  Please try again.');
+		}
+
+		const allCards = await CardsCollection.find({}).fetchAsync();
+		const gameCardsCount = playerCount * 5;
+		const randomIndexes = shuffleArray(Array.from(Array(allCards.length).keys())).slice(0, gameCardsCount);
+		const startingCardData = randomIndexes.map((value) => {
+			let card = allCards[value as number];
+			card.position = 5;
+			return card;
+		});
+
+		if (game) {			
+			game.cards = startingCardData
+			game.players.map((player: PlayerType, index: number) => {
+				player.cards = startingCardData.slice(index * 5, (index + 1) * 5);
+			})
 			const update = {
 				$set: {
-					started: true
+					cards: startingCardData,
+					players: game.players,
+					started: true,
 				}
 			}
+
 			const response = await GamesCollection.updateAsync(gameId, update);
 			if (response === 1) {
 				game.started = true
@@ -120,7 +142,7 @@ Meteor.methods({
 			throw new Meteor.Error('game-not-found', 'Game not found.  Please try again.');
 		}
 
-		const playerIds = game?.players.map((player: Player) => player._id) || [];
+		const playerIds = game?.players.map((player: PlayerType) => player._id) || [];
 		if (playerIds.includes(playerId)) {
 			throw new Meteor.Error('player-already-in-game', 'An error occurred.  You are already in this game.');
 		}
@@ -160,15 +182,16 @@ Meteor.methods({
 		if (!game) {
 			throw new Meteor.Error('game-not-found', 'Game not found.  Please try again.');
 		}
-
-		const updatedPlayers = game?.players.filter((player: Player) => player._id !== playerId) || [];
+		const updatedPlayers = game?.players.filter((player: PlayerType) => player._id !== playerId) || [];
 		if (updatedPlayers?.length > 0) {
 			const update = {
-				$set: {
-					players: updatedPlayers
+				$pull: {
+					players: {
+							_id: playerId
+					}
 				}
 			}
-			const response = await GamesCollection.updateAsync(gameId, update);
+			const response = await GamesCollection.updateAsync({_id: gameId}, update);
 			if (response === 1) {
 				game.players = updatedPlayers;
 				return game;

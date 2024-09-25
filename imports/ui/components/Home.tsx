@@ -1,27 +1,13 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTracker } from 'meteor/react-meteor-data';
 import { Meteor } from 'meteor/meteor';
 
-interface HomeProps {
-	setGameId: Function
-}
-
-export const Home:React.FC<HomeProps> = ({setGameId}) => {
-
-	const navigate = useNavigate();
-
-	const logout = () => {
-		Meteor.logout();
-	}
+export const Home = () => {
 
 	const user = useTracker(() => Meteor.user());
 
-	const startGame = () => {
-		Meteor.callAsync("games.insert", user?._id).then((result) => {
-			setGameId(result);
-			navigate("/play");
-		});
+	const logout = () => {
+		Meteor.logout();
 	}
 
 	return (
@@ -31,9 +17,8 @@ export const Home:React.FC<HomeProps> = ({setGameId}) => {
 					<>
 						<h1>Welcome, {user.username}!</h1>
 						<button className="button" onClick={logout}>Logout</button>
-						<button className="button" onClick={startGame}>Host Game</button>
 						<button className="button">
-							<a href="/join">Join Game</a>
+							<a href="/play">Play</a>
 						</button>
 					</>
 				:

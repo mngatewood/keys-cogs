@@ -1,30 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Meteor } from 'meteor/meteor';
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { useTracker, useSubscribe } from 'meteor/react-meteor-data';
 
-// Collections
-import { CardsCollection } from '../api/cards/CardsCollection';
-
 // Components
-import { PrivateRoutes } from './components/PrivateRoutes';
 import { Loading } from './components/Loading';
 import { Home } from './components/Home';
 import { Login } from './components/Login';
 import { Register } from './components/Register';
-import { Join } from './components/Join';
-import { Game } from './components/Game';
+import { PrivateRoutes } from './components/PrivateRoutes';
+import { Play } from './components/Play';
 
 export const App = () => {
-	const [gameId, setGameId] = useState<string | undefined>(undefined);
 	const isLoading = useSubscribe("cards");
 	
-	// const cards = useTracker(() => CardsCollection.find().fetch());
 	const user = useTracker(() => Meteor.user());
-
-	const handleGameUpdate = (data: string) => {
-		setGameId(data);
-	}
 
 	return (
 		<Router>
@@ -39,12 +29,11 @@ export const App = () => {
 				{ isLoading() ? <Loading /> :
 					<Routes>
 						<Route element={<PrivateRoutes />}>
-							<Route path="/join" element={<Join setGameId={handleGameUpdate} />} />
-							<Route path="/play" element={<Game gameId={gameId ?? ""} />} />
+							<Route path="/play" element={<Play />} />
 						</Route>
 						<Route path="/login" element={<Login />} />
 						<Route path="/register" element={<Register />} />
-						<Route path="/" element={<Home setGameId={handleGameUpdate}/>} />
+						<Route path="/" element={<Home />} />
 					</Routes>
 				}
 			</div>

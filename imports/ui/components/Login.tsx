@@ -1,5 +1,5 @@
 import { Meteor } from "meteor/meteor";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom'
 import { validateEmail } from '../../helpers/registerValidation';
 
@@ -11,9 +11,11 @@ export const Login = () => {
 	const [passwordError, setPasswordError] = useState("*Required");
 	const navigate = useNavigate();
 
-	if(Meteor.user()) {
-		navigate("/");
-	}
+	useEffect(() => {
+		if (Meteor.user()) {
+			navigate("/");
+		}
+	}, [Meteor.user()]);
 
 	const handleChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
 		e.preventDefault();

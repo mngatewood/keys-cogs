@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { useSubscribe, useTracker } from 'meteor/react-meteor-data';
-import { type Game } from './Game';
+import type { GameType } from '../../api/types';
 import { Loading } from './Loading';
 import { GamesCollection } from '/imports/api/games/GamesCollection';
-import { useNavigate } from 'react-router-dom';
 import {fullName } from '/imports/helpers/reducers';
 
 interface JoinProps {
-	setGameId: Function,
+	joinGame: Function,
 }
 
 interface ExtendedUser extends Meteor.User {
@@ -21,22 +20,42 @@ interface ExtendedGame extends Meteor.User {
 	playerCount: number
 }
 
-export const Join:React.FC<JoinProps> = ({setGameId}) => {
+export const Join:React.FC<JoinProps> = ({joinGame}) => {
 	const [games, setGames] = useState<ExtendedGame[]>([]);
 	const [joinError, setJoinError] = useState<string | undefined>(undefined);
 	const isLoading = useSubscribe("games.pending");
 	const userSub = useSubscribe("users.all");
-	const pendingGames = useTracker(() => GamesCollection.find().fetch() as Game[]);
-	const navigate = useNavigate();
+
+	const gamesQuery = {
+		started: false,
+		completed: false,
+		players: {
+			$elemMatch: {
+				_id: {
+					$ne: Meteor.userId()
+				}
+			}
+		}
+	};
+
+	const gamesOptions = {
+		sort: { createdAt: -1 },
+	}
+	const pendingGames = useTracker(() => GamesCollection.find(gamesQuery, gamesOptions).fetch() as GameType[]);
 
 	useEffect(() => {
 		if (pendingGames ) {
 			loadPendingGames();
 		}
-	}, [isLoading(), userSub()]);
+	}, [isLoading(), userSub(), pendingGames?.length]);
 
 	const loadPendingGames = () => {
-		const updatedGames = pendingGames.map((game: Game) => {
+		if (pendingGames.length === 0) {
+			setJoinError("No pending games. Please try again later.");
+		} else {
+			setJoinError(undefined);
+		}
+		const updatedGames = pendingGames.map((game: GameType) => {
 			// TODO: detect host presence
 			const host = Meteor.users.findOne(game.hostId) as ExtendedUser || undefined;
 
@@ -58,8 +77,7 @@ export const Join:React.FC<JoinProps> = ({setGameId}) => {
 		if (gameId) {
 			Meteor.callAsync("game.join", gameId, Meteor.userId()).then((result) => {
 				console.log("updatedGame", result)
-				setGameId(gameId);
-				navigate("/play");
+				joinGame(gameId);
 			}).catch((error) => {
 				console.log("joinError", error)
 				setJoinError(error.reason);
