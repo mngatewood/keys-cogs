@@ -9,6 +9,7 @@ export type CardType = {
 	_id: string;
 	words: Array<string>,
 	position: number,
+	rotation?: number
 }
 
 export type GameType = {
