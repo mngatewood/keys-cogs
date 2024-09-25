@@ -8,12 +8,13 @@ import { Loading } from './Loading';
 import { Menu } from './Menu';
 import { Lobby } from './Lobby';
 import { Join } from './Join';
+import { Game } from './Game';
 
 // Collections
 import { GamesCollection } from '/imports/api/games/GamesCollection';
 
 // Types
-import type { Game } from '../../api/types';
+import type { GameType } from '../../api/types';
 
 export const Play = () => {
 	const [gameId, setGameId] = useState("");
@@ -21,7 +22,16 @@ export const Play = () => {
 	const [gameCompleted, setGameCompleted] = useState(false);
 	const [renderGamesList, setRenderGamesList] = useState(false);
 	const isLoading = useSubscribe("games");
-	const game = useTracker(() => GamesCollection.findOne(gameId) as Game);
+	const game = useTracker(() => GamesCollection.findOne(gameId) as GameType);
+
+	// TODO
+	// const startDemo = () => {
+	// 	const allCardData = demoCards as Card[];
+	// 	setKeys(demoKeys);
+	// 	dealCards(allCardData)
+	// }
+
+
 
 	const hostGame = (gameId: string) => {
 		if (gameId) {			
@@ -41,12 +51,10 @@ export const Play = () => {
 	}
 
 	const startGame = (gameId: string) => {
-		Meteor.callAsync("game.start", gameId).then((result) => {
-			const updatedGame = result as Game;
-			if (updatedGame._id === gameId) {
+		Meteor.callAsync("game.start", gameId).then((result) => {			
+			if (result._id === gameId) {
 				setGameStarted(true);
 			}
-			// TODO deal cards and render game
 		}).catch((error) => {
 			console.log("error", error)
 		});
@@ -100,8 +108,7 @@ export const Play = () => {
 			}
 
 			{!isLoading() && game && gameStarted && !gameCompleted && (
-				// TODO: Render game component
-				<div>Game</div>
+				<Game game={game} />
 			)}
 		</>
 	);

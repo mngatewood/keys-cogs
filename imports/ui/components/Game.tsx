@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import { Meteor } from 'meteor/meteor';
 import { useSubscribe } from 'meteor/react-meteor-data';
 import { DndContext, rectIntersection, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, rectSwappingStrategy } from '@dnd-kit/sortable';
 
 // Collections
-import { CardsCollection } from '/imports/api/cards/CardsCollection';
+// import { CardsCollection } from '/imports/api/cards/CardsCollection';
 // import { GamesCollection } from '/imports/api/games/GamesCollection';
 
 // Components
-import { Lobby } from './Lobby';
 import { Droppable } from './Droppable';
 import { CogKeys } from './CogKeys';
 import { WordCardDraggable } from './WordCardDraggable';
@@ -18,31 +17,15 @@ import { WordCardSortable } from './WordCardSortable';
 import { Loading } from './Loading';
 
 // Utilities
-import { shuffleArray } from '/imports/helpers/shuffle';
-import { demoCards, demoKeys } from '/imports/api/demoData';
+// import { shuffleArray } from '/imports/helpers/shuffle';
+// import { demoCards, demoKeys } from '/imports/api/demoData';
 
-export type Card = {
-	_id: string;
-	words: Array<string>,
-	position: number,
-}
+// Types
+import type { Player, Card, GameType } from '../../api/types';
 
-export type Game = {
-	_id: string,
-	hostId: string,
-	round: number,
-	players: Array<any>,
-	cards: Array<string>,
-	completed: boolean,
-	started: boolean,
-};
-
-export const Game = ({gameId}: {gameId: string}) => {
+export const Game = ({game} : {game: GameType}) => {
 	// State
-	const [game, setGame] = useState<any>(undefined);
-	const [gameStarted, setGameStarted] = useState(false);
-	const [gameCompleted, setGameCompleted] = useState(false);
-	const [isPlaying, setIsPlaying] = useState(false);
+	// const [isPlaying, setIsPlaying] = useState(false);
 	const [cardsData, setCardsData] = useState<Card[]>([]);
 	const [playCards, setPlayCards] = useState<React.JSX.Element[]>([]);
 	const [cogCards, setCogCards] = useState<React.JSX.Element[]>([]);
@@ -52,7 +35,7 @@ export const Game = ({gameId}: {gameId: string}) => {
 	const pointerSensor = useSensor(PointerSensor, { activationConstraint: { distance: 5 }});
 	const keyboardSensor = useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates });
 	const sensors = useSensors( pointerSensor, keyboardSensor);
-	const navigate = useNavigate();
+	// const navigate = useNavigate();
 
 	const cogContainers = [1, 2, 3, 4];
 	const isLoading = useSubscribe("games");
@@ -60,19 +43,20 @@ export const Game = ({gameId}: {gameId: string}) => {
 	useEffect(() => {
 		console.log("useEffect Game")
 		const loadGameCards = () => {
+			// console.log("game", game)
+			const player = game.players.find((player: Player) => player._id === Meteor.userId());
+			// console.log("player", player)
+			const playerCards = player.cards;
+			// console.log("playerCards", playerCards)
+			const placeholderCards = cogContainers.map((container) => {
+				return { _id: container.toString(), words: ["", "", "", ""], position: container }
+			});
+			// console.log("placeholderCards", placeholderCards)
 
-			// Game was cancelled in Lobby
-			if (!gameStarted && gameCompleted) {
-				navigate("/");
-			}
+			setCardsData([...playerCards, ...placeholderCards]);
 
-			// Game is pending
-			if (gameId) {
-				Meteor.callAsync("game.get", gameId).then((result) => { setGame(result) });
-			}
-
-			const playCardsData = cardsData.filter((card) => card.position === 5);
-			const cogCardsData = cardsData.filter((card) => card.position !== 5);
+			const playCardsData = cardsData.filter((card: Card) => card.position === 5);
+			const cogCardsData = cardsData.filter((card: Card) => card.position !== 5);
 
 			const playCardElements = playCardsData.map((card) => {
 				return <WordCardDraggable key={card._id} card={card} addCard={handleAddCard} />;
@@ -87,7 +71,7 @@ export const Game = ({gameId}: {gameId: string}) => {
 			validateCardsState();
 		};
 		loadGameCards();
-	}, [cardsData, gameId, gameStarted, gameCompleted]);
+	}, [game]);
 
 	const sortByPosition = (array: React.JSX.Element[]) => {
 		return array.sort((a: any, b: any) => {
@@ -98,33 +82,6 @@ export const Game = ({gameId}: {gameId: string}) => {
 			}
 			return aPosition - bPosition;
 		});
-	}
-
-	const startGame = () => {
-		const allCardData = CardsCollection.find({}).fetch() as Card[];
-		dealCards(allCardData);
-	}
-
-	const startDemo = () => {
-		const allCardData = demoCards as Card[];
-		setKeys(demoKeys);
-		dealCards(allCardData)
-	}
-
-	const dealCards = (allCardData?: Card[]) => {
-		if(allCardData) {
-			const randomIndexes = shuffleArray(Array.from(Array(allCardData.length).keys())).slice(0, 5);
-			const startingCardData = randomIndexes.map((value) => {
-				let card = allCardData[value];
-				card.position = 5;
-				return card;
-			});
-			const placeholderCards = cogContainers.map((container) => {
-				return { _id: container.toString(), words: ["", "", "", ""], position: container }
-			})
-			setCardsData([...startingCardData, ...placeholderCards]);
-			setIsPlaying(true);
-		}
 	}
 
 	const moveCard = (cardData: Card, origin: number, destination: number) => {
@@ -217,7 +174,6 @@ export const Game = ({gameId}: {gameId: string}) => {
 	}
 
 	const validateCardsState = () => {
-		if (!isPlaying) return;
 		const placeholdersData = cardsData.filter((card) => cogContainers.includes(parseInt(card._id)));
 		const placeholderIds = placeholdersData.map((card) => card._id);
 		const wordCardsData = cardsData.filter((card) => !placeholderIds.includes(card._id));
@@ -312,83 +268,30 @@ export const Game = ({gameId}: {gameId: string}) => {
 		moveCard(cardData, cardData.position, destination);
 	}
 
-	const handleStartGame = (gameId: string) => {
-		Meteor.callAsync("game.start", gameId).then((result) => {
-			setGame(result);
-			setGameStarted(true);
-			// TODO replace next line with start game call
-			startDemo();
-		}).catch((error) => {
-			console.log("error", error)
-		});
-	}
-
-	const handleEndGame = (gameId: string) => {
-		Meteor.callAsync("game.complete", gameId).then((result) => {
-			setGame(result);
-			setGameCompleted(true);
-		}).catch((error) => {
-			console.log("error", error)
-		});
-	}
-
-	const handleRemovePlayer = (playerId: string) => {
-		console.log("removing player", playerId);
-		// TODO remove player
-		return true;
-	}
-
-	const handleLeaveGame = (playerId: string) => {
-		console.log("leaving game", playerId);
-		Meteor.callAsync("game.leave", gameId, playerId).then((result) => {
-			setGame(result);
-			navigate("/join");
-		}).catch((error) => {
-			console.log("error", error)
-		})
-		return true;
-	}
-
 	return (
 		<>
-			{isLoading() && <Loading />}
-			{!isLoading() &&gameStarted && !gameCompleted &&
+			{isLoading() ? <Loading /> :
 				<DndContext sensors={sensors} collisionDetection={rectIntersection} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-					{ !isPlaying &&	
-						<div className="start-game-container">
-							<button className='start-game-button' onClick={startGame}>Start Game</button>
-							<button className='start-game-button' onClick={startDemo}>Start Demo</button>
-						</div>
-					}
-					{ isPlaying &&
-						<div className="cog-container">
-							<CogKeys updateKeys={handleKeyUpdate} resetCards={handleResetCards}keys={keys}/>
-							<SortableContext items={cogCards.map((card) => card.key || "")} strategy={rectSwappingStrategy} >
-								<div className="droppable-container">
-									{ cogCards.map((card) => (
-										<Droppable key={card.key ?? ""} id={card.key ?? ""}>
-											{ card }
-										</Droppable>
-									))}
-								</div>
-							</SortableContext>
-						</div>
-						}
-					{ isPlaying &&
-						<div className="draw-container">
-							{ playCards }
-						</div>
-					}
+					{/* <div className="start-game-container">
+						<button className='start-game-button' onClick={startGame}>Start Game</button>
+						<button className='start-game-button' onClick={startDemo}>Start Demo</button>
+					</div> */}
+					<div className="cog-container">
+						<CogKeys updateKeys={handleKeyUpdate} resetCards={handleResetCards}keys={keys}/>
+						<SortableContext items={cogCards.map((card) => card.key || "")} strategy={rectSwappingStrategy} >
+							<div className="droppable-container">
+								{ cogCards.map((card) => (
+									<Droppable key={card.key ?? ""} id={card.key ?? ""}>
+										{ card }
+									</Droppable>
+								))}
+							</div>
+						</SortableContext>
+					</div>
+					<div className="draw-container">
+						{ playCards }
+					</div>
 				</DndContext>
-			}
-			{!isLoading() && !gameStarted && !gameCompleted &&
-				<Lobby 
-					game={game} 
-					endGame={handleEndGame} 
-					startGame={handleStartGame} 
-					removePlayer={handleRemovePlayer}
-					leaveGame={handleLeaveGame}
-				/>
 			}
 		</>
 	)

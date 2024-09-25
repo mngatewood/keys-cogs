@@ -11,7 +11,7 @@ export type Card = {
 	position: number,
 }
 
-export type Game = {
+export type GameType = {
 	_id: string,
 	hostId: string,
 	round: number,
