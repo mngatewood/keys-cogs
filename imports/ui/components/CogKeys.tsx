@@ -26,6 +26,10 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, keys}) 
 		setIsEditing(0);
 	}
 
+	const handleResetCards = () => {
+		resetCards();
+	}
+
 	const keyDisplayContent = (key: string) => {
 		if (key === "") {
 			return {content: "click to add a key", class: "animate-key key-placeholder"}
@@ -83,7 +87,7 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, keys}) 
 			</div>
 			<div className="cog-panel">
 				<button className='cog-button'>
-					<img className='cog-img' src='/reset-icon.png' onClick={resetCards}/>
+					<img className='cog-img' src='/reset-icon.png' onClick={handleResetCards}/>
 				</button>
 			</div>
 		</>
