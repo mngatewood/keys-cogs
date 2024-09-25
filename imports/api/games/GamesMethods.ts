@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { GamesCollection, GamesCollectionSchema } from './GamesCollection';
-import type { Player } from '../types'
+import type { PlayerType } from '../types'
 import { shuffleArray } from '/imports/helpers/shuffle';
 import { CardsCollection } from '../cards/CardsCollection';
 
@@ -107,7 +107,7 @@ Meteor.methods({
 
 		if (game) {			
 			game.cards = startingCardData
-			game.players.map((player: Player, index: number) => {
+			game.players.map((player: PlayerType, index: number) => {
 				player.cards = startingCardData.slice(index * 5, (index + 1) * 5);
 			})
 			const update = {
@@ -142,7 +142,7 @@ Meteor.methods({
 			throw new Meteor.Error('game-not-found', 'Game not found.  Please try again.');
 		}
 
-		const playerIds = game?.players.map((player: Player) => player._id) || [];
+		const playerIds = game?.players.map((player: PlayerType) => player._id) || [];
 		if (playerIds.includes(playerId)) {
 			throw new Meteor.Error('player-already-in-game', 'An error occurred.  You are already in this game.');
 		}
@@ -182,7 +182,7 @@ Meteor.methods({
 		if (!game) {
 			throw new Meteor.Error('game-not-found', 'Game not found.  Please try again.');
 		}
-		const updatedPlayers = game?.players.filter((player: Player) => player._id !== playerId) || [];
+		const updatedPlayers = game?.players.filter((player: PlayerType) => player._id !== playerId) || [];
 		if (updatedPlayers?.length > 0) {
 			const update = {
 				$pull: {

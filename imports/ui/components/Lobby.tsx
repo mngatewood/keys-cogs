@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { useSubscribe } from 'meteor/react-meteor-data';
-import type { Game, Player } from '../../api/types';
+import type { GameType, PlayerType } from '../../api/types';
 import { Loading } from './Loading';
 import { fullName } from '/imports/helpers/reducers';
 
 interface LobbyProps {
-	game: Game,
+	game: GameType,
 	endGame: Function,
 	startGame: Function,
 	removePlayer: Function,
@@ -26,7 +26,7 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 	useEffect(() => {
 		console.log("useEffect Lobby");
 
-		const playerIds = game.players.map((player: Player) => player._id);
+		const playerIds = game.players.map((player: PlayerType) => player._id);
 		const inGame = playerIds.includes(Meteor.userId() ?? "");
 
 		if (inGame && !game?.started && !game?.completed) {	// player is in pending game
@@ -42,7 +42,7 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 	}, [game, isLoading()]);
 
 	const loadLobbyPlayers = () => {
-		const updatedPlayers = game.players.map((player: Player) => {
+		const updatedPlayers = game.players.map((player: PlayerType) => {
 			const playerDoc = Meteor.users.findOne(player._id) as ExtendedUser | undefined;
 
 			const status = () => {

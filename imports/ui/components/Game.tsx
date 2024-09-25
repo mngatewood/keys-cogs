@@ -21,12 +21,12 @@ import { Loading } from './Loading';
 // import { demoCards, demoKeys } from '/imports/api/demoData';
 
 // Types
-import type { Player, Card, GameType } from '../../api/types';
+import type { PlayerType, CardType, GameType } from '../../api/types';
 
 export const Game = ({game} : {game: GameType}) => {
 	// State
 	// const [isPlaying, setIsPlaying] = useState(false);
-	const [cardsData, setCardsData] = useState<Card[]>([]);
+	const [cardsData, setCardsData] = useState<CardType[]>([]);
 	const [playCards, setPlayCards] = useState<React.JSX.Element[]>([]);
 	const [cogCards, setCogCards] = useState<React.JSX.Element[]>([]);
 	const [keys, setKeys] = useState<string[]>(["", "", "", ""]);
@@ -44,7 +44,7 @@ export const Game = ({game} : {game: GameType}) => {
 		console.log("useEffect Game")
 		const loadGameCards = () => {
 			// console.log("game", game)
-			const player = game.players.find((player: Player) => player._id === Meteor.userId());
+			const player = game.players.find((player: PlayerType) => player._id === Meteor.userId());
 			// console.log("player", player)
 			const playerCards = player.cards;
 			// console.log("playerCards", playerCards)
@@ -55,8 +55,8 @@ export const Game = ({game} : {game: GameType}) => {
 
 			setCardsData([...playerCards, ...placeholderCards]);
 
-			const playCardsData = cardsData.filter((card: Card) => card.position === 5);
-			const cogCardsData = cardsData.filter((card: Card) => card.position !== 5);
+			const playCardsData = cardsData.filter((card: CardType) => card.position === 5);
+			const cogCardsData = cardsData.filter((card: CardType) => card.position !== 5);
 
 			const playCardElements = playCardsData.map((card) => {
 				return <WordCardDraggable key={card._id} card={card} addCard={handleAddCard} />;
@@ -84,7 +84,7 @@ export const Game = ({game} : {game: GameType}) => {
 		});
 	}
 
-	const moveCard = (cardData: Card, origin: number, destination: number) => {
+	const moveCard = (cardData: CardType, origin: number, destination: number) => {
 		// console.log(cardData, origin, destination);
 		let cards = cardsData;
 		const cardToShiftData = cards.find((card) => card.position === destination);
@@ -182,11 +182,11 @@ export const Game = ({game} : {game: GameType}) => {
 		});
 		const occupiedCogSpaces = updatedCogCardsOnlyData.map((card) => card.position);
 		const emptyCogSpaces = cogContainers.filter((space) => !occupiedCogSpaces.includes(space));
-		let updatedCogCardsData: Card[] = [];
+		let updatedCogCardsData: CardType[] = [];
 		emptyCogSpaces.forEach((space) => {
 			const placeholder = placeholdersData.find((card) => card._id === space.toString());
 			if (placeholder) {
-				updatedCogCardsData.push(placeholdersData.find((card) => card._id === space.toString()) as Card);
+				updatedCogCardsData.push(placeholdersData.find((card) => card._id === space.toString()) as CardType);
 			}
 		});
 		updatedCogCardsData.push(...updatedCogCardsOnlyData)
@@ -229,7 +229,7 @@ export const Game = ({game} : {game: GameType}) => {
 	}
 	
 	const handleDragEnd = (event: any) => {
-		const movedCardData = cardsData.find((card) => card._id === event.active.id) as Card;
+		const movedCardData = cardsData.find((card) => card._id === event.active.id) as CardType;
 		const origin = movedCardData.position;
 		if(event.over?.id) {			
 			const destination = cardsData.find((card) => card._id === event.over.id)?.position || 5;
@@ -251,7 +251,7 @@ export const Game = ({game} : {game: GameType}) => {
 	}
 
 	const handleRemoveCard = (cardId: string) => {
-		const updatedCard = cardsData.find((card) => card._id === cardId) as Card;
+		const updatedCard = cardsData.find((card) => card._id === cardId) as CardType;
 		if (updatedCard) {
 			moveCard(updatedCard, updatedCard.position, 5);
 		}
@@ -259,7 +259,7 @@ export const Game = ({game} : {game: GameType}) => {
 
 	const handleAddCard = (cardId: string) => {
 		let destination = 4;
-		const cardData = cardsData.find((card) => card._id === cardId) as Card;
+		const cardData = cardsData.find((card) => card._id === cardId) as CardType;
 		const cogCardData = cardsData.filter((card) => cogContainers.includes(card.position));
 		const cogPlaceholders = cogCardData.filter((card) => cogContainers.includes(parseInt(card._id)));
 		if (cogPlaceholders.length) {

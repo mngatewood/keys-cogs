@@ -1,11 +1,11 @@
-export type Player = {
+export type PlayerType = {
 	_id: string
 	keys: string[]
 	cards: any[]
 	results: any[]
 }
 
-export type Card = {
+export type CardType = {
 	_id: string;
 	words: Array<string>,
 	position: number,

@@ -26,7 +26,7 @@ export const Play = () => {
 
 	// TODO
 	// const startDemo = () => {
-	// 	const allCardData = demoCards as Card[];
+	// 	const allCardData = demoCards as CardType[];
 	// 	setKeys(demoKeys);
 	// 	dealCards(allCardData)
 	// }

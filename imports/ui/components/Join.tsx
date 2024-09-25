@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { useSubscribe, useTracker } from 'meteor/react-meteor-data';
-import type { Game } from '../../api/types';
+import type { GameType } from '../../api/types';
 import { Loading } from './Loading';
 import { GamesCollection } from '/imports/api/games/GamesCollection';
 import {fullName } from '/imports/helpers/reducers';
@@ -41,7 +41,7 @@ export const Join:React.FC<JoinProps> = ({joinGame}) => {
 	const gamesOptions = {
 		sort: { createdAt: -1 },
 	}
-	const pendingGames = useTracker(() => GamesCollection.find(gamesQuery, gamesOptions).fetch() as Game[]);
+	const pendingGames = useTracker(() => GamesCollection.find(gamesQuery, gamesOptions).fetch() as GameType[]);
 
 	useEffect(() => {
 		if (pendingGames ) {
@@ -55,7 +55,7 @@ export const Join:React.FC<JoinProps> = ({joinGame}) => {
 		} else {
 			setJoinError(undefined);
 		}
-		const updatedGames = pendingGames.map((game: Game) => {
+		const updatedGames = pendingGames.map((game: GameType) => {
 			// TODO: detect host presence
 			const host = Meteor.users.findOne(game.hostId) as ExtendedUser || undefined;
 
