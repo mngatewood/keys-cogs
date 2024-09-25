@@ -86,8 +86,8 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, keys}) 
 				</TransitionGroup>
 			</div>
 			<div className="cog-panel">
-				<button className='cog-button'>
-					<img className='cog-img' src='/reset-icon.png' onClick={handleResetCards}/>
+				<button className='cog-button' onClick={handleResetCards}>
+					<img className='cog-img' src='/reset-icon.png' />
 				</button>
 			</div>
 		</>
