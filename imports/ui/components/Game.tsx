@@ -1,13 +1,7 @@
 import React, { useState, useEffect } from 'react';
-// import { useNavigate } from 'react-router-dom';
-import { Meteor } from 'meteor/meteor';
 import { useSubscribe } from 'meteor/react-meteor-data';
 import { DndContext, rectIntersection, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, rectSwappingStrategy } from '@dnd-kit/sortable';
-
-// Collections
-// import { CardsCollection } from '/imports/api/cards/CardsCollection';
-// import { GamesCollection } from '/imports/api/games/GamesCollection';
 
 // Components
 import { Droppable } from './Droppable';
@@ -16,17 +10,17 @@ import { WordCardDraggable } from './WordCardDraggable';
 import { WordCardSortable } from './WordCardSortable';
 import { Loading } from './Loading';
 
-// Utilities
-// import { shuffleArray } from '/imports/helpers/shuffle';
-// import { demoCards, demoKeys } from '/imports/api/demoData';
-
 // Types
-import type { PlayerType, CardType, GameType } from '../../api/types';
+import type { CardType, GameType } from '../../api/types';
 
-export const Game = ({game} : {game: GameType}) => {
+interface GameProps {
+  game: GameType;
+  cards: CardType[];
+}
+
+export const Game = ({ game, cards }: GameProps) => {
 	// State
-	// const [isPlaying, setIsPlaying] = useState(false);
-	const [cardsData, setCardsData] = useState<CardType[]>([]);
+	const [cardsData, setCardsData] = useState<CardType[]>(cards);
 	const [playCards, setPlayCards] = useState<React.JSX.Element[]>([]);
 	const [cogCards, setCogCards] = useState<React.JSX.Element[]>([]);
 	const [keys, setKeys] = useState<string[]>(["", "", "", ""]);
@@ -35,7 +29,6 @@ export const Game = ({game} : {game: GameType}) => {
 	const pointerSensor = useSensor(PointerSensor, { activationConstraint: { distance: 5 }});
 	const keyboardSensor = useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates });
 	const sensors = useSensors( pointerSensor, keyboardSensor);
-	// const navigate = useNavigate();
 
 	const cogContainers = [1, 2, 3, 4];
 	const isLoading = useSubscribe("games");
@@ -43,17 +36,6 @@ export const Game = ({game} : {game: GameType}) => {
 	useEffect(() => {
 		console.log("useEffect Game")
 		const loadGameCards = () => {
-			// console.log("game", game)
-			const player = game.players.find((player: PlayerType) => player._id === Meteor.userId());
-			// console.log("player", player)
-			const playerCards = player.cards;
-			// console.log("playerCards", playerCards)
-			const placeholderCards = cogContainers.map((container) => {
-				return { _id: container.toString(), words: ["", "", "", ""], position: container }
-			});
-			// console.log("placeholderCards", placeholderCards)
-
-			setCardsData([...playerCards, ...placeholderCards]);
 
 			const playCardsData = cardsData.filter((card: CardType) => card.position === 5);
 			const cogCardsData = cardsData.filter((card: CardType) => card.position !== 5);
@@ -69,9 +51,11 @@ export const Game = ({game} : {game: GameType}) => {
 			setCogCards(sortByPosition(cogCardElements));
 
 			validateCardsState();
+
 		};
+
 		loadGameCards();
-	}, [game]);
+	}, [game, cardsData]);
 
 	const sortByPosition = (array: React.JSX.Element[]) => {
 		return array.sort((a: any, b: any) => {
@@ -238,7 +222,7 @@ export const Game = ({game} : {game: GameType}) => {
 		document.getElementById(movedCardData._id)?.classList.remove("z-top");
 	}
 
-	const handleResetCards = () => {
+	const resetCards = () => {
 		const updatedCards = cardsData.map((card) => {
 			if(["1", "2", "3", "4"].includes(card._id)) {
 				card.position = parseInt(card._id);
@@ -277,7 +261,7 @@ export const Game = ({game} : {game: GameType}) => {
 						<button className='start-game-button' onClick={startDemo}>Start Demo</button>
 					</div> */}
 					<div className="cog-container">
-						<CogKeys updateKeys={handleKeyUpdate} resetCards={handleResetCards}keys={keys}/>
+						<CogKeys updateKeys={handleKeyUpdate} resetCards={resetCards} keys={keys}/>
 						<SortableContext items={cogCards.map((card) => card.key || "")} strategy={rectSwappingStrategy} >
 							<div className="droppable-container">
 								{ cogCards.map((card) => (

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useSubscribe, useTracker } from 'meteor/react-meteor-data';
 import { Meteor } from 'meteor/meteor';
@@ -14,7 +13,7 @@ import { Game } from './Game';
 import { GamesCollection } from '/imports/api/games/GamesCollection';
 
 // Types
-import type { GameType } from '../../api/types';
+import type { GameType, CardType, PlayerType } from '../../api/types';
 
 export const Play = () => {
 	const [gameId, setGameId] = useState("");
@@ -23,6 +22,7 @@ export const Play = () => {
 	const [renderGamesList, setRenderGamesList] = useState(false);
 	const isLoading = useSubscribe("games");
 	const game = useTracker(() => GamesCollection.findOne(gameId) as GameType);
+	const [cards, setCards] = useState<CardType[]>([]);
 
 	// TODO
 	// const startDemo = () => {
@@ -30,8 +30,6 @@ export const Play = () => {
 	// 	setKeys(demoKeys);
 	// 	dealCards(allCardData)
 	// }
-
-
 
 	const hostGame = (gameId: string) => {
 		if (gameId) {			
@@ -53,6 +51,14 @@ export const Play = () => {
 	const startGame = (gameId: string) => {
 		Meteor.callAsync("game.start", gameId).then((result) => {			
 			if (result._id === gameId) {
+				const game = result as GameType;
+				const player = game.players.find((player: PlayerType) => player._id === Meteor.userId());
+				const playerCards = player.cards;
+				const placeholderCards = [1, 2, 3, 4].map((position) => {
+					return { _id: position.toString(), words: ["", "", "", ""], position: position }
+				});
+
+				setCards([...playerCards, ...placeholderCards]);
 				setGameStarted(true);
 			}
 		}).catch((error) => {
@@ -108,7 +114,7 @@ export const Play = () => {
 			}
 
 			{!isLoading() && game && gameStarted && !gameCompleted && (
-				<Game game={game} />
+				<Game game={game} cards={cards} />
 			)}
 		</>
 	);
