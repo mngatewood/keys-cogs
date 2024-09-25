@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Meteor } from 'meteor/meteor';
 import { useSubscribe } from 'meteor/react-meteor-data';
 import { DndContext, rectIntersection, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, rectSwappingStrategy } from '@dnd-kit/sortable';
@@ -13,8 +14,6 @@ import { Loading } from './Loading';
 // Types
 import type { CardType, GameType } from '../../api/types';
 
-type CardTypeExtended = CardType & { rotation?: number | null };
-
 interface GameProps {
   game: GameType;
   cards: CardType[];
@@ -22,7 +21,7 @@ interface GameProps {
 
 export const Game = ({ game, cards }: GameProps) => {
 	// State
-	const [cardsData, setCardsData] = useState<CardTypeExtended[]>(cards);
+	const [cardsData, setCardsData] = useState<CardType[]>(cards);
 	const [playCards, setPlayCards] = useState<React.JSX.Element[]>([]);
 	const [cogCards, setCogCards] = useState<React.JSX.Element[]>([]);
 	const [keys, setKeys] = useState<string[]>(["", "", "", ""]);
@@ -39,8 +38,8 @@ export const Game = ({ game, cards }: GameProps) => {
 		console.log("useEffect Game")
 		const loadGameCards = () => {
 
-			const playCardsData = cardsData.filter((card: CardTypeExtended) => card.position === 5);
-			const cogCardsData = cardsData.filter((card: CardTypeExtended) => card.position !== 5);
+			const playCardsData = cardsData.filter((card: CardType) => card.position === 5);
+			const cogCardsData = cardsData.filter((card: CardType) => card.position !== 5);
 
 			const playCardElements = playCardsData.map(card => draggableElement(card));
 			setPlayCards(sortByPosition(playCardElements));
@@ -66,15 +65,15 @@ export const Game = ({ game, cards }: GameProps) => {
 		});
 	}
 
-	const sortableElement = (card: CardTypeExtended) => {
+	const sortableElement = (card: CardType) => {
 		return <WordCardSortable key={card._id} card={card} removeCard={handleRemoveCard} updateGame={updateCardRotation} />;
 	}
 
-	const draggableElement = (card: CardTypeExtended) => {
+	const draggableElement = (card: CardType) => {
 		return <WordCardDraggable key={card._id} card={card} addCard={handleAddCard} />;
 	}
 
-	const moveCard = (cardData: CardTypeExtended, origin: number, destination: number) => {
+	const moveCard = (cardData: CardType, origin: number, destination: number) => {
 		// console.log(cardData, origin, destination);
 		let cards = cardsData;
 		const cardToShiftData = cards.find((card) => card.position === destination);
@@ -172,11 +171,11 @@ export const Game = ({ game, cards }: GameProps) => {
 		});
 		const occupiedCogSpaces = updatedCogCardsOnlyData.map((card) => card.position);
 		const emptyCogSpaces = cogContainers.filter((space) => !occupiedCogSpaces.includes(space));
-		let updatedCogCardsData: CardTypeExtended[] = [];
+		let updatedCogCardsData: CardType[] = [];
 		emptyCogSpaces.forEach((space) => {
 			const placeholder = placeholdersData.find((card) => card._id === space.toString());
 			if (placeholder) {
-				updatedCogCardsData.push(placeholdersData.find((card) => card._id === space.toString()) as CardTypeExtended);
+				updatedCogCardsData.push(placeholdersData.find((card) => card._id === space.toString()) as CardType);
 			}
 		});
 		updatedCogCardsData.push(...updatedCogCardsOnlyData)
@@ -219,7 +218,7 @@ export const Game = ({ game, cards }: GameProps) => {
 	}
 	
 	const handleDragEnd = (event: any) => {
-		const movedCardData = cardsData.find((card) => card._id === event.active.id) as CardTypeExtended;
+		const movedCardData = cardsData.find((card) => card._id === event.active.id) as CardType;
 		const origin = movedCardData.position;
 		if(event.over?.id) {			
 			const destination = cardsData.find((card) => card._id === event.over.id)?.position || 5;
@@ -241,7 +240,7 @@ export const Game = ({ game, cards }: GameProps) => {
 	}
 
 	const handleRemoveCard = (cardId: string) => {
-		const updatedCard = cardsData.find((card) => card._id === cardId) as CardTypeExtended;
+		const updatedCard = cardsData.find((card) => card._id === cardId) as CardType;
 		if (updatedCard) {
 			moveCard(updatedCard, updatedCard.position, 5);
 		}
@@ -249,7 +248,7 @@ export const Game = ({ game, cards }: GameProps) => {
 
 	const handleAddCard = (cardId: string) => {
 		let destination = 4;
-		const cardData = cardsData.find((card) => card._id === cardId) as CardTypeExtended;
+		const cardData = cardsData.find((card) => card._id === cardId) as CardType;
 		cardData.rotation = 0;
 		const cogCardData = cardsData.filter((card) => cogContainers.includes(card.position));
 		const cogPlaceholders = cogCardData.filter((card) => cogContainers.includes(parseInt(card._id)));
@@ -263,10 +262,15 @@ export const Game = ({ game, cards }: GameProps) => {
 	const saveGame = () => {
 		console.log("saving game");
 		console.log("cardsData", cardsData);
+		Meteor.callAsync("game.savePlayerCards", game._id, Meteor.userId() as string, cardsData).then(() => {
+			console.log("game saved");
+		}).catch((error: Meteor.Error) => {
+			console.log("error saving game", error);
+		});
 	}
 
 	const updateCardRotation = (cardId: string, rotation: number) => {
-		const cardData = cardsData.find((card) => card._id === cardId) as CardTypeExtended;
+		const cardData = cardsData.find((card) => card._id === cardId) as CardType;
 		if (cardData) {
 			cardData.rotation = rotation % 1;
 		}

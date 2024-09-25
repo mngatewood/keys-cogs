@@ -4,6 +4,7 @@ import { GamesCollection, GamesCollectionSchema } from './GamesCollection';
 import type { PlayerType } from '../types'
 import { shuffleArray } from '/imports/helpers/shuffle';
 import { CardsCollection } from '../cards/CardsCollection';
+import type { CardType } from '../types';
 
 Meteor.methods({
 	async 'games.insert'(host: string) {
@@ -199,10 +200,42 @@ Meteor.methods({
 				throw new Meteor.Error('unable-to-leave-game', 'An error occurred.  Please try again.');
 			}
 		} else {
-			Meteor.callAsync('game.end', gameId).then((result) => {
+			Meteor.callAsync('game.complete', gameId).then((result) => {
 				return result;
 			});
 		}
 	},
+
+	async 'game.savePlayerCards'(gameId: string, playerId: string, cards: CardType[]) {
+		check(gameId, String);
+		check(cards, [Object]);
+
+		if (!Meteor.userId()) {
+			throw new Meteor.Error('not authorized', 'You are not authorized to perform this operation.  Please log in.');
+		}
+
+		const game = await GamesCollection.findOneAsync({_id: gameId});
+		if (!game) {
+			throw new Meteor.Error('game-not-found', 'Game not found.  Please try again.');
+		}
+
+		const update = {
+			$set: {
+				"players.$[player].cards": cards
+			}
+		},
+		const options = {
+			arrayFilters: [
+				{ "player._id": playerId }
+			]
+		}
+		const response = await GamesCollection.updateAsync(gameId, update, options);
+
+		if (response === 1) {
+			return game;
+		} else {
+			throw new Meteor.Error('unable-to-save-cards', 'An error occurred.  Please try again.');
+		}
+
 
 });
