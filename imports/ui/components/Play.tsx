@@ -24,8 +24,8 @@ export const Play = () => {
 	const game = useTracker(() => GamesCollection.findOne(gameId) as GameType);
 	const [cards, setCards] = useState<CardType[]>([]);
 	const [initialKeys, setInitialKeys] = useState<string[]>(["", "", "", ""]);
-	const placeholderCards = ["1", "2", "3", "4"].map((position) => {
-		return { _id: position, words: ["", "", "", ""], position: position }
+	const placeholderCards = [1, 2, 3, 4].map((position) => {
+		return { _id: position.toString(), words: ["", "", "", ""], position: position }
 	});
 
 	useEffect(() => {
