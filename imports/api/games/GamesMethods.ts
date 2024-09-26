@@ -210,7 +210,7 @@ Meteor.methods({
 		}
 	},
 
-	async 'game.savePlayerCards'(gameId: string, playerId: string, cards: CardType[]) {
+	async 'game.saveCog'(gameId: string, playerId: string, cards: CardType[], keys: string[]) {
 		check(gameId, String);
 		check(cards, [Object]);
 
@@ -225,7 +225,8 @@ Meteor.methods({
 
 		const update = {
 			$set: {
-				"players.$[player].cards": cards
+				"players.$[player].cards": cards,
+				"players.$[player].keys": keys
 			}
 		},
 		const options = {

@@ -17,14 +17,15 @@ import type { CardType, GameType } from '../../api/types';
 interface GameProps {
   game: GameType;
   cards: CardType[];
+  initialKeys: string[];
 }
 
-export const Game = ({ game, cards }: GameProps) => {
+export const Game = ({ game, cards, initialKeys }: GameProps) => {
 	// State
 	const [cardsData, setCardsData] = useState<CardType[]>(cards);
 	const [playCards, setPlayCards] = useState<React.JSX.Element[]>([]);
 	const [cogCards, setCogCards] = useState<React.JSX.Element[]>([]);
-	const [keys, setKeys] = useState<string[]>(["", "", "", ""]);
+	const [keys, setKeys] = useState<string[]>(initialKeys);
 
 	// Hooks
 	const pointerSensor = useSensor(PointerSensor, { activationConstraint: { distance: 5 }});
@@ -264,7 +265,7 @@ export const Game = ({ game, cards }: GameProps) => {
 			return new Promise((resolve) => resolve(false));
 		}
 
-		return await Meteor.callAsync("game.savePlayerCards", game._id, Meteor.userId() as string, cardsData).then(() => {
+		return await Meteor.callAsync("game.saveCog", game._id, Meteor.userId() as string, cardsData, keys).then(() => {
 			return true;
 		}).catch((error: Meteor.Error) => {
 			console.log("error saving game", error);
@@ -319,10 +320,6 @@ export const Game = ({ game, cards }: GameProps) => {
 		<>
 			{isLoading() ? <Loading /> :
 				<DndContext sensors={sensors} collisionDetection={rectIntersection} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-					{/* <div className="start-game-container">
-						<button className='start-game-button' onClick={startGame}>Start Game</button>
-						<button className='start-game-button' onClick={startDemo}>Start Demo</button>
-					</div> */}
 					<div className="cog-container">
 						<CogKeys updateKeys={handleKeyUpdate} resetCards={resetCards} saveGame={saveGame} keys={keys}/>
 						<SortableContext items={cogCards.map((card) => card.key || "")} strategy={rectSwappingStrategy} >

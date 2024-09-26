@@ -23,6 +23,7 @@ export const Play = () => {
 	const isLoading = useSubscribe("games");
 	const game = useTracker(() => GamesCollection.findOne(gameId) as GameType);
 	const [cards, setCards] = useState<CardType[]>([]);
+	const [initialKeys, setInitialKeys] = useState<string[]>(["", "", "", ""]);
 
 	useEffect(() => {
 		console.log("useEffect Play");
@@ -45,7 +46,7 @@ export const Play = () => {
 	// TODO
 	// const startDemo = () => {
 	// 	const allCardData = demoCards as CardType[];
-	// 	setKeys(demoKeys);
+	// 	setInitialKeys(demoKeys);
 	// 	dealCards(allCardData)
 	// }
 
@@ -92,6 +93,7 @@ export const Play = () => {
 			const player = game.players.find((player: PlayerType) => player._id === Meteor.userId());
 			const playerCards = player.cards;
 			setCards([...playerCards]);
+			setInitialKeys(player.keys);
 			setGameStarted(game.started);
 			setGameCompleted(game.completed);
 			console.log("cards", cards)
@@ -164,7 +166,7 @@ export const Play = () => {
 							<img className='exit-img' src='/exit-icon.png' />
 						</button>
 					</div>
-					<Game game={game} cards={cards} />
+					<Game game={game} cards={cards} initialKeys={initialKeys} />
 				</>
 			)}
 		</>
