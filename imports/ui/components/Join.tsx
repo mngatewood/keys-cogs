@@ -76,7 +76,6 @@ export const Join:React.FC<JoinProps> = ({joinGame}) => {
 		const gameId = (e.target as HTMLElement).closest(".game-card")?.id;
 		if (gameId) {
 			Meteor.callAsync("game.join", gameId, Meteor.userId()).then((result) => {
-				console.log("updatedGame", result)
 				joinGame(gameId);
 			}).catch((error) => {
 				console.log("joinError", error)

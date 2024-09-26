@@ -88,7 +88,6 @@ export const Play = () => {
 	}
 
 	const enterGame = async (game: GameType) => {
-		console.log("entering game", gameId)
 		if (game) {
 			const player = game.players.find((player: PlayerType) => player._id === Meteor.userId());
 			const playerCards = player.cards;
@@ -96,7 +95,6 @@ export const Play = () => {
 			setInitialKeys(player.keys);
 			setGameStarted(game.started);
 			setGameCompleted(game.completed);
-			console.log("cards", cards)
 		}
 	}
 

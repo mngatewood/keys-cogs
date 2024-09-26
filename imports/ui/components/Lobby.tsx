@@ -80,7 +80,6 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 	}
 
 	const handleStartGame = () => {
-		console.log("startGame");
 		startGame(game._id);
 	}
 
