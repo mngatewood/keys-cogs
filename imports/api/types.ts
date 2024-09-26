@@ -1,15 +1,16 @@
 export type PlayerType = {
-	_id: string
-	keys: string[]
-	cards: any[]
-	results: any[]
+	_id: string,
+	ready: boolean,
+	keys: string[],
+	cards: any[],
+	results: any[],
 }
 
 export type CardType = {
-	_id: string;
+	_id: string,
 	words: Array<string>,
 	position: number,
-	rotation?: number
+	rotation?: number,
 }
 
 export type GameType = {

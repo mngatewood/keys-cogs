@@ -29,11 +29,6 @@ export const GamesCollectionSchema = new SimpleSchema({
 	},
 	createdAt: {
 		type: Number,
-		autoValue: function() {
-			if(!this.isSet) {
-				return new Date().valueOf();
-			}
-		}
 	},
 	updatedAt: {
 		type: Number,
@@ -47,6 +42,10 @@ export const GamesCollectionSchema = new SimpleSchema({
 	},
 	"players.$._id": {
 		type: String,
+	},
+	"players.$.ready": {
+		type: Boolean,
+		defaultValue: false
 	},
 
 	"players.$.keys": {

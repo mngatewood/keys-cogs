@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { GamesCollection, GamesCollectionSchema } from './GamesCollection';
-import type { PlayerType } from '../types'
+import type { GameType, PlayerType } from '../types'
 import { shuffleArray } from '/imports/helpers/shuffle';
 import { CardsCollection } from '../cards/CardsCollection';
 import type { CardType } from '../types';
@@ -22,11 +22,13 @@ Meteor.methods({
 			players: [
 				{
 					_id: host,
+					ready: false,
 					keys: [],
 					cards: [],
 					results: []
 				}
-			]
+			],
+			createdAt: new Date().valueOf(),
 		};
 
 		const cleanDoc = GamesCollectionSchema.clean(game);
@@ -158,6 +160,7 @@ Meteor.methods({
 				$push: {
 					players: {
 						_id: playerId,
+						ready: false,
 						keys: [],
 						cards: [],
 						results: [],
@@ -218,29 +221,51 @@ Meteor.methods({
 			throw new Meteor.Error('not authorized', 'You are not authorized to perform this operation.  Please log in.');
 		}
 
-		const game = await GamesCollection.findOneAsync({_id: gameId});
+		const gameDoc = await GamesCollection.findOneAsync({_id: gameId});
+		const game = gameDoc as GameType;
+
 		if (!game) {
 			throw new Meteor.Error('game-not-found', 'Game not found.  Please try again.');
 		}
 
 		const update = {
 			$set: {
+				round: game.round,
+				"players.$[player].ready": true,
 				"players.$[player].cards": cards,
 				"players.$[player].keys": keys
 			}
-		},
+		};
+
 		const options = {
 			arrayFilters: [
 				{ "player._id": playerId }
 			]
 		}
+
+		const advanceRound = allOtherPlayersReady(game, playerId);
+		if (advanceRound) {
+			update.$set.round = game.round + 1;
+		}
+
 		const response = await GamesCollection.updateAsync(gameId, update, options);
 
 		if (response === 1) {
+			console.log("updated game", game)
 			return game;
 		} else {
 			throw new Meteor.Error('unable-to-save-cards', 'An error occurred.  Please try again.');
 		}
-
+	}
 
 });
+
+const allOtherPlayersReady = (game: GameType, playerId: string) => {
+	let ready = true;
+	game.players.forEach((player: PlayerType) => {
+		if (player._id !== playerId && !player.ready) {
+			ready = false;
+		}
+	});
+	return ready;
+}
