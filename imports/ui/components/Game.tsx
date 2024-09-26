@@ -10,9 +10,10 @@ import { CogKeys } from './CogKeys';
 import { WordCardDraggable } from './WordCardDraggable';
 import { WordCardSortable } from './WordCardSortable';
 import { Loading } from './Loading';
+import { WaitingOverlay } from './WaitingOverlay';
 
 // Types
-import type { CardType, GameType } from '../../api/types';
+import type { CardType, GameType, PlayerType } from '../../api/types';
 
 interface GameProps {
   game: GameType;
@@ -316,26 +317,37 @@ export const Game = ({ game, cards, initialKeys }: GameProps) => {
 		setCardsData([...cardsData]);
 	}
 
+	const readyForNextRound = () => {
+		const player = game.players.find((player: PlayerType) => player._id === Meteor.userId());
+		console.log("player", player);
+		return (player && player.ready) ? true : false
+	}
+
 	return (
 		<>
 			{isLoading() ? <Loading /> :
-				<DndContext sensors={sensors} collisionDetection={rectIntersection} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-					<div className="cog-container">
-						<CogKeys updateKeys={handleKeyUpdate} resetCards={resetCards} saveGame={saveGame} keys={keys}/>
-						<SortableContext items={cogCards.map((card) => card.key || "")} strategy={rectSwappingStrategy} >
-							<div className="droppable-container">
-								{ cogCards.map((card) => (
-									<Droppable key={card.key ?? ""} id={card.key ?? ""}>
-										{ card }
-									</Droppable>
-								))}
-							</div>
-						</SortableContext>
-					</div>
-					<div className="draw-container">
-						{ playCards }
-					</div>
-				</DndContext>
+				<>
+					<DndContext sensors={sensors} collisionDetection={rectIntersection} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+						<div className="cog-container">
+							<CogKeys updateKeys={handleKeyUpdate} resetCards={resetCards} saveGame={saveGame} keys={keys} playerReady={readyForNextRound}/>
+							<SortableContext items={cogCards.map((card) => card.key || "")} strategy={rectSwappingStrategy} >
+								<div className="droppable-container">
+									{ cogCards.map((card) => (
+										<Droppable key={card.key ?? ""} id={card.key ?? ""}>
+											{ card }
+										</Droppable>
+									))}
+								</div>
+							</SortableContext>
+						</div>
+						<div className="draw-container">
+							{ playCards }
+						</div>
+					</DndContext>
+					{readyForNextRound() &&
+						<WaitingOverlay />
+					}
+				</>
 			}
 		</>
 	)

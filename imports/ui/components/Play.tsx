@@ -22,6 +22,7 @@ export const Play = () => {
 	const [renderGamesList, setRenderGamesList] = useState(false);
 	const isLoading = useSubscribe("games");
 	const game = useTracker(() => GamesCollection.findOne(gameId) as GameType);
+	// console.log("game declaration", game);
 	const [cards, setCards] = useState<CardType[]>([]);
 	const [initialKeys, setInitialKeys] = useState<string[]>(["", "", "", ""]);
 
@@ -132,6 +133,7 @@ export const Play = () => {
 		setGameId("");
 		setGameCompleted(false);
 		setGameStarted(false);
+		setInitialKeys(["", "", "", ""]);
 	};
 
 	return (
@@ -159,7 +161,7 @@ export const Play = () => {
 
 			{!isLoading() && game && gameStarted && !gameCompleted && (
 				<>
-					<div className='game-panel'>
+					<div className='game-panel z-top'>
 						<button onClick={exitGame}>
 							<img className='exit-img' src='/exit-icon.png' />
 						</button>

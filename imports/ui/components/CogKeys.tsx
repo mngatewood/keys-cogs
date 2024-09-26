@@ -9,9 +9,10 @@ interface CogKeysProps {
 	resetCards: Function
 	saveGame: Function
 	keys: Array<string>
+	playerReady: Function
 }
 
-export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGame,keys}) => {
+export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGame, keys, playerReady}) => {
 	const [isEditing, setIsEditing] = useState(0);
 
 	const handleClickEdit = (keyId: number) => {
@@ -69,6 +70,10 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGam
 		}
 	}
 
+	const playerReadyForNextRound = () => {
+		playerReady();
+	}
+
 	return (
 		<>
 			{isEditing !== 0 && <EditKey updateForm={handleFormUpdate} keyId={isEditing} keyValue={keys[isEditing - 1]} />}
@@ -121,11 +126,13 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGam
 					<img className='cog-img' src='/reset-icon.png' />
 				</button>
 			</div>
-			<div className="cog-save">
-				<button onClick={handleSaveGame}>
-					<img className='save-img' src='/save-icon.png' />
-				</button>
-			</div>
+			{ !playerReadyForNextRound &&
+				<div className="cog-save">
+					<button onClick={handleSaveGame}>
+						<img className='save-img' src='/save-icon.png' />
+					</button>
+				</div>
+			}
 		</>
 	)
 }
