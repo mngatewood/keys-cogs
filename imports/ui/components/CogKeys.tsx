@@ -16,6 +16,7 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGam
 
 	const handleClickEdit = (keyId: number) => {
 		document.getElementById(`key-${keyId}`)?.classList.add("highlighted-key");
+		document.getElementById(`key-${keyId}`)?.classList.remove("highlighted-error");
 		setIsEditing(keyId);
 	}
 
@@ -33,12 +34,27 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGam
 	}
 
 	const handleSaveGame = () => {
+
 		saveGame().then((result: boolean) => {
-			if (result) {
-				console.log("saved successfully", result)
-			} else {
-				console.log("failed to save due to validation error", result)
-				// TODO highlight missing keys and cards
+			if (!result) {
+
+				const cogCards = document.querySelectorAll(".droppable");
+				cogCards?.forEach((card) => {
+					if (["1", "2", "3", "4"].includes(card.id)) {
+						card.classList.add("highlighted-error");
+					} else {
+						card.classList.remove("highlighted-error");
+					}
+				})
+
+				const keyInputs = document.querySelectorAll(".key-placeholder");
+				keyInputs?.forEach((input) => {
+					if ((input as HTMLElement).innerText === "click to add a key") {
+						input.classList.add("highlighted-error");			
+					} else {
+						input.classList.remove("highlighted-error");
+					}
+				});
 			}
 		}).catch((error: Meteor.Error) => {			
 			console.log("failed to save", error)
