@@ -23,7 +23,7 @@ Meteor.methods({
 				{
 					_id: host,
 					ready: false,
-					keys: [],
+					keys: ["", "", "", ""],
 					cards: [],
 					results: []
 				}
@@ -161,7 +161,7 @@ Meteor.methods({
 					players: {
 						_id: playerId,
 						ready: false,
-						keys: [],
+						keys: ["", "", "", ""],
 						cards: [],
 						results: [],
 					}
