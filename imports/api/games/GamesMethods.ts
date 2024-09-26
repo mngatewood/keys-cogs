@@ -87,6 +87,10 @@ Meteor.methods({
 
 		const game = await GamesCollection.findOneAsync({_id: gameId});
 
+		if (game?.completed) {
+			throw new Meteor.Error('game-already-completed', 'Game has already been completed.  Please try again.');
+		}
+
 		if (game?.started) {
 			return game;
 		}
