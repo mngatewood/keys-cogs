@@ -22,9 +22,11 @@ export const Play = () => {
 	const [renderGamesList, setRenderGamesList] = useState(false);
 	const isLoading = useSubscribe("games");
 	const game = useTracker(() => GamesCollection.findOne(gameId) as GameType);
-	// console.log("game declaration", game);
 	const [cards, setCards] = useState<CardType[]>([]);
 	const [initialKeys, setInitialKeys] = useState<string[]>(["", "", "", ""]);
+	const placeholderCards = ["1", "2", "3", "4"].map((position) => {
+		return { _id: position, words: ["", "", "", ""], position: position }
+	});
 
 	useEffect(() => {
 		console.log("useEffect Play");
@@ -74,9 +76,9 @@ export const Play = () => {
 				const game = result as GameType;
 				const player = game.players.find((player: PlayerType) => player._id === Meteor.userId());
 				const playerCards = player.cards;
-				const placeholderCards = [1, 2, 3, 4].map((position) => {
-					return { _id: position.toString(), words: ["", "", "", ""], position: position }
-				});
+				// const placeholderCards = [1, 2, 3, 4].map((position) => {
+				// 	return { _id: position.toString(), words: ["", "", "", ""], position: position }
+				// });
 
 				setCards([...playerCards, ...placeholderCards]);
 				setGameStarted(game.started);
@@ -91,11 +93,13 @@ export const Play = () => {
 	const enterGame = async (game: GameType) => {
 		if (game) {
 			const player = game.players.find((player: PlayerType) => player._id === Meteor.userId());
-			const playerCards = player.cards;
-			setCards([...playerCards]);
-			setInitialKeys(player.keys);
+			const playerCards = player.cards.filter((card: CardType) => !["1", "2", "3", "4"].includes(card._id));
+			setCards([...playerCards, ...placeholderCards]);
+			setInitialKeys(player.keys.length ? player.keys : ["", "", "", ""]);
 			setGameStarted(game.started);
 			setGameCompleted(game.completed);
+
+			// TODO consolidate startGame and enterGame
 		}
 	}
 
