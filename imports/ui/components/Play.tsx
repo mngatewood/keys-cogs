@@ -25,8 +25,20 @@ export const Play = () => {
 	const [cards, setCards] = useState<CardType[]>([]);
 
 	useEffect(() => {
-		if (localStorage.getItem("gameId") !== null) {
-			setGameId(localStorage.getItem("gameId") as string);
+		console.log("useEffect Play");
+		const localStorageGameId = localStorage.getItem("gameId") as string;
+		if (localStorageGameId) {
+			Meteor.callAsync("game.get", localStorageGameId).then((result) => {
+				if (result) {
+					setGameId(localStorageGameId);
+					enterGame(result);
+				} else {
+					localStorage.setItem("gameId", "");
+				}
+			}).catch((error) => {
+				console.log("error", error)
+				localStorage.setItem("gameId", "");
+			})
 		}
 	}, []);
 
@@ -65,12 +77,25 @@ export const Play = () => {
 				});
 
 				setCards([...playerCards, ...placeholderCards]);
+				setGameStarted(game.started);
+				setGameCompleted(game.completed);
 				localStorage.setItem("gameId", gameId);
-				setGameStarted(true);
 			}
 		}).catch((error) => {
 			console.log("error", error)
 		});
+	}
+
+	const enterGame = async (game: GameType) => {
+		console.log("entering game", gameId)
+		if (game) {
+			const player = game.players.find((player: PlayerType) => player._id === Meteor.userId());
+			const playerCards = player.cards;
+			setCards([...playerCards]);
+			setGameStarted(game.started);
+			setGameCompleted(game.completed);
+			console.log("cards", cards)
+		}
 	}
 
 	const endGame = (gameId: string) => {
@@ -128,6 +153,7 @@ export const Play = () => {
 					startGame={startGame}
 					removePlayer={removePlayer}
 					leaveGame={resetGameState}
+					enterGame={enterGame}
 				/>
 			}
 
@@ -139,7 +165,7 @@ export const Play = () => {
 						</button>
 					</div>
 					<Game game={game} cards={cards} />
-					</>
+				</>
 			)}
 		</>
 	);
