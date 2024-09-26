@@ -10,7 +10,8 @@ interface LobbyProps {
 	endGame: Function,
 	startGame: Function,
 	removePlayer: Function,
-	leaveGame: Function
+	leaveGame: Function,
+	enterGame: Function,
 }
 
 // Add first and last name to Meteor User collection per Accounts schema
@@ -19,7 +20,7 @@ interface ExtendedUser extends Meteor.User {
 	lastName: string,
 }
 
-export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlayer, leaveGame}) => {
+export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlayer, leaveGame, enterGame}) => {
 	const [players, setPlayers] = useState<any[]>([]);
 	const isLoading = useSubscribe("users.all");
 
@@ -32,7 +33,7 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 		if (inGame && !game?.started && !game?.completed) {	// player is in pending game
 			loadLobbyPlayers();
 		} else if (inGame && game.started && !game?.completed) { // player is in active game
-			startGame(game._id);
+			enterGame(game);
 		} else if (game) { // player is no longer in game
 			leaveGame();
 			// TODO: notify player if they are removed from the game
@@ -79,7 +80,6 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 	}
 
 	const handleStartGame = () => {
-		console.log("startGame");
 		startGame(game._id);
 	}
 
@@ -122,7 +122,8 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 						<div className="flex flex-col items-center justify-center">
 							{ isHost()
 								?
-									<button onClick={handleStartGame} type="submit" disabled={players.length < 2} className="w-full flex justify-center mt-4 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 disabled:bg-gray-200 disabled:text-gray-400 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+									// <button onClick={handleStartGame} type="submit" disabled={players.length < 2} className="w-full flex justify-center mt-4 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 disabled:bg-gray-200 disabled:text-gray-400 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+									<button onClick={handleStartGame} type="submit" className="w-full flex justify-center mt-4 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 disabled:bg-gray-200 disabled:text-gray-400 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
 										Start Game
 									</button>
 								: 

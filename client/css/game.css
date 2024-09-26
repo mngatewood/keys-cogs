@@ -7,7 +7,7 @@
 	position: relative;
 	aspect-ratio: 1 / 1;
 	width: 100%;
-	margin: 0;
+	margin: 0 auto;
 	padding: 0;
 	margin-bottom: 1rem;
 	max-width: 768px;
@@ -158,6 +158,7 @@
 	justify-content: space-evenly;
 	width: 100%;
 	max-width: 768px;
+	margin: 0 auto;
 }
 
 .word-card-wrapper {
@@ -386,4 +387,31 @@
 
 .z-top {
 	z-index: 1000;
+}
+
+.cog-save {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+	grid-row-start: 1;
+	grid-row-end: 1;
+	grid-column-start: 5;
+	grid-column-end: 5;
+}
+
+.cog-save button {
+	height: 6vmin;
+	margin: 0 2vmin;
+	cursor: pointer;
+}
+
+.save-img {
+	max-height: 100%;
+}
+
+.highlighted-error, .highlighted-error div{
+	color: white;
+	background-color: red;
 }

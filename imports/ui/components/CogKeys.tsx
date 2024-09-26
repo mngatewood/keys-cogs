@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Meteor } from 'meteor/meteor';
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 
 import { EditKey } from './EditKey';
@@ -6,14 +7,16 @@ import { EditKey } from './EditKey';
 interface CogKeysProps {
 	updateKeys: Function
 	resetCards: Function
+	saveGame: Function
 	keys: Array<string>
 }
 
-export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, keys}) => {
+export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGame,keys}) => {
 	const [isEditing, setIsEditing] = useState(0);
 
 	const handleClickEdit = (keyId: number) => {
 		document.getElementById(`key-${keyId}`)?.classList.add("highlighted-key");
+		document.getElementById(`key-${keyId}`)?.classList.remove("highlighted-error");
 		setIsEditing(keyId);
 	}
 
@@ -24,6 +27,38 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, keys}) 
 		}
 		document.getElementById(`key-${keyId}`)?.classList.remove("highlighted-key");
 		setIsEditing(0);
+	}
+
+	const handleResetCards = () => {
+		resetCards();
+	}
+
+	const handleSaveGame = () => {
+
+		saveGame().then((result: boolean) => {
+			if (!result) {
+
+				const cogCards = document.querySelectorAll(".droppable");
+				cogCards?.forEach((card) => {
+					if (["1", "2", "3", "4"].includes(card.id)) {
+						card.classList.add("highlighted-error");
+					} else {
+						card.classList.remove("highlighted-error");
+					}
+				})
+
+				const keyInputs = document.querySelectorAll(".key-placeholder");
+				keyInputs?.forEach((input) => {
+					if ((input as HTMLElement).innerText === "click to add a key") {
+						input.classList.add("highlighted-error");			
+					} else {
+						input.classList.remove("highlighted-error");
+					}
+				});
+			}
+		}).catch((error: Meteor.Error) => {			
+			console.log("failed to save", error)
+		})
 	}
 
 	const keyDisplayContent = (key: string) => {
@@ -82,8 +117,13 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, keys}) 
 				</TransitionGroup>
 			</div>
 			<div className="cog-panel">
-				<button className='cog-button'>
-					<img className='cog-img' src='/reset-icon.png' onClick={resetCards}/>
+				<button className='cog-button' onClick={handleResetCards}>
+					<img className='cog-img' src='/reset-icon.png' />
+				</button>
+			</div>
+			<div className="cog-save">
+				<button onClick={handleSaveGame}>
+					<img className='save-img' src='/save-icon.png' />
 				</button>
 			</div>
 		</>
