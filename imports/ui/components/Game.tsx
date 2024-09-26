@@ -259,14 +259,52 @@ export const Game = ({ game, cards }: GameProps) => {
 
 	}
 
-	const saveGame = () => {
-		console.log("saving game");
-		console.log("cardsData", cardsData);
-		Meteor.callAsync("game.savePlayerCards", game._id, Meteor.userId() as string, cardsData).then(() => {
-			console.log("game saved");
+	const saveGame = async () => {
+		if (!validateReadyToSave()) {
+			return new Promise((resolve) => resolve(false));
+		}
+
+		return await Meteor.callAsync("game.savePlayerCards", game._id, Meteor.userId() as string, cardsData).then(() => {
+			return true;
 		}).catch((error: Meteor.Error) => {
 			console.log("error saving game", error);
+			return false
 		});
+	}
+
+	const validateReadyToSave = () => {
+		const allKeysCompleted = () => {
+			if (keys.length < 4) return false;
+			let result = true;
+			keys.forEach((key) => {
+				if (!key) result = false;
+			});
+			return result
+		};
+		
+		const allCardsPlaced = () => {
+			// cog position values: 1, 2, 3, 4
+			let placedPositions = [1, 2, 3, 4]
+			let playedCards: CardType[] = [];
+
+			// filter out placeholder cards
+			const playableCards = cardsData.filter((card) => !placedPositions.includes(parseInt(card._id)));
+
+			// push cards to playedCards if they are in a valid cog position
+			playableCards.forEach((card) => {
+				if (placedPositions.includes(card.position)) {
+					playedCards.push(card);
+				}
+			})
+
+			// ensure there are no duplicated positions
+			const playedPositions = playedCards.map((card) => card.position);
+			let duplicatedPositions = playedPositions.filter((card, index) => playedPositions.indexOf(card) !== index)
+			
+			return (playedCards.length === 4 && duplicatedPositions.length === 0) ? true : false
+		}
+		
+		return allKeysCompleted() && allCardsPlaced();
 	}
 
 	const updateCardRotation = (cardId: string, rotation: number) => {

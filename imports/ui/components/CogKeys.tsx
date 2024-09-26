@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Meteor } from 'meteor/meteor';
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 
 import { EditKey } from './EditKey';
@@ -32,7 +33,16 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGam
 	}
 
 	const handleSaveGame = () => {
-		saveGame();
+		saveGame().then((result: boolean) => {
+			if (result) {
+				console.log("saved successfully", result)
+			} else {
+				console.log("failed to save due to validation error", result)
+				// TODO highlight missing keys and cards
+			}
+		}).catch((error: Meteor.Error) => {			
+			console.log("failed to save", error)
+		})
 	}
 
 	const keyDisplayContent = (key: string) => {
