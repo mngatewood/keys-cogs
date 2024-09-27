@@ -338,7 +338,6 @@ export const Game = ({ game, advanceRound }: GameProps) => {
 	const allPlayersReady = () => {
 		const playerRound = game.players.find((player: PlayerType) => player._id === Meteor.userId()).round;
 		const playersInRound = game.players.filter((player: PlayerType) => player.round === playerRound);
-		console.log("allPlayersReady", playersInRound.every((player: PlayerType) => player.ready));
 		return playersInRound.every((player: PlayerType) => player.ready);
 	}
 
