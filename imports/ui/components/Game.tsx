@@ -34,6 +34,7 @@ export const Game = ({ game, cards, initialKeys }: GameProps) => {
 	const sensors = useSensors( pointerSensor, keyboardSensor);
 
 	const cogContainers = [1, 2, 3, 4];
+	const cogContainerIds = ["1", "2", "3", "4"];
 	const isLoading = useSubscribe("games");
 
 	useEffect(() => {
@@ -80,7 +81,7 @@ export const Game = ({ game, cards, initialKeys }: GameProps) => {
 		let cards = cardsData;
 		const cardToShiftData = cards.find((card) => card.position === destination);
 		let placeholderCardData = cards.find((card) => {
-			return cogContainers.includes(parseInt(card._id)) && card.position === destination;
+			return cogContainerIds.includes(card._id) && card.position === destination;
 		});
 
 		if (origin === 5 && placeholderCardData) { 
@@ -94,7 +95,7 @@ export const Game = ({ game, cards, initialKeys }: GameProps) => {
 		// moving from play to non-empty cog space
 
 			// console.log("moving from play to non-empty cog space");
-			const cogPlaceholders = cogCards.filter((card) => ["1", "2", "3", "4"].includes(card?.key as string));
+			const cogPlaceholders = cogCards.filter((card) => cogContainerIds.includes(card?.key as string));
 
 			if(cogPlaceholders.length > 0) { 
 			// shift to empty space if possible
@@ -108,7 +109,7 @@ export const Game = ({ game, cards, initialKeys }: GameProps) => {
 
 					// console.log("shifting card to next space")
 					placeholderCardData = cards.find((card) => {
-						return cogContainers.includes(parseInt(card._id)) && card.position === destination + 1;
+						return cogContainerIds.includes(card._id) && card.position === destination + 1;
 					});
 					if (placeholderCardData) placeholderCardData.position = 5;
 					if (cardToShiftData) cardToShiftData.position = destination + 1;
@@ -165,7 +166,7 @@ export const Game = ({ game, cards, initialKeys }: GameProps) => {
 	}
 
 	const validateCardsState = () => {
-		const placeholdersData = cardsData.filter((card) => cogContainers.includes(parseInt(card._id)));
+		const placeholdersData = cardsData.filter((card) => cogContainerIds.includes(card._id));
 		const placeholderIds = placeholdersData.map((card) => card._id);
 		const wordCardsData = cardsData.filter((card) => !placeholderIds.includes(card._id));
 		const updatedCogCardsOnlyData = wordCardsData.filter((card) => {
@@ -231,7 +232,7 @@ export const Game = ({ game, cards, initialKeys }: GameProps) => {
 
 	const resetCards = () => {
 		const updatedCards = cardsData.map((card) => {
-			if(["1", "2", "3", "4"].includes(card._id)) {
+			if (cogContainerIds.includes(card._id)) {
 				card.position = parseInt(card._id);
 			} else {
 				card.position = 5;
@@ -253,7 +254,7 @@ export const Game = ({ game, cards, initialKeys }: GameProps) => {
 		const cardData = cardsData.find((card) => card._id === cardId) as CardType;
 		cardData.rotation = 0;
 		const cogCardData = cardsData.filter((card) => cogContainers.includes(card.position));
-		const cogPlaceholders = cogCardData.filter((card) => cogContainers.includes(parseInt(card._id)));
+		const cogPlaceholders = cogCardData.filter((card) => cogContainerIds.includes(card._id));
 		if (cogPlaceholders.length) {
 			destination = cardsData.find((card) => card._id === cogPlaceholders[0]._id)?.position || 4;
 		}
