@@ -91,7 +91,6 @@ Meteor.methods({
 		}
 
 		const game = await GamesCollection.findOneAsync({_id: gameId});
-		console.log("completing game", game)
 		if (game) {
 			const update = {
 				$set: {
@@ -183,7 +182,6 @@ Meteor.methods({
 			throw new Meteor.Error('player-already-in-game', 'An error occurred.  You are already in this game.');
 		}
 
-		console.log("joining game", game)
 		if (game) {
 			const update = {
 				$push: {
