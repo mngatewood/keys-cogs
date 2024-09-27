@@ -279,7 +279,7 @@
 	cursor: pointer;
 }
 
-.key:hover {
+.key-placeholder:hover {
 	background-color:lightgoldenrodyellow;
 }
 

@@ -98,6 +98,7 @@ export const Play = () => {
 			setInitialKeys(player.keys.length ? player.keys : ["", "", "", ""]);
 			setGameStarted(game.started);
 			setGameCompleted(game.completed);
+			localStorage.setItem("gameId", gameId);
 
 			// TODO consolidate startGame and enterGame
 		}

@@ -70,13 +70,14 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGam
 		}
 	}
 
-	const playerReadyForNextRound = () => {
-		playerReady();
-	}
-
 	return (
 		<>
-			{isEditing !== 0 && <EditKey updateForm={handleFormUpdate} keyId={isEditing} keyValue={keys[isEditing - 1]} />}
+			{isEditing !== 0 && 
+				<>
+					<div className="h-screen w-screen fixed top-0 left-0 z-50 bg-purple-500 bg-opacity-50" />
+					<EditKey updateForm={handleFormUpdate} keyId={isEditing} keyValue={keys[isEditing - 1]} />
+				</>
+			}
 			<div className="key cog-top" onClick={() => handleClickEdit(1)}>
 				<TransitionGroup>
 					<CSSTransition
@@ -126,7 +127,7 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGam
 					<img className='cog-img' src='/reset-icon.png' />
 				</button>
 			</div>
-			{ !playerReadyForNextRound &&
+			{ !playerReady() &&
 				<div className="cog-save">
 					<button onClick={handleSaveGame}>
 						<img className='save-img' src='/save-icon.png' />
