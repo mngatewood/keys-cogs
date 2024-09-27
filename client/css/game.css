@@ -279,7 +279,7 @@
 	cursor: pointer;
 }
 
-.key:hover {
+.key-placeholder:hover {
 	background-color:lightgoldenrodyellow;
 }
 
@@ -287,6 +287,14 @@
 	font-family: sans-serif;
 	color: rgba(0, 0, 0, 0.3);
 	font-style: italic;
+}
+
+.key-locked {
+	cursor: not-allowed;
+}
+
+.key-locked key-placeholder:hover {
+	background-color: unset;
 }
 
 .highlighted-key {

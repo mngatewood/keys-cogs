@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface EditKeyProps {
 	updateForm: Function
@@ -9,6 +9,11 @@ interface EditKeyProps {
 
 export const EditKey: React.FC<EditKeyProps> = ({ updateForm, keyId, keyValue }) => {
 	const [input, setInput] = useState(keyValue);
+
+	useEffect(() => {
+		const input = document.querySelector(".edit-key-input") as HTMLInputElement | null;
+		input?.focus();
+	}, [])
 
 	const handleClickCancel = () => {
 		updateForm("cancel", keyId, "")
@@ -26,10 +31,8 @@ export const EditKey: React.FC<EditKeyProps> = ({ updateForm, keyId, keyValue })
 
 	return (
 		<div className="edit-key-container z-top">
-			{/* <div className="edit-key-input-container"> */}
 				<label className="edit-key-label">{addOrEditLabel}</label>
 				<input className="edit-key-input" type="text" value={input} onChange={handleInputChange}/>
-			{/* </div> */}
 			<div className="edit-key-buttons-container">
 				<button className="edit-key-button cancel" onClick={handleClickCancel}>Cancel</button>
 				<button className="edit-key-button submit" onClick ={handleClickSave}>Save</button>

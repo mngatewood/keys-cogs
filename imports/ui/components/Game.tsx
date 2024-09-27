@@ -10,60 +10,74 @@ import { CogKeys } from './CogKeys';
 import { WordCardDraggable } from './WordCardDraggable';
 import { WordCardSortable } from './WordCardSortable';
 import { Loading } from './Loading';
+import { WaitingOverlay } from './WaitingOverlay';
+
+// Helpers
+import { getCardsToRender, getKeysToRender } from '/imports/helpers/gameplay';
 
 // Types
-import type { CardType, GameType } from '../../api/types';
+import type { CardType, GameType, PlayerType } from '../../api/types';
 
 interface GameProps {
-  game: GameType;
-  cards: CardType[];
-  initialKeys: string[];
+	game: GameType;
+	advanceRound: Function;
 }
 
-export const Game = ({ game, cards, initialKeys }: GameProps) => {
+export const Game = ({ game, advanceRound }: GameProps) => {
 	// State
-	const [cardsData, setCardsData] = useState<CardType[]>(cards);
+	const [cardsData, setCardsData] = useState<CardType[]>([]);
 	const [playCards, setPlayCards] = useState<React.JSX.Element[]>([]);
 	const [cogCards, setCogCards] = useState<React.JSX.Element[]>([]);
-	const [keys, setKeys] = useState<string[]>(initialKeys);
+	const [keys, setKeys] = useState<string[]>(["", "", "", ""]);
 
 	// Hooks
 	const pointerSensor = useSensor(PointerSensor, { activationConstraint: { distance: 5 }});
 	const keyboardSensor = useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates });
 	const sensors = useSensors( pointerSensor, keyboardSensor);
-
+	
+	
 	const cogContainers = [1, 2, 3, 4];
+	const cogContainerIds = ["1", "2", "3", "4"];
 	const isLoading = useSubscribe("games");
 
 	useEffect(() => {
-		console.log("useEffect Game")
-		const loadGameCards = () => {
+		console.log("useEffect Game setCardsData and setKeys");
 
-			const playCardsData = cardsData.filter((card: CardType) => card.position === 5);
-			const cogCardsData = cardsData.filter((card: CardType) => card.position !== 5);
+		const cardsToRender = getCardsToRender(game);
+		const keysToRender = getKeysToRender(game);
 
-			const playCardElements = playCardsData.map(card => draggableElement(card));
-			setPlayCards(sortByPosition(playCardElements));
+		setCardsData(cardsToRender || []);
+		setKeys(keysToRender || []);
 
-			const cogCardElements = cogCardsData.map(card => sortableElement(card));
-			setCogCards(sortByPosition(cogCardElements));
+	}, [game]);
 
-			validateCardsState();
+	useEffect(() => {
+		console.log("useEffect Game setPlayCards and setCogCards");
 
-		};
+		const playCardsData = cardsData?.filter((card: CardType) => card.position === 5);
+		const playCardElements = playCardsData?.map(card => draggableElement(card));
+			if (playCardElements) setPlayCards(sortByPosition(playCardElements));
 
-		loadGameCards();
-	}, [game, cardsData]);
+		const cogCardsData = cardsData?.filter((card: CardType) => card.position !== 5);
+		const cogCardElements = cogCardsData?.map(card => sortableElement(card));
+		if (cogCardElements) setCogCards(sortByPosition(cogCardElements));
 
-	const sortByPosition = (array: React.JSX.Element[]) => {
-		return array.sort((a: any, b: any) => {
+		validateCardsState();
+
+	}, [cardsData]);
+
+	const sortByPosition = (array: any) => {
+		const sortedArray = array.sort((a: any, b: any) => {
 			const aPosition = cardsData.find((card) => card._id === a.key)?.position;
 			const bPosition = cardsData.find((card) => card._id === b.key)?.position;
+
 			if (aPosition === undefined || bPosition === undefined) {
 				throw new Error("Invalid card data");
 			}
 			return aPosition - bPosition;
 		});
+
+		return sortedArray;
 	}
 
 	const sortableElement = (card: CardType) => {
@@ -79,7 +93,7 @@ export const Game = ({ game, cards, initialKeys }: GameProps) => {
 		let cards = cardsData;
 		const cardToShiftData = cards.find((card) => card.position === destination);
 		let placeholderCardData = cards.find((card) => {
-			return cogContainers.includes(parseInt(card._id)) && card.position === destination;
+			return cogContainerIds.includes(card._id) && card.position === destination;
 		});
 
 		if (origin === 5 && placeholderCardData) { 
@@ -93,7 +107,7 @@ export const Game = ({ game, cards, initialKeys }: GameProps) => {
 		// moving from play to non-empty cog space
 
 			// console.log("moving from play to non-empty cog space");
-			const cogPlaceholders = cogCards.filter((card) => ["1", "2", "3", "4"].includes(card?.key as string));
+			const cogPlaceholders = cogCards.filter((card) => cogContainerIds.includes(card?.key as string));
 
 			if(cogPlaceholders.length > 0) { 
 			// shift to empty space if possible
@@ -107,7 +121,7 @@ export const Game = ({ game, cards, initialKeys }: GameProps) => {
 
 					// console.log("shifting card to next space")
 					placeholderCardData = cards.find((card) => {
-						return cogContainers.includes(parseInt(card._id)) && card.position === destination + 1;
+						return cogContainerIds.includes(card._id) && card.position === destination + 1;
 					});
 					if (placeholderCardData) placeholderCardData.position = 5;
 					if (cardToShiftData) cardToShiftData.position = destination + 1;
@@ -164,7 +178,7 @@ export const Game = ({ game, cards, initialKeys }: GameProps) => {
 	}
 
 	const validateCardsState = () => {
-		const placeholdersData = cardsData.filter((card) => cogContainers.includes(parseInt(card._id)));
+		const placeholdersData = cardsData.filter((card) => cogContainerIds.includes(card._id));
 		const placeholderIds = placeholdersData.map((card) => card._id);
 		const wordCardsData = cardsData.filter((card) => !placeholderIds.includes(card._id));
 		const updatedCogCardsOnlyData = wordCardsData.filter((card) => {
@@ -230,7 +244,7 @@ export const Game = ({ game, cards, initialKeys }: GameProps) => {
 
 	const resetCards = () => {
 		const updatedCards = cardsData.map((card) => {
-			if(["1", "2", "3", "4"].includes(card._id)) {
+			if (cogContainerIds.includes(card._id)) {
 				card.position = parseInt(card._id);
 			} else {
 				card.position = 5;
@@ -252,7 +266,7 @@ export const Game = ({ game, cards, initialKeys }: GameProps) => {
 		const cardData = cardsData.find((card) => card._id === cardId) as CardType;
 		cardData.rotation = 0;
 		const cogCardData = cardsData.filter((card) => cogContainers.includes(card.position));
-		const cogPlaceholders = cogCardData.filter((card) => cogContainers.includes(parseInt(card._id)));
+		const cogPlaceholders = cogCardData.filter((card) => cogContainerIds.includes(card._id));
 		if (cogPlaceholders.length) {
 			destination = cardsData.find((card) => card._id === cogPlaceholders[0]._id)?.position || 4;
 		}
@@ -316,26 +330,63 @@ export const Game = ({ game, cards, initialKeys }: GameProps) => {
 		setCardsData([...cardsData]);
 	}
 
+	const readyForNextRound = () => {
+		const player = game.players.find((player: PlayerType) => player._id === Meteor.userId());
+		return (player && player.ready) ? true : false
+	}
+
+	const allPlayersReady = () => {
+		const playerRound = game.players.find((player: PlayerType) => player._id === Meteor.userId()).round;
+		const playersInRound = game.players.filter((player: PlayerType) => player.round === playerRound);
+		return playersInRound.every((player: PlayerType) => player.ready);
+	}
+
 	return (
 		<>
 			{isLoading() ? <Loading /> :
-				<DndContext sensors={sensors} collisionDetection={rectIntersection} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-					<div className="cog-container">
-						<CogKeys updateKeys={handleKeyUpdate} resetCards={resetCards} saveGame={saveGame} keys={keys}/>
-						<SortableContext items={cogCards.map((card) => card.key || "")} strategy={rectSwappingStrategy} >
-							<div className="droppable-container">
-								{ cogCards.map((card) => (
-									<Droppable key={card.key ?? ""} id={card.key ?? ""}>
-										{ card }
-									</Droppable>
-								))}
-							</div>
-						</SortableContext>
-					</div>
-					<div className="draw-container">
-						{ playCards }
-					</div>
-				</DndContext>
+				<>
+					<DndContext 
+						sensors={sensors} 
+						collisionDetection={rectIntersection} 
+						onDragStart={handleDragStart} 
+						onDragEnd={handleDragEnd}
+					>
+						<div className="cog-container">
+							<CogKeys 
+								updateKeys={handleKeyUpdate} 
+								resetCards={resetCards} 
+								saveGame={saveGame} 
+								keys={keys} 
+								playerReady={readyForNextRound} 
+								round={game.round}
+							/>
+							<SortableContext 
+								items={cogCards.map((card) => card.key || "")} 
+								strategy={rectSwappingStrategy}
+							>
+								<div className="droppable-container">
+									{ cogCards.map((card) => (
+										<Droppable 
+											key={card.key ?? ""} 
+											id={card.key ?? ""}
+										>
+											{ card }
+										</Droppable>
+									))}
+								</div>
+							</SortableContext>
+						</div>
+						<div className="draw-container">
+							{ playCards }
+						</div>
+					</DndContext>
+					{readyForNextRound() &&
+						<WaitingOverlay 
+							allPlayersReady={allPlayersReady} 
+							advanceRound={advanceRound}
+						/>
+					}
+				</>
 			}
 		</>
 	)
