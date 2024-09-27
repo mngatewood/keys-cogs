@@ -6,6 +6,34 @@ import { shuffleArray } from '/imports/helpers/shuffle';
 import { CardsCollection } from '../cards/CardsCollection';
 import type { CardType } from '../types';
 
+const allOtherPlayersReady = (game: GameType, playerId: string) => {
+	return game.players.reduce((accumulator, player) => {
+		if (player._id !== playerId) {
+			return accumulator && player.ready;
+		}
+		return accumulator;
+	}, true as boolean);
+};
+
+const advanceRound = async (game: GameType) => {
+	if (game.completed) {
+		throw new Meteor.Error('game-already-completed', 'Game has already been completed.  Please try again.');
+	} else if (game.round + 1 >= game.players.length) {
+		// TODO: check for winners
+		console.log("game complete", game)
+		return
+	}
+
+	const update = {
+		$set: {
+			round: game.round + 1,
+		}
+	};
+
+	const response = await GamesCollection.updateAsync(game._id, update);
+	return response;
+}
+
 Meteor.methods({
 	async 'games.insert'(host: string) {
 		check(host, String);
@@ -23,6 +51,7 @@ Meteor.methods({
 				{
 					_id: host,
 					ready: false,
+					round: 0,
 					keys: ["", "", "", ""],
 					cards: [],
 					results: []
@@ -161,6 +190,7 @@ Meteor.methods({
 					players: {
 						_id: playerId,
 						ready: false,
+						round: 0,
 						keys: ["", "", "", ""],
 						cards: [],
 						results: [],
@@ -245,49 +275,51 @@ Meteor.methods({
 		const response = await GamesCollection.updateAsync(gameId, update, options);
 		
 		if (response === 1) {
-			const advanceRound = allOtherPlayersReady(game, playerId);
-			if (advanceRound) {
-				await startNewRound(game);
+
+			if (allOtherPlayersReady(game, playerId)) {
+				await advanceRound(game);
 			}
-			return game;
+
+			const updatedGame = await GamesCollection.findOneAsync({ _id: gameId }) as GameType;
+			return updatedGame;
 		} else {
 			throw new Meteor.Error('unable-to-save-cards', 'An error occurred.  Please try again.');
+		}
+	},
+
+	async 'game.advancePlayer'(gameId: string, playerId: string) {
+		check(gameId, String);
+		check(playerId, String);
+
+		if (!Meteor.userId()) {
+			throw new Meteor.Error('not authorized', 'You are not authorized to perform this operation.  Please log in.');
+		}
+
+		const game = await GamesCollection.findOneAsync({_id: gameId}) as GameType;
+
+		if (!game) {
+			throw new Meteor.Error('game-not-found', 'Game not found.  Please try again.');
+		}
+
+		const update = {
+			$set: {
+				"players.$[player].round": game.round,
+				"players.$[player].ready": false,
+			}
+		};
+		const options = {
+			arrayFilters: [
+				{ "player._id": playerId }
+			]
+		}
+
+		const response = await GamesCollection.updateAsync(game._id, update, options);
+		if (response === 1) {
+			const updatedGame = await GamesCollection.findOneAsync({ _id: gameId }) as GameType;
+			return updatedGame;
+		} else {
+			throw new Meteor.Error('unable-to-start-new-round', 'An error occurred.  Please try again.');
 		}
 	}
 
 });
-
-const allOtherPlayersReady = (game: GameType, playerId: string) => {
-	let ready = true;
-	game.players.forEach((player: PlayerType) => {
-		if (player._id !== playerId && !player.ready) {
-			ready = false;
-		}
-	});
-	return ready;
-}
-
-const startNewRound = async (game: GameType) => {
-	console.log("starting new round", game)
-
-	const update = {
-		$set: {
-			round: game.round + 1,
-			"players.$[player].ready": false,
-		}
-	},
-
-	const options = {
-		arrayFilters: [
-			{ "player.ready": true }
-		]
-	}
-
-	const response = await GamesCollection.updateAsync(game._id, update, options);
-	if (response === 1) {
-		return game;
-	} else {
-		throw new Meteor.Error('unable-to-start-new-round', 'An error occurred.  Please try again.');
-	}
-
-}

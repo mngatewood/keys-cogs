@@ -20,6 +20,8 @@ export const Play = () => {
 	const [gameStarted, setGameStarted] = useState(false);
 	const [gameCompleted, setGameCompleted] = useState(false);
 	const [renderGamesList, setRenderGamesList] = useState(false);
+	const [cardsFetched, setCardsFetched] = useState(false);
+	
 	const isLoading = useSubscribe("games");
 	const game = useTracker(() => GamesCollection.findOne(gameId) as GameType);
 	console.log("game", Date(), game ?? "null");
@@ -32,13 +34,13 @@ export const Play = () => {
 	useEffect(() => {
 		console.log("useEffect Play");
 		const localStorageGameId = localStorage.getItem("gameId") as string;
-		if (localStorageGameId) {
+		if (localStorageGameId && !cardsFetched) {
 			Meteor.callAsync("game.get", localStorageGameId).then((result) => {
 				setGameId(localStorageGameId);
 				setGameStarted(result.started);
 				setGameCompleted(result.completed);
 				if (result) {
-					loadCards(result);
+					enterGame(result);
 				} else {
 					localStorage.setItem("gameId", "");
 				}
@@ -47,17 +49,7 @@ export const Play = () => {
 				localStorage.removeItem("gameId");
 			})
 		}
-	}, []);
-
-	const loadCards = (game: GameType) => {
-		const { round } = game
-		console.log("round in loadCards", round);
-		if (round === 0) {
-			enterGame(game);
-		} else {
-			advanceRound(game);
-		}
-	}
+	}, [cards]);
 
 	// TODO
 	// const startDemo = () => {
@@ -110,30 +102,31 @@ export const Play = () => {
 			setGameStarted(game.started);
 			setGameCompleted(game.completed);
 			localStorage.setItem("gameId", gameId);
-
+			setCardsFetched(true);
 			// TODO consolidate startGame and enterGame
 		}
 	}
 
-	const advanceRound = (game: GameType) => {
-		const { round } = game;
-		if (round === 0) {
-			throw new Meteor.Error('unable-to-advance-round', 'Something went wrong.  Cannot advance round.');
-		}
+	const advanceRound = () => {
+		console.log("advanceRound", game);
 
-		const playerIds = game?.players.map((player: PlayerType) => player._id) || [];
-		const playerIdsExtended = [...playerIds, ...playerIds];
-		const playerIndex = playerIds.indexOf(Meteor.userId() ?? "");
-		const nextPlayerId = playerIdsExtended[playerIndex + round];
-		const nextPlayer = game.players.find((player: PlayerType) => player._id === nextPlayerId); 
-		const nextPlayerCards = nextPlayer.cards.filter((card: CardType) => !["1", "2", "3", "4"].includes(card._id));
-		const nextPlayerCardsReset = nextPlayerCards.map((card: CardType) => {
-			card.position = 5;
-			card.rotation = 0;
-			return card
+		Meteor.callAsync("game.advancePlayer", gameId, Meteor.userId()).then((result) => {
+			const playerIds = result.players.map((player: PlayerType) => player._id) || [];
+			const playerIdsExtended = [...playerIds, ...playerIds];
+			const playerIndex = playerIds.indexOf(Meteor.userId() ?? "");
+			const nextPlayerId = playerIdsExtended[playerIndex + result.round];
+			const nextPlayer = result.players.find((player: PlayerType) => player._id === nextPlayerId);
+			const nextPlayerCards = nextPlayer.cards.filter((card: CardType) => !["1", "2", "3", "4"].includes(card._id));
+			const nextPlayerCardsReset = nextPlayerCards.map((card: CardType) => {
+				card.position = 5;
+				card.rotation = 0;
+				return card
+			})
+			setCards([...nextPlayerCardsReset, ...placeholderCards]);
+			setInitialKeys(nextPlayer.keys);
+		}).catch((error) => {
+			console.log("error", error)
 		})
-		setCards([...nextPlayerCardsReset, ...placeholderCards]);
-		setInitialKeys(nextPlayer.keys);
 	}
 
 	const endGame = (gameId: string) => {
@@ -180,11 +173,12 @@ export const Play = () => {
 
 			{!isLoading() && renderGamesList && <Join {...{joinGame}} /> }
 
-			{!isLoading() && !game && <Menu 
-										hostGame={hostGame} 
-										showGames={showGames}
-										/>
-									}
+			{!isLoading() && !game && 
+				<Menu 
+					hostGame={hostGame} 
+					showGames={showGames}
+				/>
+			}
 
 			{!isLoading() && game && !gameStarted && !gameCompleted &&
 				<Lobby
@@ -204,7 +198,12 @@ export const Play = () => {
 							<img className='exit-img' src='/exit-icon.png' />
 						</button>
 					</div>
-					<Game game={game} cards={cards} initialKeys={initialKeys} />
+					<Game 
+						game={game} 
+						cards={cards} 
+						initialKeys={initialKeys}
+						advanceRound={advanceRound}
+					/>
 				</>
 			)}
 		</>

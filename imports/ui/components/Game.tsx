@@ -16,12 +16,13 @@ import { WaitingOverlay } from './WaitingOverlay';
 import type { CardType, GameType, PlayerType } from '../../api/types';
 
 interface GameProps {
-  game: GameType;
-  cards: CardType[];
-  initialKeys: string[];
+	game: GameType;
+	cards: CardType[];
+	initialKeys: string[];
+	advanceRound: Function;
 }
 
-export const Game = ({ game, cards, initialKeys }: GameProps) => {
+export const Game = ({ game, cards, initialKeys, advanceRound }: GameProps) => {
 	// State
 	const [cardsData, setCardsData] = useState<CardType[]>(cards);
 	const [playCards, setPlayCards] = useState<React.JSX.Element[]>([]);
@@ -41,6 +42,9 @@ export const Game = ({ game, cards, initialKeys }: GameProps) => {
 		console.log("useEffect Game")
 		const loadGameCards = () => {
 
+			setCardsData(cards);
+			setKeys(initialKeys);
+
 			const playCardsData = cardsData.filter((card: CardType) => card.position === 5);
 			const cogCardsData = cardsData.filter((card: CardType) => card.position !== 5);
 
@@ -55,7 +59,7 @@ export const Game = ({ game, cards, initialKeys }: GameProps) => {
 		};
 
 		loadGameCards();
-	}, [game, cardsData]);
+	}, [game, cardsData, initialKeys]);
 
 	const sortByPosition = (array: React.JSX.Element[]) => {
 		return array.sort((a: any, b: any) => {
@@ -320,8 +324,14 @@ export const Game = ({ game, cards, initialKeys }: GameProps) => {
 
 	const readyForNextRound = () => {
 		const player = game.players.find((player: PlayerType) => player._id === Meteor.userId());
-		console.log("player", player);
 		return (player && player.ready) ? true : false
+	}
+
+	const allPlayersReady = () => {
+		const playerRound = game.players.find((player: PlayerType) => player._id === Meteor.userId()).round;
+		const playersInRound = game.players.filter((player: PlayerType) => player.round === playerRound);
+		console.log("allPlayersReady", playersInRound.every((player: PlayerType) => player.ready));
+		return playersInRound.every((player: PlayerType) => player.ready);
 	}
 
 	return (
@@ -346,7 +356,7 @@ export const Game = ({ game, cards, initialKeys }: GameProps) => {
 						</div>
 					</DndContext>
 					{readyForNextRound() &&
-						<WaitingOverlay />
+						<WaitingOverlay allPlayersReady={allPlayersReady} advanceRound={advanceRound} />
 					}
 				</>
 			}
