@@ -9,9 +9,15 @@
 	margin: 0 auto;
 }
 
+.game-panel-title {
+	font-size: 5vmin;
+	font-weight: bold;
+	text-align: center;
+}
+
 .game-panel button {
 	height: 6vmin;
-	margin: 0 2vmin;
+	margin: 0 2vmin 0 0;
 	cursor: pointer;
 }
 

@@ -5,6 +5,7 @@ export const placeholderCards = [1, 2, 3, 4].map((position) => {
 	return { _id: position.toString(), words: ["", "", "", ""], position: position }
 });
 
+// return the id of the player whose cards will be rendered
 export const getPlayerToRender = (game: GameType) => {
 	const player = game.players.find((player: PlayerType) => player._id === Meteor.userId());
 	const playerIds = game.players.map((player: PlayerType) => player._id);

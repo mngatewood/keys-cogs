@@ -4,6 +4,7 @@ import { Meteor } from 'meteor/meteor';
 
 // Components
 import { Loading } from './Loading';
+import { GamePanel } from './GamePanel';
 import { Menu } from './Menu';
 import { Lobby } from './Lobby';
 import { Join } from './Join';
@@ -12,31 +13,27 @@ import { Game } from './Game';
 // Collections
 import { GamesCollection } from '/imports/api/games/GamesCollection';
 
+// Helpers
+import { fullName } from '/imports/helpers/reducers';
+import { getPlayerToRender } from '/imports/helpers/gameplay';
+
 // Types
-import type { GameType, CardType, PlayerType } from '../../api/types';
+import type { GameType } from '../../api/types';
 
 export const Play = () => {
 	const [gameId, setGameId] = useState("");
-	// const [gameStarted, setGameStarted] = useState(false);
-	// const [gameCompleted, setGameCompleted] = useState(false);
 	const [renderGamesList, setRenderGamesList] = useState(false);
-	// const [cardsFetched, setCardsFetched] = useState(false);
 	
 	const game = useTracker(() => GamesCollection.findOne(gameId) as GameType, [gameId]);
 	const isLoading = useSubscribe("games");
 	console.log("game", Date(), game ?? "null");
-	const [cards, setCards] = useState<CardType[]>([]);
-	// const [initialKeys, setInitialKeys] = useState<string[]>(["", "", "", ""]);
-	// const [renderCardsFromPlayerId, setRenderCardsFromPlayerId] = useState(undefined);
+	const userSub = useSubscribe("users.all");
 
 	useEffect(() => {
 		console.log("useEffect Play");
 		const localStorageGameId = localStorage.getItem("gameId") as string;
-		// if (localStorageGameId && !cardsFetched) {
 		if (localStorageGameId) {
 			Meteor.callAsync("game.get", localStorageGameId).then((result) => {
-				// setGameStarted(result.started);
-				// setGameCompleted(result.completed);
 				if (result) {
 					enterGame(result);
 				} else {
@@ -47,9 +44,8 @@ export const Play = () => {
 				localStorage.removeItem("gameId");
 			})
 		}
-	}, [cards]);
+	}, [game, userSub()]);
 
-	// return the id of the player whose cards will be rendered
 
 	// TODO
 	// const startDemo = () => {
@@ -61,8 +57,7 @@ export const Play = () => {
 	const hostGame = (gameId: string) => {
 		if (gameId) {			
 			setGameId(gameId);
-			// setGameStarted(false);
-			// setGameCompleted(false);
+			localStorage.setItem("gameId", gameId)
 		}
 	};
 
@@ -79,13 +74,6 @@ export const Play = () => {
 	const startGame = (gameId: string) => {
 		Meteor.callAsync("game.start", gameId).then((result) => {			
 			if (result._id === gameId) {
-				// const game = result as GameType;
-				// const player = game.players.find((player: PlayerType) => player._id === Meteor.userId());
-				// const playerCards = player.cards;
-
-				// setCards([...playerCards, ...placeholderCards]);
-				// setGameStarted(game.started);
-				// setGameCompleted(game.completed);
 				localStorage.setItem("gameId", gameId);
 			}
 		}).catch((error) => {
@@ -95,41 +83,13 @@ export const Play = () => {
 
 	const enterGame = async (game: GameType) => {
 		if (game) {
-
-			// const player = game.players.find((player: PlayerType) => player._id === Meteor.userId());
-			// const playerCards = player.cards.filter((card: CardType) => !["1", "2", "3", "4"].includes(card._id));
-			// setCards([...playerCards, ...placeholderCards]);
-			// console.log("updating keys in enterGame")
-			// setInitialKeys(player.keys.length ? player.keys : ["", "", "", ""]);
-			// setGameStarted(game.started);
-			// setGameCompleted(game.completed);
+			setGameId(game._id);
 			localStorage.setItem("gameId", gameId);
-			// setCardsFetched(true);
-			// TODO consolidate startGame and enterGame
 		}
 	}
 
 	const advanceRound = () => {
-		console.log("advanceRound", game);
-
-		Meteor.callAsync("game.advancePlayer", gameId, Meteor.userId()).then((result) => {
-			// const playerIds = result.players.map((player: PlayerType) => player._id) || [];
-			// const playerIdsExtended = [...playerIds, ...playerIds];
-			// const playerIndex = playerIds.indexOf(Meteor.userId() ?? "");
-			// const nextPlayerId = playerIdsExtended[playerIndex + result.round];
-			// const nextPlayerId = getPlayerToRender(result);
-			// const nextPlayer = result.players.find((player: PlayerType) => player._id === nextPlayerId);
-			// const nextPlayerCards = nextPlayer.cards.filter((card: CardType) => !["1", "2", "3", "4"].includes(card._id));
-			// const nextPlayerCardsReset = nextPlayerCards.map((card: CardType) => {
-			// 	card.position = 5;
-			// 	card.rotation = 0;
-			// 	return card
-			// })
-			// setCards([...nextPlayerCardsReset, ...placeholderCards]);
-			// setInitialKeys(nextPlayer.keys);
-		}).catch((error) => {
-			console.log("error", error)
-		})
+		Meteor.callAsync("game.advancePlayer", gameId, Meteor.userId())
 	}
 
 	const endGame = (gameId: string) => {
@@ -158,12 +118,20 @@ export const Play = () => {
 
 	const resetGameState = () => {
 		setGameId("");
-		// setGameCompleted(false);
-		// setGameStarted(false);
-		// console.log("updating keys in reset game state")
-		// setInitialKeys(["", "", "", ""]);
 		localStorage.removeItem("gameId")
 	};
+
+	const getPuzzleTitle = () => {
+		const playerToRenderId = getPlayerToRender(game);
+		const playerToRenderData = Meteor.users.findOne(playerToRenderId);
+		const playerToRenderName = fullName(playerToRenderData);
+		
+		if (playerToRenderId === Meteor.userId()) {
+			return "Set Your Cog & Keys"
+		} else {
+			return "Solve "  + playerToRenderName + "'s Cog"
+		}
+	}
 
 	return (
 		<>
@@ -191,11 +159,7 @@ export const Play = () => {
 
 			{!isLoading() && game && game.started && !game.completed && (
 				<>
-					<div className='game-panel z-top'>
-						<button onClick={exitGame}>
-							<img className='exit-img' src='/exit-icon.png' />
-						</button>
-					</div>
+					<GamePanel puzzleTitle={getPuzzleTitle()} exitGame={exitGame}/>
 					<Game 
 						game={game} 
 						// cards={cards} 

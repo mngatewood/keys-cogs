@@ -64,7 +64,7 @@ export const Game = ({ game, advanceRound }: GameProps) => {
 
 		validateCardsState();
 
-	}, [game, cardsData]);
+	}, [cardsData]);
 
 	const sortByPosition = (array: any) => {
 		const sortedArray = array.sort((a: any, b: any) => {
