@@ -1,6 +1,7 @@
 export type PlayerType = {
 	_id: string,
 	ready: boolean,
+	round: number,
 	keys: string[],
 	cards: any[],
 	results: any[],

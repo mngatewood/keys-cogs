@@ -47,6 +47,11 @@ export const GamesCollectionSchema = new SimpleSchema({
 		type: Boolean,
 		defaultValue: false
 	},
+	"players.$.round": {
+		type: Number,
+		defaultValue: 0,
+		min: 0,
+	},
 
 	"players.$.keys": {
 		type: Array
