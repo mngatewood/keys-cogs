@@ -289,6 +289,14 @@
 	font-style: italic;
 }
 
+.key-locked {
+	cursor: not-allowed;
+}
+
+.key-locked key-placeholder:hover {
+	background-color: unset;
+}
+
 .highlighted-key {
 	background-color: cadetblue;
 }

@@ -388,13 +388,31 @@ export const Game = ({ game, advanceRound }: GameProps) => {
 		<>
 			{isLoading() ? <Loading /> :
 				<>
-					<DndContext sensors={sensors} collisionDetection={rectIntersection} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+					<DndContext 
+						sensors={sensors} 
+						collisionDetection={rectIntersection} 
+						onDragStart={handleDragStart} 
+						onDragEnd={handleDragEnd}
+					>
 						<div className="cog-container">
-							<CogKeys updateKeys={handleKeyUpdate} resetCards={resetCards} saveGame={saveGame} keys={keys} playerReady={readyForNextRound}/>
-							<SortableContext items={cogCards.map((card) => card.key || "")} strategy={rectSwappingStrategy} >
+							<CogKeys 
+								updateKeys={handleKeyUpdate} 
+								resetCards={resetCards} 
+								saveGame={saveGame} 
+								keys={keys} 
+								playerReady={readyForNextRound} 
+								round={game.round}
+							/>
+							<SortableContext 
+								items={cogCards.map((card) => card.key || "")} 
+								strategy={rectSwappingStrategy}
+							>
 								<div className="droppable-container">
 									{ cogCards.map((card) => (
-										<Droppable key={card.key ?? ""} id={card.key ?? ""}>
+										<Droppable 
+											key={card.key ?? ""} 
+											id={card.key ?? ""}
+										>
 											{ card }
 										</Droppable>
 									))}
@@ -406,7 +424,10 @@ export const Game = ({ game, advanceRound }: GameProps) => {
 						</div>
 					</DndContext>
 					{readyForNextRound() &&
-						<WaitingOverlay allPlayersReady={allPlayersReady} advanceRound={advanceRound} />
+						<WaitingOverlay 
+							allPlayersReady={allPlayersReady} 
+							advanceRound={advanceRound}
+						/>
 					}
 				</>
 			}

@@ -10,9 +10,10 @@ interface CogKeysProps {
 	saveGame: Function
 	keys: Array<string>
 	playerReady: Function
+	round: number
 }
 
-export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGame, keys, playerReady}) => {
+export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGame, keys, playerReady, round}) => {
 	const [isEditing, setIsEditing] = useState(0);
 
 	const handleClickEdit = (keyId: number) => {
@@ -78,7 +79,8 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGam
 					<EditKey updateForm={handleFormUpdate} keyId={isEditing} keyValue={keys[isEditing - 1]} />
 				</>
 			}
-			<div className="key cog-top" onClick={() => handleClickEdit(1)}>
+			<div className={round ? "key cog-top key-locked" : "key cog-top" }
+				onClick={round ? () => {} : () => handleClickEdit(1)}>
 				<TransitionGroup>
 					<CSSTransition
 						key={keys[0]}
@@ -89,7 +91,8 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGam
 					</CSSTransition>
 				</TransitionGroup>
 			</div>
-			<div className="key cog-right" onClick={() => handleClickEdit(2)}>
+			<div className={round ? "key cog-right key-locked" : "key cog-right"} 
+				onClick={round ? () => {} : () => handleClickEdit(2)}>
 				<TransitionGroup>
 					<CSSTransition
 						key={keys[1]}
@@ -100,7 +103,8 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGam
 					</CSSTransition>
 				</TransitionGroup>
 			</div>
-			<div className="key cog-bottom" onClick={() => handleClickEdit(3)}>
+			<div className={round ? "key cog-bottom key-locked" : "key cog-bottom"}
+				onClick={round ? () => {} : () => handleClickEdit(3)}>
 				<TransitionGroup>
 					<CSSTransition
 						key={keys[2]}
@@ -111,7 +115,8 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGam
 					</CSSTransition>
 				</TransitionGroup>
 			</div>
-			<div className="key cog-left" onClick={() => handleClickEdit(4)}>
+			<div className={round ? "key cog-left key-locked" : "key cog-left"}
+				onClick={round ? () => {} : () => handleClickEdit(4)}>
 				<TransitionGroup>
 					<CSSTransition
 						key={keys[3]}
