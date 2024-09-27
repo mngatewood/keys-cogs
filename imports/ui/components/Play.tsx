@@ -22,6 +22,7 @@ export const Play = () => {
 	const [renderGamesList, setRenderGamesList] = useState(false);
 	const isLoading = useSubscribe("games");
 	const game = useTracker(() => GamesCollection.findOne(gameId) as GameType);
+	console.log("game", Date(), game ?? "null");
 	const [cards, setCards] = useState<CardType[]>([]);
 	const [initialKeys, setInitialKeys] = useState<string[]>(["", "", "", ""]);
 	const placeholderCards = [1, 2, 3, 4].map((position) => {
@@ -33,18 +34,30 @@ export const Play = () => {
 		const localStorageGameId = localStorage.getItem("gameId") as string;
 		if (localStorageGameId) {
 			Meteor.callAsync("game.get", localStorageGameId).then((result) => {
+				setGameId(localStorageGameId);
+				setGameStarted(result.started);
+				setGameCompleted(result.completed);
 				if (result) {
-					setGameId(localStorageGameId);
-					enterGame(result);
+					loadCards(result);
 				} else {
 					localStorage.setItem("gameId", "");
 				}
 			}).catch((error) => {
 				console.log("error", error)
-				localStorage.setItem("gameId", "");
+				localStorage.removeItem("gameId");
 			})
 		}
 	}, []);
+
+	const loadCards = (game: GameType) => {
+		const { round } = game
+		console.log("round in loadCards", round);
+		if (round === 0) {
+			enterGame(game);
+		} else {
+			advanceRound(game);
+		}
+	}
 
 	// TODO
 	// const startDemo = () => {
@@ -67,6 +80,7 @@ export const Play = () => {
 
 	const joinGame = (gameId: string) => {
 		setGameId(gameId);
+		localStorage.setItem("gameId", gameId)
 		setRenderGamesList(false)
 	}
 
@@ -76,9 +90,6 @@ export const Play = () => {
 				const game = result as GameType;
 				const player = game.players.find((player: PlayerType) => player._id === Meteor.userId());
 				const playerCards = player.cards;
-				// const placeholderCards = [1, 2, 3, 4].map((position) => {
-				// 	return { _id: position.toString(), words: ["", "", "", ""], position: position }
-				// });
 
 				setCards([...playerCards, ...placeholderCards]);
 				setGameStarted(game.started);
@@ -104,9 +115,31 @@ export const Play = () => {
 		}
 	}
 
+	const advanceRound = (game: GameType) => {
+		const { round } = game;
+		if (round === 0) {
+			throw new Meteor.Error('unable-to-advance-round', 'Something went wrong.  Cannot advance round.');
+		}
+
+		const playerIds = game?.players.map((player: PlayerType) => player._id) || [];
+		const playerIdsExtended = [...playerIds, ...playerIds];
+		const playerIndex = playerIds.indexOf(Meteor.userId() ?? "");
+		const nextPlayerId = playerIdsExtended[playerIndex + round];
+		const nextPlayer = game.players.find((player: PlayerType) => player._id === nextPlayerId); 
+		const nextPlayerCards = nextPlayer.cards.filter((card: CardType) => !["1", "2", "3", "4"].includes(card._id));
+		const nextPlayerCardsReset = nextPlayerCards.map((card: CardType) => {
+			card.position = 5;
+			card.rotation = 0;
+			return card
+		})
+		setCards([...nextPlayerCardsReset, ...placeholderCards]);
+		setInitialKeys(nextPlayer.keys);
+	}
+
 	const endGame = (gameId: string) => {
 		Meteor.callAsync("game.complete", gameId).then(() => {
 			setGameId("");
+			localStorage.removeItem("gameId")
 		}).catch((error) => {
 			console.log("error", error)
 		});
@@ -116,7 +149,6 @@ export const Play = () => {
 		Meteor.callAsync("game.leave", gameId, playerId).then(() => {
 			if (playerId === Meteor.userId()) {
 				resetGameState();
-				localStorage.removeItem("gameId");
 			}
 			if (playerId === game?.hostId) {
 				endGame(gameId);
@@ -139,6 +171,7 @@ export const Play = () => {
 		setGameCompleted(false);
 		setGameStarted(false);
 		setInitialKeys(["", "", "", ""]);
+		localStorage.removeItem("gameId")
 	};
 
 	return (
