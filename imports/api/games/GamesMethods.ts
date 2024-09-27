@@ -230,7 +230,6 @@ Meteor.methods({
 
 		const update = {
 			$set: {
-				round: game.round,
 				"players.$[player].ready": true,
 				"players.$[player].cards": cards,
 				"players.$[player].keys": keys
@@ -243,15 +242,13 @@ Meteor.methods({
 			]
 		}
 
-		const advanceRound = allOtherPlayersReady(game, playerId);
-		if (advanceRound) {
-			update.$set.round = game.round + 1;
-		}
-
 		const response = await GamesCollection.updateAsync(gameId, update, options);
-
+		
 		if (response === 1) {
-			console.log("updated game", game)
+			const advanceRound = allOtherPlayersReady(game, playerId);
+			if (advanceRound) {
+				await startNewRound(game);
+			}
 			return game;
 		} else {
 			throw new Meteor.Error('unable-to-save-cards', 'An error occurred.  Please try again.');
@@ -268,4 +265,29 @@ const allOtherPlayersReady = (game: GameType, playerId: string) => {
 		}
 	});
 	return ready;
+}
+
+const startNewRound = async (game: GameType) => {
+	console.log("starting new round", game)
+
+	const update = {
+		$set: {
+			round: game.round + 1,
+			"players.$[player].ready": false,
+		}
+	},
+
+	const options = {
+		arrayFilters: [
+			{ "player.ready": true }
+		]
+	}
+
+	const response = await GamesCollection.updateAsync(game._id, update, options);
+	if (response === 1) {
+		return game;
+	} else {
+		throw new Meteor.Error('unable-to-start-new-round', 'An error occurred.  Please try again.');
+	}
+
 }
