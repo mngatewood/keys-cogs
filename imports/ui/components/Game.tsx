@@ -17,17 +17,17 @@ import type { CardType, GameType, PlayerType } from '../../api/types';
 
 interface GameProps {
 	game: GameType;
-	cards: CardType[];
-	initialKeys: string[];
+	// cards: CardType[];
+	// initialKeys: string[];
 	advanceRound: Function;
 }
 
-export const Game = ({ game, cards, initialKeys, advanceRound }: GameProps) => {
+export const Game = ({ game, advanceRound }: GameProps) => {
 	// State
-	const [cardsData, setCardsData] = useState<CardType[]>(cards);
+	const [cardsData, setCardsData] = useState<CardType[]>([]);
 	const [playCards, setPlayCards] = useState<React.JSX.Element[]>([]);
 	const [cogCards, setCogCards] = useState<React.JSX.Element[]>([]);
-	const [keys, setKeys] = useState<string[]>(initialKeys);
+	const [keys, setKeys] = useState<string[]>(["", "", "", ""]);
 
 	// Hooks
 	const pointerSensor = useSensor(PointerSensor, { activationConstraint: { distance: 5 }});
@@ -37,39 +37,89 @@ export const Game = ({ game, cards, initialKeys, advanceRound }: GameProps) => {
 	const cogContainers = [1, 2, 3, 4];
 	const cogContainerIds = ["1", "2", "3", "4"];
 	const isLoading = useSubscribe("games");
+	const placeholderCards = [1, 2, 3, 4].map((position) => {
+		return { _id: position.toString(), words: ["", "", "", ""], position: position }
+	});
 
 	useEffect(() => {
-		console.log("useEffect Game")
-		const loadGameCards = () => {
+		console.log("useEffect Game setCardsData and setKeys");
 
-			setCardsData(cards);
-			setKeys(initialKeys);
+		const cardsToRender = getCardsToRender(game);
+		const keysToRender = getKeysToRender(game);
 
-			const playCardsData = cardsData.filter((card: CardType) => card.position === 5);
-			const cogCardsData = cardsData.filter((card: CardType) => card.position !== 5);
+		setCardsData(cardsToRender || []);
+		setKeys(keysToRender || []);
 
-			const playCardElements = playCardsData.map(card => draggableElement(card));
-			setPlayCards(sortByPosition(playCardElements));
+	}, [game]);
 
-			const cogCardElements = cogCardsData.map(card => sortableElement(card));
-			setCogCards(sortByPosition(cogCardElements));
+	useEffect(() => {
+		console.log("useEffect Game setPlayCards and setCogCards");
 
-			validateCardsState();
+		const playCardsData = cardsData?.filter((card: CardType) => card.position === 5);
+		const playCardElements = playCardsData?.map(card => draggableElement(card));
+			if (playCardElements) setPlayCards(sortByPosition(playCardElements));
 
-		};
+		const cogCardsData = cardsData?.filter((card: CardType) => card.position !== 5);
+		const cogCardElements = cogCardsData?.map(card => sortableElement(card));
+		if (cogCardElements) setCogCards(sortByPosition(cogCardElements));
 
-		loadGameCards();
-	}, [game, cardsData, initialKeys]);
+		validateCardsState();
 
-	const sortByPosition = (array: React.JSX.Element[]) => {
-		return array.sort((a: any, b: any) => {
+	}, [game, cardsData]);
+
+	const getPlayerToRender = (game: GameType) => {
+		const player = game.players.find((player: PlayerType) => player._id === Meteor.userId());
+		const playerIds = game.players.map((player: PlayerType) => player._id);
+		const playerIdsExtended = [...playerIds, ...playerIds];
+		const playerIndex = playerIds.indexOf(Meteor.userId() ?? "");
+		const playerOrder = playerIdsExtended.slice(playerIndex, playerIndex + playerIds.length);
+		return playerOrder[player.round];
+	}
+
+	// return the card data for the player whose cards will be rendered
+	const getCardsToRender = (game: GameType) => {
+		const playerToRenderId = getPlayerToRender(game);
+		const playerCards = game.players.find((player: PlayerType) => player._id === playerToRenderId).cards;
+
+		// strip any placeholder cards to avoid duplication
+		const filteredPlayerCards = playerCards.filter((card: CardType) => {
+			return !["1", "2", "3", "4"].includes(card._id);
+		})
+
+		// if showing player their own cards, render as-is
+		if (playerCards && playerToRenderId === Meteor.userId()) {
+			return [...filteredPlayerCards, ...placeholderCards];
+
+			// otherwise, strip position and rotation from cards
+		} else if (playerCards && playerToRenderId !== Meteor.userId()) {
+			const resetPlayerCards = filteredPlayerCards.map((card: CardType) => {
+				card.position = 5;
+				card.rotation = 0;
+				return card
+			})
+			return [...resetPlayerCards, ...placeholderCards];
+		}
+	}
+
+	// return the keys for the player whose cards will be rendered
+	const getKeysToRender = (game: GameType) => {
+		const playerToRenderId = getPlayerToRender(game);
+		const playerToRender = game.players.find((player: PlayerType) => player._id === playerToRenderId)
+		return playerToRender.keys
+	}
+
+	const sortByPosition = (array: any) => {
+		const sortedArray = array.sort((a: any, b: any) => {
 			const aPosition = cardsData.find((card) => card._id === a.key)?.position;
 			const bPosition = cardsData.find((card) => card._id === b.key)?.position;
+
 			if (aPosition === undefined || bPosition === undefined) {
 				throw new Error("Invalid card data");
 			}
 			return aPosition - bPosition;
 		});
+
+		return sortedArray;
 	}
 
 	const sortableElement = (card: CardType) => {
