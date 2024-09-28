@@ -122,7 +122,7 @@ export const Play = () => {
 	};
 
 	const getPuzzleTitle = () => {
-		const playerToRenderId = getPlayerToRender(game);
+		const playerToRenderId = getPlayerToRender(game, Meteor.userId() ?? "");
 		const playerToRenderData = Meteor.users.findOne(playerToRenderId);
 		const playerToRenderName = fullName(playerToRenderData);
 		

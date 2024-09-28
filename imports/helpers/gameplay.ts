@@ -2,22 +2,22 @@ import { Meteor } from 'meteor/meteor';
 import type { GameType, CardType, PlayerType } from '../api/types';
 
 export const placeholderCards = [1, 2, 3, 4].map((position) => {
-	return { _id: position.toString(), words: ["", "", "", ""], position: position }
+	return { _id: position.toString(), ['data-position']: position.toString(), words: ["", "", "", ""], position: position }
 });
 
 // return the id of the player whose cards will be rendered
-export const getPlayerToRender = (game: GameType) => {
+export const getPlayerToRender = (game: GameType, playerId: string) => {
 	const player = game.players.find((player: PlayerType) => player._id === Meteor.userId());
 	const playerIds = game.players.map((player: PlayerType) => player._id);
 	const playerIdsExtended = [...playerIds, ...playerIds];
-	const playerIndex = playerIds.indexOf(Meteor.userId() ?? "");
+	const playerIndex = playerIds.indexOf(playerId);
 	const playerOrder = playerIdsExtended.slice(playerIndex, playerIndex + playerIds.length);
 	return playerOrder[player.round];
 }
 
 // return the card data for the player whose cards will be rendered
 export const getCardsToRender = (game: GameType) => {
-	const playerToRenderId = getPlayerToRender(game);
+	const playerToRenderId = getPlayerToRender(game, Meteor.userId() ?? "");
 	const playerCards = game.players.find((player: PlayerType) => player._id === playerToRenderId).cards;
 
 	// strip any placeholder cards to avoid duplication
@@ -41,8 +41,8 @@ export const getCardsToRender = (game: GameType) => {
 }
 
 // return the keys for the player whose cards will be rendered
-export const getKeysToRender = (game: GameType) => {
-	const playerToRenderId = getPlayerToRender(game);
+export const getKeysToRender = (game: GameType, playerId: string) => {
+	const playerToRenderId = getPlayerToRender(game, playerId);
 	const playerToRender = game.players.find((player: PlayerType) => player._id === playerToRenderId)
 	return playerToRender.keys
 }
