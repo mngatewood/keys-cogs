@@ -5,6 +5,7 @@ import type { GameType, PlayerType } from '../types'
 import { shuffleArray } from '/imports/helpers/shuffle';
 import { CardsCollection } from '../cards/CardsCollection';
 import type { CardType } from '../types';
+import { getPlayerToRender } from '/imports/helpers/gameplay';
 
 const allOtherPlayersReady = (game: GameType, playerId: string) => {
 	return game.players.reduce((accumulator, player) => {
@@ -283,6 +284,37 @@ Meteor.methods({
 		} else {
 			throw new Meteor.Error('unable-to-save-cards', 'An error occurred.  Please try again.');
 		}
+	},
+
+	async 'game.checkCog'(gameId: string, playerId: string, cards: CardType[]) {
+		check(gameId, String);
+		check(playerId, String);
+		check(cards, [Object]);
+
+		if (!Meteor.userId()) {
+			throw new Meteor.Error('not authorized', 'You are not authorized to perform this operation.  Please log in.');
+		}
+
+		console.log("game.checkCog", gameId, playerId, cards);
+		const game = await GamesCollection.findOneAsync({_id: gameId}) as GameType;
+		const coplayerId = getPlayerToRender(game, playerId);
+		const coplayer = game.players.find((player: PlayerType) => player._id === coplayerId);
+		const coplayerPuzzle = coplayer?.cards.filter((card: CardType) => [1, 2, 3, 4].includes(card.position));
+		const playerSolution = cards.filter((card: CardType) => [1, 2, 3, 4].includes(card.position));
+
+		const results = coplayerPuzzle?.reduce((accumulator: { [key: number]: boolean }, card: CardType) => {
+			const position = card.position;
+			const solutionCard = playerSolution.find((card: CardType) => card.position === position);
+			if (card._id === solutionCard?._id && card.rotation === solutionCard?.rotation) {
+				accumulator[position] = true;
+			} else {
+				accumulator[position] = false;
+			}
+			return accumulator;
+		}, {});
+				
+		return results;
+
 	},
 
 	async 'game.advancePlayer'(gameId: string, playerId: string) {

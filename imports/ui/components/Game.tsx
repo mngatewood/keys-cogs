@@ -44,7 +44,7 @@ export const Game = ({ game, advanceRound }: GameProps) => {
 		console.log("useEffect Game setCardsData and setKeys");
 
 		const cardsToRender = getCardsToRender(game);
-		const keysToRender = getKeysToRender(game);
+		const keysToRender = getKeysToRender(game, Meteor.userId() ?? "");
 
 		setCardsData(cardsToRender || []);
 		setKeys(keysToRender || []);
@@ -279,12 +279,26 @@ export const Game = ({ game, advanceRound }: GameProps) => {
 			return new Promise((resolve) => resolve(false));
 		}
 
-		return await Meteor.callAsync("game.saveCog", game._id, Meteor.userId() as string, cardsData, keys).then(() => {
-			return true;
-		}).catch((error: Meteor.Error) => {
-			console.log("error saving game", error);
-			return false
-		});
+		if (game.round === 0) {			
+			return await Meteor.callAsync("game.saveCog", game._id, Meteor.userId() as string, cardsData, keys).then(() => {
+				return true;
+			}).catch((error: Meteor.Error) => {
+				console.log("error saving game", error);
+				return false
+			});
+		} else {
+			Meteor.callAsync("game.checkCog", game._id, Meteor.userId(), cardsData).then((result) => {
+				if (result) {
+					console.log("game check result", result);
+					const incorrectPositions = Object.keys(result).filter((key) => result[key] === false)
+					console.log("incorrectPositions", incorrectPositions);
+					incorrectPositions.forEach((position: string) => {
+						const cardData = cardsData.find((card) => card.position === parseInt(position)) as CardType;
+						moveCard(cardData, parseInt(position), 5);
+					})
+				}
+			})
+		}
 	}
 
 	const validateReadyToSave = () => {
