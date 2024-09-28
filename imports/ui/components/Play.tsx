@@ -23,6 +23,7 @@ import type { GameType } from '../../api/types';
 export const Play = () => {
 	const [gameId, setGameId] = useState("");
 	const [renderGamesList, setRenderGamesList] = useState(false);
+	const [renderNewCards, setRenderNewCards] = useState(false);
 	
 	const game = useTracker(() => GamesCollection.findOne(gameId) as GameType, [gameId]);
 	const isLoading = useSubscribe("games");
@@ -89,7 +90,15 @@ export const Play = () => {
 	}
 
 	const advanceRound = () => {
-		Meteor.callAsync("game.advancePlayer", gameId, Meteor.userId())
+		Meteor.callAsync("game.advancePlayer", gameId, Meteor.userId()).then((result) => {
+			if (result) {
+				setRenderNewCards(true);
+			}
+		})
+	}
+
+	const newCardsRendered = () => {
+		setRenderNewCards(false);
 	}
 
 	const endGame = (gameId: string) => {
@@ -162,9 +171,9 @@ export const Play = () => {
 					<GamePanel puzzleTitle={getPuzzleTitle()} exitGame={exitGame}/>
 					<Game 
 						game={game} 
-						// cards={cards} 
-						// initialKeys={initialKeys}
 						advanceRound={advanceRound}
+						renderNewCards={renderNewCards}
+						newCardsRendered={newCardsRendered}
 					/>
 				</>
 			)}

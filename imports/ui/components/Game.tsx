@@ -21,9 +21,11 @@ import type { CardType, GameType, PlayerType } from '../../api/types';
 interface GameProps {
 	game: GameType;
 	advanceRound: Function;
+	renderNewCards: boolean;
+	newCardsRendered: Function;
 }
 
-export const Game = ({ game, advanceRound }: GameProps) => {
+export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered }: GameProps) => {
 	// State
 	const [cardsData, setCardsData] = useState<CardType[]>([]);
 	const [playCards, setPlayCards] = useState<React.JSX.Element[]>([]);
@@ -43,16 +45,20 @@ export const Game = ({ game, advanceRound }: GameProps) => {
 	useEffect(() => {
 		console.log("useEffect Game setCardsData and setKeys");
 
-		const cardsToRender = getCardsToRender(game);
+		const cardsToRender = getCardsToRender(game, Meteor.userId() ?? "");
 		const keysToRender = getKeysToRender(game, Meteor.userId() ?? "");
 
 		setCardsData(cardsToRender || []);
 		setKeys(keysToRender || []);
 
-	}, [game]);
+		newCardsRendered();
+
+	}, [renderNewCards]);
 
 	useEffect(() => {
 		console.log("useEffect Game setPlayCards and setCogCards");
+
+		if (!cardsData) return;
 
 		const playCardsData = cardsData?.filter((card: CardType) => card.position === 5);
 		const playCardElements = playCardsData?.map(card => draggableElement(card));
