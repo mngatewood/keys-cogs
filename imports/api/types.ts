@@ -19,7 +19,7 @@ export type GameType = {
 	hostId: string,
 	round: number,
 	players: Array<any>,
-	cards: Array<string>,
+	cards: Array<CardType>,
 	completed: boolean,
 	started: boolean,
 };

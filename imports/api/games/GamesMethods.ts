@@ -35,6 +35,18 @@ const advanceRound = async (game: GameType) => {
 	return response;
 }
 
+const regulateCardsRotation = (cards: CardType[]) => {
+	return cards.map((card) => {
+		const rotation = card.rotation ?? 0;
+		if (rotation > 0) { card.rotation = rotation }
+		else if (rotation === -0.25) { card.rotation = 0.75}
+		else if (rotation === -0.5) { card.rotation = 0.5} 
+		else if (rotation === -0.75) { card.rotation = 0.25 } 
+		else { card.rotation = 0 }
+		return card
+	})
+}
+
 Meteor.methods({
 	async 'games.insert'(host: string) {
 		check(host, String);
@@ -260,7 +272,7 @@ Meteor.methods({
 		const update = {
 			$set: {
 				"players.$[player].ready": true,
-				"players.$[player].cards": cards,
+				"players.$[player].cards": regulateCardsRotation(cards),
 				"players.$[player].keys": keys
 			}
 		};
@@ -300,11 +312,13 @@ Meteor.methods({
 		const coplayerId = getPlayerToRender(game, playerId);
 		const coplayer = game.players.find((player: PlayerType) => player._id === coplayerId);
 		const coplayerPuzzle = coplayer?.cards.filter((card: CardType) => [1, 2, 3, 4].includes(card.position));
+		const regulatedCoplayerPuzzle = regulateCardsRotation(coplayerPuzzle || []);
 		const playerSolution = cards.filter((card: CardType) => [1, 2, 3, 4].includes(card.position));
+		const regulatedPlayerSolution = regulateCardsRotation(playerSolution || []);
 
-		const results = coplayerPuzzle?.reduce((accumulator: { [key: number]: boolean }, card: CardType) => {
+		const results = regulatedCoplayerPuzzle?.reduce((accumulator: { [key: number]: boolean }, card: CardType) => {
 			const position = card.position;
-			const solutionCard = playerSolution.find((card: CardType) => card.position === position);
+			const solutionCard = regulatedPlayerSolution.find((card: CardType) => card.position === position);
 			if (card._id === solutionCard?._id && card.rotation === solutionCard?.rotation) {
 				accumulator[position] = true;
 			} else {
