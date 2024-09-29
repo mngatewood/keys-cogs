@@ -19,7 +19,7 @@ export const WaitingOverlay = ({allPlayersReady, advanceRound, roundResults}: Wa
 				<h1 className="text-2xl font-bold text-center mb-4">
 					{ allPlayersReady() ? "All players ready" : roundResults.message }
 				</h1>
-				{roundResults.roundComplete && roundResults.incorrectPositions && roundResults.attempts && roundResults.score &&
+				{roundResults.roundComplete && roundResults.incorrectPositions &&
 					<>
 						<h3 className="text-2xl font-bold text-center mb-4">Correct: { 4 - roundResults.incorrectPositions?.length }</h3>
 						<h3 className="text-2xl font-bold text-center mb-4">Attempts: {roundResults.attempts }</h3>

@@ -85,7 +85,7 @@ const incrementAttempt = async (game: GameType, playerId: string) => {
 
 const calculateRoundScore = (game: GameType, playerId: string, incorrectPositions: number) => {
 	const player = game.players.find((player: PlayerType) => player._id === playerId);
-	const result = player.results.find((result: any) => result.round === player.round);
+	const attempts = player.results?.find((result: any) => result.round === player.round)?.attempts ?? 0;
 	let score = 0;
 	if (incorrectPositions === 2) {
 		score = score + 1;
@@ -96,7 +96,7 @@ const calculateRoundScore = (game: GameType, playerId: string, incorrectPosition
 	}
 
 	// bonus score for first attempt
-	if (result.attempts === 0) {
+	if (attempts === 0) {
 		score = score + 2;
 	}
 
@@ -412,7 +412,7 @@ Meteor.methods({
 
 		let score = 0;
 
-		if (incorrectPositions.length === 0 && attempts <= 2) {
+		if (incorrectPositions.length === 0 || attempts <= 2) {
 			score = calculateRoundScore(game, playerId, incorrectPositions.length);
 		}
 			
