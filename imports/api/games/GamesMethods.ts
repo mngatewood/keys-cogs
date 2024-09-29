@@ -47,6 +47,83 @@ const regulateCardsRotation = (cards: CardType[]) => {
 	})
 }
 
+const incrementAttempt = async (game: GameType, playerId: string) => {
+	const player = game.players.find((player: PlayerType) => player._id === playerId);
+	const previousAttempts = player.results.find((result: any) => result.round === player.round)?.attempts ?? 0;
+	if (previousAttempts > 1) return 2;
+
+	let update = {};
+	let options: any = {
+		arrayFilters: [
+			{ "player._id": playerId },
+		]
+	};
+
+	if (previousAttempts === 0) {
+		update = {
+			$addToSet: {
+				"players.$[player].results": {
+					round: player.round,
+					attempts: 1,
+					score: 0,
+				}
+			}
+		}
+	} else if (previousAttempts === 1) {
+		update = {
+			$set: {
+				"players.$[player].results.$[result].attempts": previousAttempts + 1
+			}
+		};
+
+		options.arrayFilters.push({ "result.round": player.round })
+	}
+	
+	return await GamesCollection.updateAsync(game._id, update, options)
+
+}
+
+const calculateRoundScore = (game: GameType, playerId: string, incorrectPositions: number) => {
+	const player = game.players.find((player: PlayerType) => player._id === playerId);
+	const result = player.results.find((result: any) => result.round === player.round);
+	let score = 0;
+	if (incorrectPositions === 2) {
+		score = score + 1;
+	} else if (incorrectPositions === 1) {
+		score = score + 2;
+	} else if (incorrectPositions === 0) {
+		score = score + 4;
+	}
+
+	// bonus score for first attempt
+	if (result.attempts === 0) {
+		score = score + 2;
+	}
+
+	return score
+}
+
+const finalizePlayerRound = async (game: GameType, playerId: string, attempts: number, score: number) => {
+
+	const update = {
+		$set: {
+			"players.$[player].ready": true,
+			"players.$[player].results.$[result].score": score,
+			"players.$[player].results.$[result].attempts": attempts,
+		}
+	};
+
+	const options: any = {
+		arrayFilters: [
+			{ "player._id": playerId },
+			{ "result.round": game.round },
+		]
+	};
+
+	return await GamesCollection.updateAsync(game._id, update, options)
+	
+};
+
 Meteor.methods({
 	async 'games.insert'(host: string) {
 		check(host, String);
@@ -307,7 +384,6 @@ Meteor.methods({
 			throw new Meteor.Error('not authorized', 'You are not authorized to perform this operation.  Please log in.');
 		}
 
-		console.log("game.checkCog", gameId, playerId, cards);
 		const game = await GamesCollection.findOneAsync({_id: gameId}) as GameType;
 		const coplayerId = getPlayerToRender(game, playerId);
 		const coplayer = game.players.find((player: PlayerType) => player._id === coplayerId);
@@ -316,7 +392,7 @@ Meteor.methods({
 		const playerSolution = cards.filter((card: CardType) => [1, 2, 3, 4].includes(card.position));
 		const regulatedPlayerSolution = regulateCardsRotation(playerSolution || []);
 
-		const results = regulatedCoplayerPuzzle?.reduce((accumulator: { [key: number]: boolean }, card: CardType) => {
+		const checkResult = regulatedCoplayerPuzzle?.reduce((accumulator: { [key: number]: boolean }, card: CardType) => {
 			const position = card.position;
 			const solutionCard = regulatedPlayerSolution.find((card: CardType) => card.position === position);
 			if (card._id === solutionCard?._id && card.rotation === solutionCard?.rotation) {
@@ -326,9 +402,37 @@ Meteor.methods({
 			}
 			return accumulator;
 		}, {});
-				
-		return results;
 
+		const incorrectPositions = Object.keys(checkResult).filter((key) => checkResult[parseInt(key)] === false);
+
+		await incrementAttempt(game, playerId);
+
+		const player = game.players.find((player: PlayerType) => player._id === playerId);
+		const attempts = (player.results.find((result: any) => result.round === player.round)?.attempts ?? 0) + 1;
+
+		let score = 0;
+
+		if (incorrectPositions.length === 0 && attempts <= 2) {
+			score = calculateRoundScore(game, playerId, incorrectPositions.length);
+		}
+			
+		let response = {
+			incorrectPositions: incorrectPositions,
+			attempts: attempts,
+			score: score,
+			roundComplete: false
+		}
+
+		if (attempts >= 2 || incorrectPositions.length === 0) {
+			await finalizePlayerRound(game, playerId, attempts, score).then((result) => {
+				if (result === 1) {
+					response.roundComplete = true;
+				}
+			});
+		} 
+
+		return response;
+		
 	},
 
 	async 'game.advancePlayer'(gameId: string, playerId: string) {
