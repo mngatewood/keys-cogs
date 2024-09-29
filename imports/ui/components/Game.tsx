@@ -16,19 +16,22 @@ import { WaitingOverlay } from './WaitingOverlay';
 import { getCardsToRender, getKeysToRender } from '/imports/helpers/gameplay';
 
 // Types
-import type { CardType, GameType, PlayerType } from '../../api/types';
+import type { CardType, GameType, PlayerType, RoundResults } from '../../api/types';
 
 interface GameProps {
 	game: GameType;
 	advanceRound: Function;
+	renderNewCards: boolean;
+	newCardsRendered: Function;
 }
 
-export const Game = ({ game, advanceRound }: GameProps) => {
+export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered }: GameProps) => {
 	// State
 	const [cardsData, setCardsData] = useState<CardType[]>([]);
 	const [playCards, setPlayCards] = useState<React.JSX.Element[]>([]);
 	const [cogCards, setCogCards] = useState<React.JSX.Element[]>([]);
 	const [keys, setKeys] = useState<string[]>(["", "", "", ""]);
+	const [roundResults, setRoundResults] = useState<RoundResults>({message: "Waiting for other players..."});
 
 	// Hooks
 	const pointerSensor = useSensor(PointerSensor, { activationConstraint: { distance: 5 }});
@@ -43,16 +46,20 @@ export const Game = ({ game, advanceRound }: GameProps) => {
 	useEffect(() => {
 		console.log("useEffect Game setCardsData and setKeys");
 
-		const cardsToRender = getCardsToRender(game);
-		const keysToRender = getKeysToRender(game);
+		const cardsToRender = getCardsToRender(game, Meteor.userId() ?? "");
+		const keysToRender = getKeysToRender(game, Meteor.userId() ?? "");
 
 		setCardsData(cardsToRender || []);
 		setKeys(keysToRender || []);
 
-	}, [game]);
+		newCardsRendered();
+
+	}, [renderNewCards]);
 
 	useEffect(() => {
 		console.log("useEffect Game setPlayCards and setCogCards");
+
+		if (!cardsData) return;
 
 		const playCardsData = cardsData?.filter((card: CardType) => card.position === 5);
 		const playCardElements = playCardsData?.map(card => draggableElement(card));
@@ -279,12 +286,35 @@ export const Game = ({ game, advanceRound }: GameProps) => {
 			return new Promise((resolve) => resolve(false));
 		}
 
-		return await Meteor.callAsync("game.saveCog", game._id, Meteor.userId() as string, cardsData, keys).then(() => {
-			return true;
-		}).catch((error: Meteor.Error) => {
-			console.log("error saving game", error);
-			return false
-		});
+		if (game.round === 0) {			
+			return await Meteor.callAsync("game.saveCog", game._id, Meteor.userId() as string, cardsData, keys).then(() => {
+				const roundResults = {
+					message: "Saved.  Waiting for other players...",
+				}
+				setRoundResults(roundResults);
+				return true;
+			}).catch((error: Meteor.Error) => {
+				console.log("error saving game", error);
+				return false
+			});
+		} else {
+			Meteor.callAsync("game.checkCog", game._id, Meteor.userId(), cardsData).then((result) => {
+				if (result?.roundComplete) {
+					const roundResults = {
+						message: "Round complete.  Waiting for other players...",
+						...result
+					}
+					setRoundResults(roundResults);
+					return true;
+				} else {
+					result.incorrectPositions.forEach((position: string) => {
+						const cardData = cardsData.find((card) => card.position === parseInt(position)) as CardType;
+						moveCard(cardData, parseInt(position), 5);
+						return true;
+					})
+				}
+			})
+		}
 	}
 
 	const validateReadyToSave = () => {
@@ -384,6 +414,7 @@ export const Game = ({ game, advanceRound }: GameProps) => {
 						<WaitingOverlay 
 							allPlayersReady={allPlayersReady} 
 							advanceRound={advanceRound}
+							roundResults={roundResults}
 						/>
 					}
 				</>

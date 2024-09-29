@@ -5,6 +5,7 @@ import type { GameType, PlayerType } from '../types'
 import { shuffleArray } from '/imports/helpers/shuffle';
 import { CardsCollection } from '../cards/CardsCollection';
 import type { CardType } from '../types';
+import { getPlayerToRender } from '/imports/helpers/gameplay';
 
 const allOtherPlayersReady = (game: GameType, playerId: string) => {
 	return game.players.reduce((accumulator, player) => {
@@ -33,6 +34,95 @@ const advanceRound = async (game: GameType) => {
 	const response = await GamesCollection.updateAsync(game._id, update);
 	return response;
 }
+
+const regulateCardsRotation = (cards: CardType[]) => {
+	return cards.map((card) => {
+		const rotation = card.rotation ?? 0;
+		if (rotation > 0) { card.rotation = rotation }
+		else if (rotation === -0.25) { card.rotation = 0.75}
+		else if (rotation === -0.5) { card.rotation = 0.5} 
+		else if (rotation === -0.75) { card.rotation = 0.25 } 
+		else { card.rotation = 0 }
+		return card
+	})
+}
+
+const incrementAttempt = async (game: GameType, playerId: string) => {
+	const player = game.players.find((player: PlayerType) => player._id === playerId);
+	const previousAttempts = player.results.find((result: any) => result.round === player.round)?.attempts ?? 0;
+	if (previousAttempts > 1) return 2;
+
+	let update = {};
+	let options: any = {
+		arrayFilters: [
+			{ "player._id": playerId },
+		]
+	};
+
+	if (previousAttempts === 0) {
+		update = {
+			$addToSet: {
+				"players.$[player].results": {
+					round: player.round,
+					attempts: 1,
+					score: 0,
+				}
+			}
+		}
+	} else if (previousAttempts === 1) {
+		update = {
+			$set: {
+				"players.$[player].results.$[result].attempts": previousAttempts + 1
+			}
+		};
+
+		options.arrayFilters.push({ "result.round": player.round })
+	}
+	
+	return await GamesCollection.updateAsync(game._id, update, options)
+
+}
+
+const calculateRoundScore = (game: GameType, playerId: string, incorrectPositions: number) => {
+	const player = game.players.find((player: PlayerType) => player._id === playerId);
+	const attempts = player.results?.find((result: any) => result.round === player.round)?.attempts ?? 0;
+	let score = 0;
+	if (incorrectPositions === 2) {
+		score = score + 1;
+	} else if (incorrectPositions === 1) {
+		score = score + 2;
+	} else if (incorrectPositions === 0) {
+		score = score + 4;
+	}
+
+	// bonus score for first attempt
+	if (attempts === 0) {
+		score = score + 2;
+	}
+
+	return score
+}
+
+const finalizePlayerRound = async (game: GameType, playerId: string, attempts: number, score: number) => {
+
+	const update = {
+		$set: {
+			"players.$[player].ready": true,
+			"players.$[player].results.$[result].score": score,
+			"players.$[player].results.$[result].attempts": attempts,
+		}
+	};
+
+	const options: any = {
+		arrayFilters: [
+			{ "player._id": playerId },
+			{ "result.round": game.round },
+		]
+	};
+
+	return await GamesCollection.updateAsync(game._id, update, options)
+	
+};
 
 Meteor.methods({
 	async 'games.insert'(host: string) {
@@ -259,7 +349,7 @@ Meteor.methods({
 		const update = {
 			$set: {
 				"players.$[player].ready": true,
-				"players.$[player].cards": cards,
+				"players.$[player].cards": regulateCardsRotation(cards),
 				"players.$[player].keys": keys
 			}
 		};
@@ -283,6 +373,66 @@ Meteor.methods({
 		} else {
 			throw new Meteor.Error('unable-to-save-cards', 'An error occurred.  Please try again.');
 		}
+	},
+
+	async 'game.checkCog'(gameId: string, playerId: string, cards: CardType[]) {
+		check(gameId, String);
+		check(playerId, String);
+		check(cards, [Object]);
+
+		if (!Meteor.userId()) {
+			throw new Meteor.Error('not authorized', 'You are not authorized to perform this operation.  Please log in.');
+		}
+
+		const game = await GamesCollection.findOneAsync({_id: gameId}) as GameType;
+		const coplayerId = getPlayerToRender(game, playerId);
+		const coplayer = game.players.find((player: PlayerType) => player._id === coplayerId);
+		const coplayerPuzzle = coplayer?.cards.filter((card: CardType) => [1, 2, 3, 4].includes(card.position));
+		const regulatedCoplayerPuzzle = regulateCardsRotation(coplayerPuzzle || []);
+		const playerSolution = cards.filter((card: CardType) => [1, 2, 3, 4].includes(card.position));
+		const regulatedPlayerSolution = regulateCardsRotation(playerSolution || []);
+
+		const checkResult = regulatedCoplayerPuzzle?.reduce((accumulator: { [key: number]: boolean }, card: CardType) => {
+			const position = card.position;
+			const solutionCard = regulatedPlayerSolution.find((card: CardType) => card.position === position);
+			if (card._id === solutionCard?._id && card.rotation === solutionCard?.rotation) {
+				accumulator[position] = true;
+			} else {
+				accumulator[position] = false;
+			}
+			return accumulator;
+		}, {});
+
+		const incorrectPositions = Object.keys(checkResult).filter((key) => checkResult[parseInt(key)] === false);
+
+		await incrementAttempt(game, playerId);
+
+		const player = game.players.find((player: PlayerType) => player._id === playerId);
+		const attempts = (player.results.find((result: any) => result.round === player.round)?.attempts ?? 0) + 1;
+
+		let score = 0;
+
+		if (incorrectPositions.length === 0 || attempts <= 2) {
+			score = calculateRoundScore(game, playerId, incorrectPositions.length);
+		}
+			
+		let response = {
+			incorrectPositions: incorrectPositions,
+			attempts: attempts,
+			score: score,
+			roundComplete: false
+		}
+
+		if (attempts >= 2 || incorrectPositions.length === 0) {
+			await finalizePlayerRound(game, playerId, attempts, score).then((result) => {
+				if (result === 1) {
+					response.roundComplete = true;
+				}
+			});
+		} 
+
+		return response;
+		
 	},
 
 	async 'game.advancePlayer'(gameId: string, playerId: string) {

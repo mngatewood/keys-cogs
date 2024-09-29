@@ -19,11 +19,16 @@ export type GameType = {
 	hostId: string,
 	round: number,
 	players: Array<any>,
-	cards: Array<string>,
+	cards: Array<CardType>,
 	completed: boolean,
 	started: boolean,
 };
 
-
-
-
+export type RoundResults = {
+	message: string,
+	roundComplete?: boolean,
+	incorrectPositions?: string[],
+	correctPositions?: string[],
+	score?: number,
+	attempts?: number
+}
