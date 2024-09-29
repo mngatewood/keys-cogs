@@ -16,7 +16,7 @@ import { WaitingOverlay } from './WaitingOverlay';
 import { getCardsToRender, getKeysToRender } from '/imports/helpers/gameplay';
 
 // Types
-import type { CardType, GameType, PlayerType } from '../../api/types';
+import type { CardType, GameType, PlayerType, RoundResults } from '../../api/types';
 
 interface GameProps {
 	game: GameType;
@@ -31,6 +31,7 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered }: G
 	const [playCards, setPlayCards] = useState<React.JSX.Element[]>([]);
 	const [cogCards, setCogCards] = useState<React.JSX.Element[]>([]);
 	const [keys, setKeys] = useState<string[]>(["", "", "", ""]);
+	const [roundResults, setRoundResults] = useState<RoundResults>({message: "Waiting for other players..."});
 
 	// Hooks
 	const pointerSensor = useSensor(PointerSensor, { activationConstraint: { distance: 5 }});
@@ -287,6 +288,10 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered }: G
 
 		if (game.round === 0) {			
 			return await Meteor.callAsync("game.saveCog", game._id, Meteor.userId() as string, cardsData, keys).then(() => {
+				const roundResults = {
+					message: "Saved.  Waiting for other players...",
+				}
+				setRoundResults(roundResults);
 				return true;
 			}).catch((error: Meteor.Error) => {
 				console.log("error saving game", error);
@@ -294,13 +299,18 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered }: G
 			});
 		} else {
 			Meteor.callAsync("game.checkCog", game._id, Meteor.userId(), cardsData).then((result) => {
-				if (result) {
-					console.log("game check result", result);
-					const incorrectPositions = Object.keys(result).filter((key) => result[key] === false)
-					console.log("incorrectPositions", incorrectPositions);
-					incorrectPositions.forEach((position: string) => {
+				if (result?.roundComplete) {
+					const roundResults = {
+						message: "Round complete.  Waiting for other players...",
+						...result
+					}
+					setRoundResults(roundResults);
+					return true;
+				} else {
+					result.incorrectPositions.forEach((position: string) => {
 						const cardData = cardsData.find((card) => card.position === parseInt(position)) as CardType;
 						moveCard(cardData, parseInt(position), 5);
+						return true;
 					})
 				}
 			})
@@ -404,6 +414,7 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered }: G
 						<WaitingOverlay 
 							allPlayersReady={allPlayersReady} 
 							advanceRound={advanceRound}
+							roundResults={roundResults}
 						/>
 					}
 				</>

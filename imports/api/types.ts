@@ -24,6 +24,11 @@ export type GameType = {
 	started: boolean,
 };
 
-
-
-
+export type RoundResults = {
+	message: string,
+	roundComplete?: boolean,
+	incorrectPositions?: string[],
+	correctPositions?: string[],
+	score?: number,
+	attempts?: number
+}
