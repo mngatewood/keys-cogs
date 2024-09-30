@@ -27,6 +27,10 @@ export const GamesCollectionSchema = new SimpleSchema({
 	cards: {
 		type: Array
 	},
+	isDemo: {
+		type: Boolean,
+		defaultValue: false
+	},
 	createdAt: {
 		type: Number,
 	},

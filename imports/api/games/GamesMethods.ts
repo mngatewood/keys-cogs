@@ -125,8 +125,8 @@ const finalizePlayerRound = async (game: GameType, playerId: string, attempts: n
 };
 
 Meteor.methods({
-	async 'games.insert'(host: string) {
-		check(host, String);
+	async 'games.insert'(hostId: string) {
+		check(hostId, String);
 		if (!Meteor.userId()) {
 			throw new Meteor.Error('not authorized', 'You are not authorized to perform this operation.  Please log in.');
 		}
@@ -136,10 +136,11 @@ Meteor.methods({
 			round: 0,
 			started: false,
 			completed: false,
+			isDemo: false,
 			cards: [],
 			players: [
 				{
-					_id: host,
+					_id: hostId,
 					ready: false,
 					round: 0,
 					keys: ["", "", "", ""],
