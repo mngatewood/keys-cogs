@@ -172,8 +172,8 @@ Meteor.startup(async() => {
 			const playerCard5 = await CardsCollection.findOneAsync({ words: "Card" })
 			const opponentCard1 = await CardsCollection.findOneAsync({ words: "Accessory" })
 			const opponentCard2 = await CardsCollection.findOneAsync({ words: "Adventure" })
-			const opponentCard3 = await CardsCollection.findOneAsync({ words: "Ammo" })
-			const opponentCard4 = await CardsCollection.findOneAsync({ words: "Bomb" })
+			const opponentCard3 = await CardsCollection.findOneAsync({ words: "Bomb" })
+			const opponentCard4 = await CardsCollection.findOneAsync({ words: "Ammo" })
 			const opponentCard5 = await CardsCollection.findOneAsync({ words: "Advocate" })
 			const playerCards = [
 				{
@@ -212,7 +212,7 @@ Meteor.startup(async() => {
 					_id: opponentCard1?._id,
 					words: opponentCard1?.words,
 					position: 1,
-					rotation: 0.5
+					rotation: 0.25
 				},
 				{
 					_id: opponentCard2?._id,
