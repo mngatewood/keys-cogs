@@ -124,6 +124,29 @@ const finalizePlayerRound = async (game: GameType, playerId: string, attempts: n
 	
 };
 
+const resetDemoGame = async (gameId: string, playerId: string) => {
+	const update = {
+		$set: {
+			started: true,
+			completed: false,
+			round: 0,
+			"players.$[player].ready": false,
+			"players.$[player].round": 0,
+			"players.$[player].keys": ["", "", "", ""],
+			"players.$[player].cards.$[].position": 5,
+			"players.$[player].cards.$[].rotation": 0,
+		}
+	}
+
+	const options = {
+		arrayFilters: [
+			{ "player._id": playerId },
+		]
+	}
+
+	return await GamesCollection.updateAsync(gameId, update, options);
+}
+
 Meteor.methods({
 	async 'games.insert'(hostId: string) {
 		check(hostId, String);
@@ -311,7 +334,10 @@ Meteor.methods({
 		}
 
 		if (game.isDemo) {
-			// if game is demo, allow client to leave, but don't update the game
+			const response = await resetDemoGame(gameId, playerId);
+			if (response) {
+				console.log("demo game reset", response)
+			}
 			return true 
 		}
 
@@ -484,6 +510,13 @@ Meteor.methods({
 		} else {
 			throw new Meteor.Error('game-not-found', 'Game not found.  Please try again.');
 		}
+	},
+
+	async "game.resetDemo"(gameId: string, playerId: string) {
+		check(gameId, String);
+		check(playerId, String);
+		const response = await resetDemoGame(gameId, playerId);
+		return response
 	}
 
 });

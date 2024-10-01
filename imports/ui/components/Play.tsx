@@ -47,14 +47,6 @@ export const Play = () => {
 		}
 	}, [game, userSub()]);
 
-
-	// TODO
-	// const startDemo = () => {
-	// 	const allCardData = demoCards as CardType[];
-	// 	setInitialKeys(demoKeys);
-	// 	dealCards(allCardData)
-	// }
-
 	const hostGame = (gameId: string) => {
 		if (gameId) {			
 			setGameId(gameId);
@@ -123,7 +115,17 @@ export const Play = () => {
 		if (userId) {			
 			removePlayer(gameId, userId);
 		}
+		if (game?.isDemo) {
+			resetDemo();
+		}
 	}
+
+	const resetDemo = () => {
+		if (game?.isDemo) {
+			Meteor.callAsync("game.resetDemo", gameId, Meteor.userId());
+			Meteor.logout();
+		}
+	};
 
 	const resetGameState = () => {
 		setGameId("");

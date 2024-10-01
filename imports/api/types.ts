@@ -18,6 +18,7 @@ export type GameType = {
 	_id: string,
 	hostId: string,
 	round: number,
+	isDemo: boolean,
 	players: Array<any>,
 	cards: Array<CardType>,
 	completed: boolean,
