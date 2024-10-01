@@ -469,6 +469,15 @@ Meteor.methods({
 		} else {
 			throw new Meteor.Error('unable-to-start-new-round', 'An error occurred.  Please try again.');
 		}
+	},
+
+	async "games.getDemo"() {
+		const demoGame = await GamesCollection.findOneAsync({isDemo: true}) as GameType;
+		if (demoGame) {
+			return demoGame;
+		} else {
+			throw new Meteor.Error('game-not-found', 'Game not found.  Please try again.');
+		}
 	}
 
 });
