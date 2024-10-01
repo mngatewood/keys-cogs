@@ -49,6 +49,8 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered }: G
 		const cardsToRender = getCardsToRender(game, Meteor.userId() ?? "");
 		const keysToRender = getKeysToRender(game, Meteor.userId() ?? "");
 
+		if (cardsToRender)resetPlaceholders(cardsToRender);
+
 		setCardsData(cardsToRender || []);
 		setKeys(keysToRender || []);
 
@@ -72,6 +74,21 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered }: G
 		validateCardsState();
 
 	}, [cardsData]);
+
+	const resetPlaceholders = (cards: CardType[]) => {
+		const playerCards = cards.filter((card) => !cogContainerIds.includes(card._id));
+		const unoccupiedSlots = cogContainers.filter((position) => {
+			const cardInSlot = playerCards.find((card) => card.position === position);
+			return cardInSlot ? false : true;
+		});
+		const placeholderCards = cogContainerIds.map(id => playerCards.find((card) => card._id === id));
+		unoccupiedSlots.forEach((position) => {
+			const placeholder = placeholderCards.find((card) => parseInt(card?._id as string) === position);
+			if (placeholder) {
+				moveCard(placeholder, placeholder.position, position);
+			}
+		})
+	};
 
 	const sortByPosition = (array: any) => {
 		const sortedArray = array.sort((a: any, b: any) => {
