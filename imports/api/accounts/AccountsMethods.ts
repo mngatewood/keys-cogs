@@ -4,7 +4,6 @@ import { check } from 'meteor/check';
 
 Meteor.methods({
 	async 'accounts.insert'(firstName: string, lastName: string, username: string, email: string, password: string) {
-		// console.log("insert", firstName, lastName, username, email, password);
 		check(firstName, String);
 		check(lastName, String);
 		check(username, String);
@@ -27,5 +26,22 @@ Meteor.methods({
 
 		Meteor.users.updateAsync(userId, update);
 		return userId;
+	},
+
+	async "accounts.getDemoPlayer"() {
+		const demoPlayerUsername = Meteor.settings.private.DEMO_PLAYER_EMAIL;
+		const password = Meteor.settings.private.DEMO_PLAYER_PASSWORD
+		const demoPlayer = await Meteor.users.findOneAsync({username: demoPlayerUsername});
+
+		if (demoPlayer) {
+			return {
+				_id: demoPlayer._id,
+				username: demoPlayer.username,
+				password: password,
+			}
+		} else {
+			return null;
+		}
 	}
 });
+

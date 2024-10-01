@@ -124,9 +124,32 @@ const finalizePlayerRound = async (game: GameType, playerId: string, attempts: n
 	
 };
 
+const resetDemoGame = async (gameId: string, playerId: string) => {
+	const update = {
+		$set: {
+			started: true,
+			completed: false,
+			round: 0,
+			"players.$[player].ready": false,
+			"players.$[player].round": 0,
+			"players.$[player].keys": ["", "", "", ""],
+			"players.$[player].cards.$[].position": 5,
+			"players.$[player].cards.$[].rotation": 0,
+		}
+	}
+
+	const options = {
+		arrayFilters: [
+			{ "player._id": playerId },
+		]
+	}
+
+	return await GamesCollection.updateAsync(gameId, update, options);
+}
+
 Meteor.methods({
-	async 'games.insert'(host: string) {
-		check(host, String);
+	async 'games.insert'(hostId: string) {
+		check(hostId, String);
 		if (!Meteor.userId()) {
 			throw new Meteor.Error('not authorized', 'You are not authorized to perform this operation.  Please log in.');
 		}
@@ -136,10 +159,11 @@ Meteor.methods({
 			round: 0,
 			started: false,
 			completed: false,
+			isDemo: false,
 			cards: [],
 			players: [
 				{
-					_id: host,
+					_id: hostId,
 					ready: false,
 					round: 0,
 					keys: ["", "", "", ""],
@@ -308,6 +332,15 @@ Meteor.methods({
 		if (!game) {
 			throw new Meteor.Error('game-not-found', 'Game not found.  Please try again.');
 		}
+
+		if (game.isDemo) {
+			const response = await resetDemoGame(gameId, playerId);
+			if (response) {
+				console.log("demo game reset", response)
+			}
+			return true 
+		}
+
 		const updatedPlayers = game?.players.filter((player: PlayerType) => player._id !== playerId) || [];
 		if (updatedPlayers?.length > 0) {
 			const update = {
@@ -468,6 +501,22 @@ Meteor.methods({
 		} else {
 			throw new Meteor.Error('unable-to-start-new-round', 'An error occurred.  Please try again.');
 		}
+	},
+
+	async "games.getDemo"() {
+		const demoGame = await GamesCollection.findOneAsync({isDemo: true}) as GameType;
+		if (demoGame) {
+			return demoGame;
+		} else {
+			throw new Meteor.Error('game-not-found', 'Game not found.  Please try again.');
+		}
+	},
+
+	async "game.resetDemo"(gameId: string, playerId: string) {
+		check(gameId, String);
+		check(playerId, String);
+		const response = await resetDemoGame(gameId, playerId);
+		return response
 	}
 
 });

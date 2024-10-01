@@ -29,6 +29,7 @@ export const Join:React.FC<JoinProps> = ({joinGame}) => {
 	const gamesQuery = {
 		started: false,
 		completed: false,
+		isDemo: false,
 		players: {
 			$elemMatch: {
 				_id: {
