@@ -124,7 +124,7 @@ Meteor.startup(async() => {
 
 	if (!existingDemoGame && demoAccounts) {
 		console.log("inserting demo game");
-		const demoGame = {
+		const demoGameData = {
 			hostId: demoAccounts.demoOpponentId,
 			started: true,
 			completed: false,
@@ -153,16 +153,104 @@ Meteor.startup(async() => {
 			updatedAt: new Date().valueOf()
 		}
 
-		GamesCollectionSchema.validate(demoGame);
+		GamesCollectionSchema.validate(demoGameData);
 
-		if (GamesCollectionSchema.isValid()) {
-			GamesCollection.insertAsync(demoGame).then((result: string) => {
-				console.log("insert demo game result", result)
-			}).catch((error: Meteor.Error) => {
-				console.log("error", error)
-			});
-		} else {
-			console.log("invalid demo game", demoGame)
+		if (!GamesCollectionSchema.isValid()) {
+			throw new Error("Invalid demo game data");
 		}
+			
+		const demoGameId = await GamesCollection.insertAsync(demoGameData)
+		const demoGame = await GamesCollection.findOneAsync(demoGameId);
+		const allCardsSeeded = await CardsCollection.find().countAsync() === 220;
+
+		if (demoGame && allCardsSeeded) {
+			console.log("demo game inserted, updating game")
+			const playerCard1 = await CardsCollection.findOneAsync({ words: "Airport" })
+			const playerCard2 = await CardsCollection.findOneAsync({ words: "Bag" })
+			const playerCard3 = await CardsCollection.findOneAsync({ words: "Bakery" })
+			const playerCard4 = await CardsCollection.findOneAsync({ words: "Boxing" })
+			const playerCard5 = await CardsCollection.findOneAsync({ words: "Card" })
+			const opponentCard1 = await CardsCollection.findOneAsync({ words: "Accessory" })
+			const opponentCard2 = await CardsCollection.findOneAsync({ words: "Adventure" })
+			const opponentCard3 = await CardsCollection.findOneAsync({ words: "Ammo" })
+			const opponentCard4 = await CardsCollection.findOneAsync({ words: "Bomb" })
+			const opponentCard5 = await CardsCollection.findOneAsync({ words: "Advocate" })
+			const playerCards = [
+				{
+					_id: playerCard1?._id,
+					position: 5,
+					rotation: 0
+				},
+				{
+					_id: playerCard2?._id,
+					position: 5,
+					rotation: 0
+				},
+				{
+					_id: playerCard3?._id,
+					position: 5,
+					rotation: 0
+				},
+				{
+					_id: playerCard4?._id,
+					position: 5,
+					rotation: 0
+				},
+				{
+					_id: playerCard5?._id,
+					position: 5,
+					rotation: 0
+				},
+			];
+			const opponentCards = [
+				{
+					_id: opponentCard1?._id,
+					position: 1,
+					rotation: 0.5
+				},
+				{
+					_id: opponentCard2?._id,
+					position: 2,
+					rotation: 0
+				},
+				{
+					_id: opponentCard3?._id,
+					position: 3,
+					rotation: 0.75
+				},
+				{
+					_id: opponentCard4?._id,
+					position: 4,
+					rotation: 0.75
+				},
+				{
+					_id: opponentCard5?._id,
+					position: 5,
+					rotation: 0
+				},
+			]
+			const opponentKeys = ["liftoff", "valentine", "silence", "countdown"]
+			const update = {
+				$set: {
+					cards: [...playerCards, ...opponentCards],
+					"players.$[opponent].keys": opponentKeys,
+					"players.$[player].cards": playerCards,
+					"players.$[opponent].cards": opponentCards,
+				},
+			}
+			const options: any = {
+				arrayFilters: [
+					{ "opponent._id": demoAccounts.demoOpponentId },
+					{ "player._id": demoAccounts.demoPlayerId },
+				]
+			};
+
+			const updatedDemoGame = await GamesCollection.updateAsync(demoGame._id, update, options);
+
+			if (updatedDemoGame) {
+				console.log("successfully updated demo game");		
+			}
+		}
+
 	}
 });
