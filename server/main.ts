@@ -178,26 +178,31 @@ Meteor.startup(async() => {
 			const playerCards = [
 				{
 					_id: playerCard1?._id,
+					words: playerCard1?.words,
 					position: 5,
 					rotation: 0
 				},
 				{
 					_id: playerCard2?._id,
+					words: playerCard2?.words,
 					position: 5,
 					rotation: 0
 				},
 				{
 					_id: playerCard3?._id,
+					words: playerCard3?.words,
 					position: 5,
 					rotation: 0
 				},
 				{
 					_id: playerCard4?._id,
+					words: playerCard4?.words,
 					position: 5,
 					rotation: 0
 				},
 				{
 					_id: playerCard5?._id,
+					words: playerCard5?.words,
 					position: 5,
 					rotation: 0
 				},
@@ -205,26 +210,31 @@ Meteor.startup(async() => {
 			const opponentCards = [
 				{
 					_id: opponentCard1?._id,
+					words: opponentCard1?.words,
 					position: 1,
 					rotation: 0.5
 				},
 				{
 					_id: opponentCard2?._id,
+					words: opponentCard2?.words,
 					position: 2,
 					rotation: 0
 				},
 				{
 					_id: opponentCard3?._id,
+					words: opponentCard3?.words,
 					position: 3,
 					rotation: 0.75
 				},
 				{
 					_id: opponentCard4?._id,
+					words: opponentCard4?.words,
 					position: 4,
 					rotation: 0.75
 				},
 				{
 					_id: opponentCard5?._id,
+					words: opponentCard5?.words,
 					position: 5,
 					rotation: 0
 				},
