@@ -309,6 +309,12 @@ Meteor.methods({
 		if (!game) {
 			throw new Meteor.Error('game-not-found', 'Game not found.  Please try again.');
 		}
+
+		if (game.isDemo) {
+			// if game is demo, allow client to leave, but don't update the game
+			return true 
+		}
+
 		const updatedPlayers = game?.players.filter((player: PlayerType) => player._id !== playerId) || [];
 		if (updatedPlayers?.length > 0) {
 			const update = {
