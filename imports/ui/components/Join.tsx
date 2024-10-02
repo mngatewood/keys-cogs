@@ -52,7 +52,7 @@ export const Join:React.FC<JoinProps> = ({joinGame}) => {
 
 	const loadPendingGames = () => {
 		if (pendingGames.length === 0) {
-			setJoinError("No pending games. Please try again later.");
+			setJoinError("No pending games.");
 		} else {
 			setJoinError(undefined);
 		}
@@ -77,7 +77,9 @@ export const Join:React.FC<JoinProps> = ({joinGame}) => {
 		const gameId = (e.target as HTMLElement).closest(".game-card")?.id;
 		if (gameId) {
 			Meteor.callAsync("game.join", gameId, Meteor.userId()).then((result) => {
-				joinGame(gameId);
+				if (result) {
+					joinGame(gameId);
+				}
 			}).catch((error) => {
 				console.log("joinError", error)
 				setJoinError(error.reason);
@@ -85,6 +87,15 @@ export const Join:React.FC<JoinProps> = ({joinGame}) => {
 		} else {
 			setJoinError("Something went wrong. Please try again.");
 		}
+	}
+
+	const handleHostGame = () => {
+		Meteor.callAsync("games.insert", Meteor.userId()).then((result) => {
+			joinGame(result);
+		}).catch((error) => {
+			console.log("hostError", error)
+			setJoinError("Something went wrong. Please try again.");
+		});
 	}
 
 	return (
@@ -102,7 +113,7 @@ export const Join:React.FC<JoinProps> = ({joinGame}) => {
 											<p className="mt-1 max-w-2xl text-sm text-gray-500">Number of Players: {game.playerCount}</p>
 										</div>
 										<div className="flex flex-col justify-center items-end w-1/4">
-											<button onClick={handleJoinGame} className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 disabled:bg-gray-200 disabled:text-gray-400 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+											<button onClick={handleJoinGame} className="button w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-1 disabled:bg-gray-200 disabled:text-gray-400 hover:bg-blue-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-1">
 												Join
 											</button>
 										</div>
@@ -112,7 +123,20 @@ export const Join:React.FC<JoinProps> = ({joinGame}) => {
 						</ul>
 						<div className="flex flex-col items-center justify-center">
 							<div className="error mt-4 text-red-500 text-sm text-center whitespace-pre-line">
-								{joinError}
+								{ joinError === "No pending games." 
+									? 
+										<>
+											<p className="mb-4">No pending games.</p>
+											<p>
+												<span>Please try again later or </span>
+											<button onClick={handleHostGame} className="underline inline border border-transparent text-sm font-medium bg-transparent text-blue-1  hover:text-blue-2 focus:outline-none">
+												host 
+											</button>
+											<span> a new game.</span> 
+											</p>  
+										</>
+									: joinError
+								}
 							</div>
 						</div>
 					</>

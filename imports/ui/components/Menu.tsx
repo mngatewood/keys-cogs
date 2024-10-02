@@ -3,17 +3,17 @@ import { useTracker } from 'meteor/react-meteor-data';
 import { Meteor } from 'meteor/meteor';
 
 interface MenuProps {
-	hostGame: Function,
+	joinGame: Function,
 	showGames: Function
 }
 
-export const Menu: React.FC<MenuProps> = ({hostGame, showGames}) => {
+export const Menu: React.FC<MenuProps> = ({joinGame, showGames}) => {
 
 	const user = useTracker(() => Meteor.user());
 
 	const handleHostGame = () => {
 		Meteor.callAsync("games.insert", user?._id).then((result) => {
-			hostGame(result);
+			joinGame(result);
 		});
 	}
 

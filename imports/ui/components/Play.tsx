@@ -48,13 +48,6 @@ export const Play = () => {
 		}
 	}, [game, userSub()]);
 
-	const hostGame = (gameId: string) => {
-		if (gameId) {			
-			setGameId(gameId);
-			localStorage.setItem("gameId", gameId)
-		}
-	};
-
 	const showGames = () => {
 		setRenderGamesList(true);
 	}
@@ -155,12 +148,16 @@ export const Play = () => {
 
 			{!isLoading() && !renderGamesList && !game && 
 				<Menu 
-					hostGame={hostGame} 
+					joinGame={joinGame} 
 					showGames={showGames}
 				/>
 			}
 
-			{!isLoading() && renderGamesList && <Join {...{joinGame}} /> }
+			{!isLoading() && renderGamesList && 
+				<Join 
+					joinGame={joinGame}
+				/>
+			}
 
 			{!isLoading() && game && !game.started && !game.completed &&
 				<Lobby
