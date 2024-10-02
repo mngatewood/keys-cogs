@@ -1,29 +1,49 @@
 @import url('https://fonts.googleapis.com/css2?family=Rokkitt:ital,wght@0,100..900;1,100..900&display=swap');
 
 header {
+	background-color: theme('colors.rosegold.1');
+}
+
+.navbar {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
-	background-color: theme('colors.rosegold.1');
+	max-width: 768px;
+	margin: 0 auto;
 	padding: 1vmin 5vmin;
 }
 
 .app-title {
 	display: flex;
 	flex-direction: row;
+	justify-content: center;
 	align-items: center;
+	width: 50%;
+	margin: 0 1vmin;
 	font-family: "Rokkitt", serif;
 	font-optical-sizing: auto;
 	font-weight: 400;
 	font-style: normal;
 	font-size: 4vmin;
 	color: theme('colors.yellow.1');
-	margin: 0 1vmin;
 }
 
 .app-title div {
 	display: inline-block;
+}
+
+.header-icons-container {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	align-items: center;
+	width: 25%;
+	margin: 0;
+}
+
+.home-icon-container {
+	justify-content: flex-start;
 }
 
 .header-img.title-cog-img {
