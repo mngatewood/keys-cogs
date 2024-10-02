@@ -8,6 +8,7 @@ import type { CardType } from '../types';
 import { getPlayerToRender } from '/imports/helpers/gameplay';
 
 const allOtherPlayersReady = (game: GameType, playerId: string) => {
+	if (game.isDemo) return true;
 	return game.players.reduce((accumulator, player) => {
 		if (player._id !== playerId) {
 			return accumulator && player.ready;
@@ -19,21 +20,61 @@ const allOtherPlayersReady = (game: GameType, playerId: string) => {
 const advanceRound = async (game: GameType) => {
 	if (game.completed) {
 		throw new Meteor.Error('game-already-completed', 'Game has already been completed.  Please try again.');
-	} else if (game.round + 1 >= game.players.length) {
-		// TODO: check for winners
-		console.log("game complete", game)
-		return
 	}
 
 	const update = {
 		$set: {
-			round: game.round + 1,
+			round: game.round + 1
 		}
 	};
 
 	const response = await GamesCollection.updateAsync(game._id, update);
-	return response;
+	if (response) return game.round + 1;
+};
+
+const advanceToGameSummary = async (game: GameType) => {
+	const update = {
+		$set: {
+			completed: true
+		},
+	};
+
+	const response = await GamesCollection.updateAsync(game._id, update);
+	if (response) {
+		return { 
+			endGame: true
+		 };
+	}
 }
+
+const getGameResults = async (game: GameType) => {
+	const players = game.players;
+	const results = players.map((player) => {
+		const attemptsByRound = player.results.map((result: any) => {
+			return { round: result.round, attempts:result.attempts };
+		});
+		const totalAttempts = attemptsByRound.reduce((accumulator: number, round: any) => {
+			accumulator = accumulator + round.attempts
+			return accumulator
+		}, 0);
+		const scoresByRound = player.results.map((result: any) => {
+			return { round: result.round, score:result.score };
+		});
+		const totalScore = scoresByRound.reduce((accumulator: number, round: any) => {
+			return accumulator + round.score
+		}, 0);
+
+		return {
+			playerId: player._id,
+			attempts: attemptsByRound,
+			scores: scoresByRound,
+			totalAttempts: totalAttempts,
+			totalScore: totalScore
+		}
+	})
+
+	return results
+};
 
 const regulateCardsRotation = (cards: CardType[]) => {
 	return cards.map((card) => {
@@ -135,6 +176,7 @@ const resetDemoGame = async (gameId: string, playerId: string) => {
 			"players.$[player].keys": ["", "", "", ""],
 			"players.$[player].cards.$[].position": 5,
 			"players.$[player].cards.$[].rotation": 0,
+			"players.$[player].results": []
 		}
 	}
 
@@ -457,6 +499,11 @@ Meteor.methods({
 		}
 
 		if (attempts >= 2 || incorrectPositions.length === 0) {
+
+			if (allOtherPlayersReady(game, playerId)) {
+				await advanceRound(game);
+			}
+
 			await finalizePlayerRound(game, playerId, attempts, score).then((result) => {
 				if (result === 1) {
 					response.roundComplete = true;
@@ -480,6 +527,11 @@ Meteor.methods({
 
 		if (!game) {
 			throw new Meteor.Error('game-not-found', 'Game not found.  Please try again.');
+		}
+
+		if (game.round >= game.players.length) {
+			const response = await advanceToGameSummary(game);
+			return response;
 		}
 
 		const update = {
@@ -516,6 +568,17 @@ Meteor.methods({
 		check(gameId, String);
 		check(playerId, String);
 		const response = await resetDemoGame(gameId, playerId);
+		return response
+	},
+
+	async "game.getResults"(gameId: string) {
+		check(gameId, String);
+		if (!Meteor.userId()) {
+			throw new Meteor.Error('not authorized', 'You are not authorized to perform this operation.  Please log in.');
+		}
+
+		const game = await GamesCollection.findOneAsync({ _id: gameId }) as GameType;
+		const response = await getGameResults(game);
 		return response
 	}
 
