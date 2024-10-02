@@ -104,7 +104,9 @@ export const Play = () => {
 
 	const removePlayer = (gameId: string, playerId: string) => {
 		Meteor.callAsync("game.leave", gameId, playerId).then(() => {
-			resetGameState();
+			if (!game?.players.map((player) => player._id).includes(Meteor.userId())) {
+				resetGameState();
+			}
 		}).catch((error) => {
 			console.log("error", error)
 		})
@@ -151,14 +153,14 @@ export const Play = () => {
 		<>
 			{isLoading() && <Loading /> }
 
-			{!isLoading() && renderGamesList && <Join {...{joinGame}} /> }
-
-			{!isLoading() && !game && 
+			{!isLoading() && !renderGamesList && !game && 
 				<Menu 
 					hostGame={hostGame} 
 					showGames={showGames}
 				/>
 			}
+
+			{!isLoading() && renderGamesList && <Join {...{joinGame}} /> }
 
 			{!isLoading() && game && !game.started && !game.completed &&
 				<Lobby
