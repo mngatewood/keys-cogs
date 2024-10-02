@@ -10,22 +10,18 @@ import { Login } from './components/Login';
 import { Register } from './components/Register';
 import { PrivateRoutes } from './components/PrivateRoutes';
 import { Play } from './components/Play';
+import { Header } from './components/Header';
+import { Account } from './components/Account';
 
 export const App = () => {
 	const isLoading = useSubscribe("cards");
 	
-	const user = useTracker(() => Meteor.user());
+	const user = useTracker(() => Meteor.user() as Meteor.User);
 
 	return (
 		<Router>
 			<div>
-				<nav className="navbar">
-					<ul>
-						<li><Link to="/">Home</Link></li>
-						{!user && <li><Link to="/login">Login</Link></li>}
-						{user && <li><Link to="/play">Play</Link></li>}
-					</ul>
-				</nav>
+				<Header user={user} />
 				{ isLoading() ? <Loading /> :
 					<Routes>
 						<Route element={<PrivateRoutes />}>
@@ -33,6 +29,7 @@ export const App = () => {
 						</Route>
 						<Route path="/login" element={<Login />} />
 						<Route path="/register" element={<Register />} />
+						<Route path="/account" element={<Account />} />
 						<Route path="/" element={<Home />} />
 					</Routes>
 				}

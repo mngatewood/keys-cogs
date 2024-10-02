@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Rokkitt:ital,wght@0,100..900;1,100..900&display=swap');
+
+header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	background-color: theme('colors.rosegold.1');
+	padding: 1vmin 5vmin;
+}
+
+.app-title {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	font-family: "Rokkitt", serif;
+	font-optical-sizing: auto;
+	font-weight: 400;
+	font-style: normal;
+	font-size: 4vmin;
+	color: theme('colors.yellow.1');
+	margin: 0 1vmin;
+}
+
+.app-title div {
+	display: inline-block;
+}
+
+.header-img.title-cog-img {
+	margin: 0 1vmin;
+	vertical-align: text-bottom;
+	padding-top: 0.8vmin;
+	box-shadow: none;
+}
+
+.header-img {
+	display: inline;
+	max-width: 5vmin;
+	border-radius: 50%;
+	box-shadow: 0.3vmin 0.3vmin 0.5vmin rgba(243, 240, 216, 0.2);
+}
+
+.header-img:hover {
+	opacity: 0.5;
+	box-shadow: 0.3vmin 0.3vmin 0.3vmin rgba(243, 240, 216, 0.5);
+}
+
+.header-img:active {
+	outline: none;
+	box-shadow: inset 0 0 5px #c1c1c1;
+	transform: scale(0.9);
+}
