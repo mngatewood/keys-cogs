@@ -49,7 +49,7 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered }: G
 		const cardsToRender = getCardsToRender(game, Meteor.userId() ?? "");
 		const keysToRender = getKeysToRender(game, Meteor.userId() ?? "");
 
-		if (cardsToRender)resetPlaceholders(cardsToRender);
+		if (cardsToRender) resetPlaceholders(cardsToRender);
 
 		setCardsData(cardsToRender || []);
 		setKeys(keysToRender || []);
