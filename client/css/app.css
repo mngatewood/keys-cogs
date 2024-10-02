@@ -2,7 +2,7 @@ body {
 	margin: 0;
 	padding: 0;
 	font-family: sans-serif;
-	background-color: white;
+	background-color: theme('colors.beige.1')
 }
 
 .app {
@@ -12,7 +12,6 @@ body {
 	max-width: 768px;
 	margin: auto;
 	padding: 1rem;
-	background-color: white;
 }
 
 .navbar > ul {
@@ -22,9 +21,8 @@ body {
 	align-items: center;
 	width: 100%;
 	max-width: 768px;
-	margin: auto;
-	padding: 1rem;
-	background-color: white;
+	margin: 0;
+	padding: 0;
 }
 
 a {
