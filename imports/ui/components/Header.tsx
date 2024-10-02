@@ -14,7 +14,7 @@ export const Header = ({ user }: { user: Meteor.User }) => {
 				<div className="app-title">
 					<div>Keys</div>
 					<div>
-						<img className='header-img title-cog-img' src='/header-cog-icon.png' />
+						<img className='title-cog-img' src='/header-cog-icon.png' />
 					</div>
 					<div>Cogs</div>
 				</div>

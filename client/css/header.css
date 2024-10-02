@@ -1,6 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Rokkitt:ital,wght@0,100..900;1,100..900&display=swap');
 
 header {
+	position: fixed;
+	width: 100%;
 	background-color: theme('colors.rosegold.1');
 }
 
@@ -46,11 +48,12 @@ header {
 	justify-content: flex-start;
 }
 
-.header-img.title-cog-img {
+.title-cog-img {
+	display: inline;
+	max-width: 5vmin;
+	padding-top: 0.8vmin;
 	margin: 0 1vmin;
 	vertical-align: text-bottom;
-	padding-top: 0.8vmin;
-	box-shadow: none;
 }
 
 .header-img {
