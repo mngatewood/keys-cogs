@@ -146,7 +146,13 @@ Meteor.startup(async() => {
 					round: 0,
 					keys: ["", "", "", ""],
 					cards: [],
-					results: []
+					results: [
+						{
+							round: 1,
+							attempts: 0,
+							score: 0
+						}
+					]
 				}
 			],
 			createdAt: new Date().valueOf(),
