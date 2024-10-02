@@ -9,6 +9,7 @@ import { Menu } from './Menu';
 import { Lobby } from './Lobby';
 import { Join } from './Join';
 import { Game } from './Game';
+import { GameResults } from './GameResults';
 
 // Collections
 import { GamesCollection } from '/imports/api/games/GamesCollection';
@@ -83,7 +84,7 @@ export const Play = () => {
 
 	const advanceRound = () => {
 		Meteor.callAsync("game.advancePlayer", gameId, Meteor.userId()).then((result) => {
-			if (result) {
+			if (!result.endGame) {
 				setRenderNewCards(true);
 			}
 		})
@@ -136,8 +137,10 @@ export const Play = () => {
 		const playerToRenderId = getPlayerToRender(game, Meteor.userId() ?? "");
 		const playerToRenderData = Meteor.users.findOne(playerToRenderId);
 		const playerToRenderName = fullName(playerToRenderData);
-		
-		if (playerToRenderId === Meteor.userId()) {
+
+		if (game.completed) {
+			return "Game Over"
+		} else if (playerToRenderId === Meteor.userId()) {
 			return "Set Your Cog & Keys"
 		} else {
 			return "Solve "  + playerToRenderName + "'s Cog"
@@ -168,7 +171,7 @@ export const Play = () => {
 				/>
 			}
 
-			{!isLoading() && game && game.started && !game.completed && (
+			{!isLoading() && game && game.started && !game.completed &&
 				<>
 					<GamePanel puzzleTitle={getPuzzleTitle()} exitGame={exitGame}/>
 					<Game 
@@ -178,7 +181,16 @@ export const Play = () => {
 						newCardsRendered={newCardsRendered}
 					/>
 				</>
-			)}
+			}
+
+			{!isLoading() && game && game.completed &&
+				<>
+					<GamePanel puzzleTitle={getPuzzleTitle()} exitGame={exitGame}/>
+					<GameResults
+						game={game}
+					/>
+				</>
+			}
 		</>
 	);
 }

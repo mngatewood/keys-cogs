@@ -102,35 +102,40 @@ export const GamesCollectionSchema = new SimpleSchema({
 		defaultValue: 0,
 		min: 0
 	},
-	"players.$.results.$.playerId": {
-		type: String,
-	},
-
-	"players.$.results.$.keys": {
-		type: Array
-	},
-	"players.$.results.$.keys.$": {
-		type: String
-	},
-
-	"players.$.results.$.cards": {
-		type: Array
-	},
-	"players.$.results.$.cards.$": {
-		type: Object
-	},
-	"players.$.results.$.cards.$.position": {
-		type: Number,
-		defaultValue: 1,
-		min: 1,
-		max: 5
-	},
-	"players.$.results.$.cards.$.rotation": {
+	"players.$.results.$.attempts": {
 		type: Number,
 		defaultValue: 0,
-		min: -0.75, 
-		max: 0.75
+		min: 0
 	},
+	// "players.$.results.$.playerId": {
+	// 	type: String,
+	// },
+
+	// "players.$.results.$.keys": {
+	// 	type: Array
+	// },
+	// "players.$.results.$.keys.$": {
+	// 	type: String
+	// },
+
+	// "players.$.results.$.cards": {
+	// 	type: Array
+	// },
+	// "players.$.results.$.cards.$": {
+	// 	type: Object
+	// },
+	// "players.$.results.$.cards.$.position": {
+	// 	type: Number,
+	// 	defaultValue: 1,
+	// 	min: 1,
+	// 	max: 5
+	// },
+	// "players.$.results.$.cards.$.rotation": {
+	// 	type: Number,
+	// 	defaultValue: 0,
+	// 	min: -0.75, 
+	// 	max: 0.75
+	// },
 
 	"cards.$": {
 		type: Object,
