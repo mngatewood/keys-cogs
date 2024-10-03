@@ -4,9 +4,9 @@
 	align-items: center;
 	position: relative;
 	width: 100%;
-	height: 100%;
 	max-width: 768px;
-	margin: 0 auto;
+	margin: 1vmin auto;
+	padding: 0 2vmin;
 }
 
 .game-panel-title {
@@ -23,4 +23,16 @@
 
 .exit-img {
 	max-height: 100%;
+}
+
+.exit-img:hover {
+	filter: brightness(120%);
+	transform: scale(1.1);
+}
+
+.exit-img:active {
+	outline: none;
+	box-shadow: inset 0 0 5px #c1c1c1;
+	transform: scale(0.9);
+	brightness: 80%;
 }

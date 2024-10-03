@@ -423,8 +423,10 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered }: G
 								</div>
 							</SortableContext>
 						</div>
-						<div className="draw-container">
-							{ playCards }
+						<div className="draw-container-flex">
+							<div className="draw-container">
+								{ playCards }
+							</div>
 						</div>
 					</DndContext>
 					{readyForNextRound() &&
