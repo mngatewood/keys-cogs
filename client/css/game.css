@@ -314,7 +314,6 @@
 	color: theme('colors.rosegold.1');
 	font-style: italic;
 	background-color: unset;
-	transition: background-color 500ms,color 500ms;
 }
 
 .key-locked {
@@ -326,8 +325,13 @@
 }
 
 .highlighted-key {
-	background-color: theme('colors.rosegold.1');
+	background-color: theme('colors.rosegold.1') !important;
 	color: theme('colors.beige.2');
+}
+
+.animate-key {
+	background-color: unset;
+	transition: background-color 500ms linear 100ms, color 500ms linear 100ms;
 }
 
 .card-panel {
