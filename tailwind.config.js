@@ -8,14 +8,17 @@
 			extend: {
 				colors: {
 					beige: {
-						1: '#f3f0d8'
+						1: '#f3f0d8',
+						2: '#ffffef'
 					},
 					rosegold: {
-						1: '#b97171'
+						1: '#b97171',
+						2: '#ffd6d5'
 					},
 					yellow: {
 						1: '#f6cc08',
-						2: '#e9ba14'
+						2: '#e9ba14',
+						3: '#fdff3c'
 					},
 					blue: {
 						1: '#719cc6',
