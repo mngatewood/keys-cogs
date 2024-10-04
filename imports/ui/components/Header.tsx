@@ -10,7 +10,7 @@ export const Header = ({ user }: { user: Meteor.User }) => {
 			<div className="navbar">
 				<div className="header-icons-container home-icon-container">
 					<Link to="/">
-						<img className='header-img' src='/home-icon.png' />
+						<img className='header-img' src='/home-icon.png' title="Go to Home page"/>
 					</Link>
 				</div>
 				<div className="app-title">
@@ -23,19 +23,19 @@ export const Header = ({ user }: { user: Meteor.User }) => {
 				<div className="header-icons-container">
 					{!user && 
 						<Link to="/login">
-							<img className='header-img' src='/account-icon.png' />
+							<img className='header-img' src='/account-icon.png' title="Log in" />
 						</Link>
 					}
 					{user &&
 						<>
 							{!location.pathname.includes("/play") &&
 								<Link to="/play">
-									<img className='header-img ml-4' src='/play-icon.png' />
+									<img className='header-img ml-4' src='/play-icon.png' title="Start or join a game"/>
 								</Link>
 							}
 							{!location.pathname.includes("/account") &&
 								<Link to="/account">
-									<img className='header-img ml-4' src='/account-icon.png' />
+									<img className='header-img ml-4' src='/account-icon.png' title="Go to account page" />
 								</Link>
 							}
 						</>

@@ -55,14 +55,14 @@ export const WordCardSortable: React.FC<WordCardSortableProps> = ({card, removeC
 				<div className="card-panel nodrag">
 					<div className='card-panel-buttons-container'>
 						<button onClick={(event) => rotateCard(event, "counterclockwise")} className='card-button rotate-button'>
-							<img className='card-img' src='/counter-clockwise-arrow.png' />
+							<img className='card-img' src='/counter-clockwise-arrow.png' title="Rotate this card counter-clockwise" />
 						</button>
 						<button onClick={(event) => rotateCard(event, "clockwise")} className='card-button rotate-button'>
-							<img className='card-img' src='/clockwise-arrow.png' />
+							<img className='card-img' src='/clockwise-arrow.png' title="Rotate this card clockwise" />
 						</button>
 					</div>
 					<div className='card-panel-buttons-container'>
-						<button className='card-button remove-button' onClick={() => removeCard(card._id)}><img className='card-img' src='/minus-icon.png' /></button>
+						<button className='card-button remove-button' onClick={() => removeCard(card._id)}><img className='card-img' src='/minus-icon.png' title="Remove this card from the cog" /></button>
 					</div>
 				</div>
 			</div>

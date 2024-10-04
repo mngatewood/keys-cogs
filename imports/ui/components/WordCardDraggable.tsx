@@ -31,7 +31,7 @@ export const WordCardDraggable: React.FC<WordCardDraggableProps> = ({card, addCa
 			<div className="card-panel">
 				<div className='card-panel-buttons-container'>
 					<button className='card-button remove-button' onClick={() => addCard(card._id)}>
-						<img className='card-img' src='/add-icon.png' />
+						<img className='card-img' src='/add-icon.png' title="Add this card to the cog" />
 					</button>
 				</div>
 			</div>
