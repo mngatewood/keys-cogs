@@ -1,6 +1,6 @@
 .game-panel {
 	display: flex;
-	justify-content: flex-end;
+	justify-content: space-around;
 	align-items: center;
 	position: relative;
 	width: 100%;
@@ -14,25 +14,3 @@
 	font-weight: bold;
 	text-align: center;
 }
-
-.game-panel button {
-	height: 6vmin;
-	margin: 0 2vmin 0 0;
-	cursor: pointer;
-}
-
-/* .exit-img {
-	max-height: 100%;
-}
-
-.exit-img:hover {
-	filter: brightness(120%);
-	transform: scale(1.1);
-}
-
-.exit-img:active {
-	outline: none;
-	box-shadow: inset 0 0 5px #c1c1c1;
-	transform: scale(0.9);
-	brightness: 80%;
-} */

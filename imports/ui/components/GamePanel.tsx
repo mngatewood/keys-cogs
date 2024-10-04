@@ -7,12 +7,9 @@ interface GamePanelProps {
 export const GamePanel = ({puzzleTitle }: GamePanelProps) => {
 
 	return (
-		<div className='game-panel z-top'>
-			<div className='w-1/12' />
-			<div className="w-10/12">
-				<div className="game-panel-title">
-					{ puzzleTitle }
-				</div>
+		<div className='game-panel'>
+			<div className="game-panel-title">
+				{ puzzleTitle }
 			</div>
 		</div>
 	);

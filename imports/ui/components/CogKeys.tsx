@@ -65,7 +65,6 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGam
 	}
 
 	const handleExitGame = () => {
-		console.log("exit game")
 		exitGame();
 	}
 
