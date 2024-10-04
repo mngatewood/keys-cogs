@@ -453,38 +453,82 @@
 	z-index: 1000;
 }
 
-.cog-save {
+.cog-exit, .cog-save {
 	display: flex;
-	justify-content: flex-end;
 	align-items: center;
-	width: 100%;
-	height: 100%;
 	grid-row-start: 1;
 	grid-row-end: 1;
-	grid-column-start: 5;
-	grid-column-end: 5;
 }
 
-.cog-save button {
-	height: 6vmin;
-	margin: 0 2vmin;
+.cog-exit {
+	justify-content: flex-start;
+	grid-column-start: 1;
+	grid-column-end: 3;
+}
+
+.cog-save {
+	justify-content: flex-end;
+	grid-column-start: 4;
+	grid-column-end: 6;
+}
+
+.save-button, .exit-button {
+	width: 6vmin;
+	margin: 0;
+	border-radius: 50px;
+	border: 2px solid red;
+	background-color: theme('colors.yellow.2');
+	color: #fff;
 	cursor: pointer;
+	transition: width 500ms 300ms, background-color 500ms 300ms;
 }
 
-.save-img {
-	max-height: 100%;
+.save-button:hover, .save-button:active, .exit-button:hover, .exit-button:active {
+	width: 100%;
+	background-color: theme('colors.yellow.3');
+	transition: width 500ms, background-color 500ms 300ms;
 }
 
-.save-img:hover {
-	filter: brightness(120%);
-	transform: scale(1.1);
+.save-img, .exit-img {
+	height: 6vmin;
+	opacity: 1;
+	transition: opacity 500ms 300ms;
 }
 
-.save-img:active {
+.save-button:hover .save-img, .exit-button:hover .exit-img,.save-button:active .save-img, .exit-button:active .exit-img {
+	opacity: 0;
+	transition: opacity 500ms;
+}
+
+.save-img:active, .exit-img:active {
 	outline: none;
 	box-shadow: inset 0 0 5px #c1c1c1;
 	transform: scale(0.9);
 	brightness: 80%;
+}
+
+.save-button .button-text, .exit-button .button-text {
+	opacity: 0;
+	transition: opacity 500ms;
+	position: absolute;
+	font-size: 4vmin;
+	color: theme('colors.rosegold.1');
+	text-decoration: underline;
+}
+
+.exit-button .button-text {
+	left: 5vmin;
+	top: 4vmin;
+}
+
+.save-button .button-text {
+	right: 5vmin;
+	top: 4vmin;
+}
+
+.save-button:hover .button-text, .exit-button:hover .button-text,.save-button:active .button-text, .exit-button:active .button-text {
+	opacity: 1;
+	transition: opacity 500ms 300ms;
 }
 
 .highlighted-error, .highlighted-error div {
