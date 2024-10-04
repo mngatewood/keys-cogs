@@ -138,7 +138,7 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGam
 				</button>
 			</div>
 			<div className="cog-exit">
-				<button className="exit-button">
+				<button className="exit-button z-top">
 					<img className='exit-img' src='/exit-icon.png' />
 					<a onClick={handleExitGame} className="button-text" role="button" tabIndex={0} >Exit Game</a>
 				</button>

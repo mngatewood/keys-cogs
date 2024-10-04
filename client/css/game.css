@@ -535,3 +535,7 @@
 	color: theme('colors.blue.2');
 	background-color: theme('colors.yellow.3');
 }
+
+.waiting-overlay-container {
+	min-height: 36vmin;
+}

@@ -15,7 +15,7 @@ export const WaitingOverlay = ({allPlayersReady, advanceRound, roundResults}: Wa
 
 	return (
 		<div className="h-screen w-full fixed top-0 left-0 flex items-center justify-center z-50 bg-blue-1 bg-opacity-50 ">
-			<div className="bg-white shadow-lg border border-gray-300 rounded-lg px-8 py-6 w-5/6 max-w-md">
+			<div className="waiting-overlay-container flex flex-col justify-evenly items-center bg-white shadow-lg border border-gray-300 rounded-lg px-8 py-6 w-5/6 max-w-md">
 				<h1 className="text-2xl font-bold text-center mb-4">
 					{ allPlayersReady() ? "All players ready" : roundResults.message }
 				</h1>
@@ -26,7 +26,7 @@ export const WaitingOverlay = ({allPlayersReady, advanceRound, roundResults}: Wa
 						<h3 className="text-2xl font-bold text-center mb-4">Score: {roundResults.score}</h3>
 					</>
 				}
-				<button disabled={!allPlayersReady()} onClick={handleAdvanceRound} className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 disabled:bg-gray-200 disabled:text-gray-400 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+				<button disabled={!allPlayersReady()} onClick={handleAdvanceRound} className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-1 disabled:bg-gray-200 disabled:text-gray-400 hover:bg-blue-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-1">
 					Start Next Round
 				</button>
 			</div>
