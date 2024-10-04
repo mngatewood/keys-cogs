@@ -1,8 +1,10 @@
 import React from 'react';
 import { Meteor } from 'meteor/meteor';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 export const Header = ({ user }: { user: Meteor.User }) => {
+	const location = useLocation();
+
 	return (
 		<header>
 			<div className="navbar">
@@ -20,24 +22,22 @@ export const Header = ({ user }: { user: Meteor.User }) => {
 				</div>
 				<div className="header-icons-container">
 					{!user && 
-						// <div>
-							<Link to="/login">
-								<img className='header-img' src='/account-icon.png' />
-							</Link>
-						// </div>	
+						<Link to="/login">
+							<img className='header-img' src='/account-icon.png' />
+						</Link>
 					}
-					{user && 
+					{user &&
 						<>
-							{/* <div> */}
+							{!location.pathname.includes("/play") &&
 								<Link to="/play">
-									<img className='header-img mr-4' src='/play-icon.png' />
+									<img className='header-img ml-4' src='/play-icon.png' />
 								</Link>
-							{/* </div> */}
-							{/* <div> */}
+							}
+							{!location.pathname.includes("/account") &&
 								<Link to="/account">
-									<img className='header-img' src='/account-icon.png' />
+									<img className='header-img ml-4' src='/account-icon.png' />
 								</Link>
-							{/* </div> */}
+							}
 						</>
 					}
 				</div>
