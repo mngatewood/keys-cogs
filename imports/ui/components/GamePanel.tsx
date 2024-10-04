@@ -2,14 +2,9 @@ import React from 'react';
 
 interface GamePanelProps {
 	puzzleTitle: string
-	exitGame: Function
 }
 
-export const GamePanel = ({puzzleTitle, exitGame}: GamePanelProps) => {
-
-	const handleExitGame = () => {
-		exitGame();
-	}
+export const GamePanel = ({puzzleTitle }: GamePanelProps) => {
 
 	return (
 		<div className='game-panel z-top'>
@@ -19,9 +14,6 @@ export const GamePanel = ({puzzleTitle, exitGame}: GamePanelProps) => {
 					{ puzzleTitle }
 				</div>
 			</div>
-			<button className='flex justify-end w-1/12' onClick={handleExitGame}>
-				<img className='exit-img' src='/exit-icon.png' />
-			</button>
 		</div>
 	);
 }

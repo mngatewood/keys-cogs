@@ -172,19 +172,20 @@ export const Play = () => {
 
 			{!isLoading() && game && game.started && !game.completed &&
 				<>
-					<GamePanel puzzleTitle={getPuzzleTitle()} exitGame={exitGame}/>
+					<GamePanel puzzleTitle={getPuzzleTitle()} />
 					<Game 
 						game={game} 
 						advanceRound={advanceRound}
 						renderNewCards={renderNewCards}
 						newCardsRendered={newCardsRendered}
+						exitGame={exitGame}
 					/>
 				</>
 			}
 
 			{!isLoading() && game && game.completed &&
 				<>
-					<GamePanel puzzleTitle={getPuzzleTitle()} exitGame={exitGame}/>
+					<GamePanel puzzleTitle={getPuzzleTitle()} />
 					<GameResults
 						game={game}
 					/>
