@@ -89,7 +89,7 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 	}
 
 	return (
-		<div className="lobby-container min-h-screen flex items-center justify-center w-full">
+		<div className="lobby-container h-full flex items-center justify-center w-full">
 			<div className=" bg-white shadow-lg overflow-hidden border border-gray-300 rounded-lg px-8 py-6 max-w-md w-5/6 mx-w-md">
 				<h1 className="text-2xl font-bold text-center">Lobby</h1>
 				{ isLoading() ? <Loading /> : 
@@ -99,7 +99,7 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 								<li key={player._id} id={player._id} className="player-card border border-gray-300 my-4 shadow-md">
 									<div className="px-4 py-5 sm:px-6">
 										<div className="flex items-center justify-between h-6">
-											<h3 className="text-lg leading-6 font-medium text-gray-900">{player.fullName}</h3>
+											<h3 className="text-lg leading-6 font-bold text-gray-900">{player.fullName}</h3>
 											<p className="mt-1 max-w-2xl text-sm text-gray-500">
 												{player._id === Meteor.userId() && "You"}
 												{player._id !== Meteor.userId() && player._id === game.hostId && "Host"}
@@ -107,12 +107,17 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 											</p>
 										</div>
 										<div className="mt-4 flex items-center justify-between h-6">
-											<button onClick={handleClickPlayer} className="font-medium text-indigo-600 hover:text-indigo-500">
-												{game.hostId === Meteor.userId() && (
-													player._id === game.hostId ? "End Game" : "Remove"
-												)}
-												{game.hostId !== Meteor.userId() && player._id === Meteor.userId() && "Leave"}
-											</button>
+											{ isHost() || (player._id === Meteor.userId()) 
+												?
+													<button onClick={handleClickPlayer} className="button flex justify-center py-1 px-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-1 disabled:bg-gray-200 disabled:text-gray-400 hover:bg-blue-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-1">
+														{game.hostId === Meteor.userId() && (
+															player._id === game.hostId ? "End Game" : "Remove"
+														)}
+														{game.hostId !== Meteor.userId() && player._id === Meteor.userId() && "Leave"}
+													</button>
+												:
+													<div />
+											}
 											<p className="text-sm font-medium text-gray-500">Status: <span className="text-green-600">{player.status}</span></p>
 										</div>
 									</div>
@@ -122,7 +127,7 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 						<div className="flex flex-col items-center justify-center">
 							{ isHost()
 								?
-									<button onClick={handleStartGame} type="submit" disabled={players.length < 2} className="w-full flex justify-center mt-4 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 disabled:bg-gray-200 disabled:text-gray-400 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+								<button onClick={handleStartGame} type="submit" disabled={players.length < 2} className="button w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-1 disabled:bg-gray-200 disabled:text-gray-400 hover:bg-blue-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-1">
 										Start Game
 									</button>
 								: 

@@ -6,6 +6,7 @@ import { shuffleArray } from '/imports/helpers/shuffle';
 import { CardsCollection } from '../cards/CardsCollection';
 import type { CardType } from '../types';
 import { getPlayerToRender } from '/imports/helpers/gameplay';
+import { fullName } from '/imports/helpers/reducers';
 
 const allOtherPlayersReady = (game: GameType, playerId: string) => {
 	if (game.isDemo) return true;
@@ -49,31 +50,38 @@ const advanceToGameSummary = async (game: GameType) => {
 
 const getGameResults = async (game: GameType) => {
 	const players = game.players;
-	const results = players.map((player) => {
-		const attemptsByRound = player.results.map((result: any) => {
-			return { round: result.round, attempts:result.attempts };
-		});
-		const totalAttempts = attemptsByRound.reduce((accumulator: number, round: any) => {
+	const totals = players.map((player) => {
+		const totalAttempts = player.results.reduce((accumulator: number, round: any) => {
 			accumulator = accumulator + round.attempts
 			return accumulator
 		}, 0);
-		const scoresByRound = player.results.map((result: any) => {
-			return { round: result.round, score:result.score };
-		});
-		const totalScore = scoresByRound.reduce((accumulator: number, round: any) => {
+		const totalScore = player.results.reduce((accumulator: number, round: any) => {
 			return accumulator + round.score
 		}, 0);
+		const bonusScores = player.results.filter((result: any) => result.score === 6).length;
 
 		return {
 			playerId: player._id,
-			attempts: attemptsByRound,
-			scores: scoresByRound,
 			totalAttempts: totalAttempts,
-			totalScore: totalScore
+			totalScore: totalScore,
+			bonusScores: bonusScores
 		}
 	})
 
-	return results
+	const response = await Promise.all(players.map( async (player) => {
+		const profile = await Meteor.users.findOneAsync(player._id);
+		const name = fullName(profile)
+		return {
+			_id: player._id,
+			name: name,
+			totalAttempts: totals.find((total) => total.playerId === player._id)?.totalAttempts ?? 0,
+			totalScore: totals.find((total) => total.playerId === player._id)?.totalScore ?? 0,
+			bonusScores: totals.find((total) => total.playerId === player._id)?.bonusScores ?? 0,
+			results: player.results
+		}
+	}));
+
+	return response
 };
 
 const regulateCardsRotation = (cards: CardType[]) => {

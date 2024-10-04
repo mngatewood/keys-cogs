@@ -11,9 +11,10 @@ interface CogKeysProps {
 	keys: Array<string>
 	playerReady: Function
 	round: number
+	exitGame: Function
 }
 
-export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGame, keys, playerReady, round}) => {
+export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGame, keys, playerReady, round, exitGame}) => {
 	const [isEditing, setIsEditing] = useState(0);
 
 	const handleClickEdit = (keyId: number) => {
@@ -61,6 +62,10 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGam
 		}).catch((error: Meteor.Error) => {			
 			console.log("failed to save", error)
 		})
+	}
+
+	const handleExitGame = () => {
+		exitGame();
 	}
 
 	const keyDisplayContent = (key: string) => {
@@ -132,10 +137,19 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGam
 					<img className='cog-img' src='/reset-icon.png' />
 				</button>
 			</div>
+			<div className="cog-exit">
+				<button className="exit-button z-top">
+					<img className='exit-img' src='/exit-icon.png' />
+					<a onClick={handleExitGame} className="button-text" role="button" tabIndex={0} >Exit Game</a>
+				</button>
+			</div>
 			{ !playerReady() &&
 				<div className="cog-save">
-					<button onClick={handleSaveGame}>
+					<button className="save-button">
 						<img className='save-img' src='/save-icon.png' />
+						<a onClick={handleSaveGame} className="button-text" role="button" tabIndex={0} >
+							{ round === 0 ? "Save Cog" : "Solve Cog" }
+						</a>
 					</button>
 				</div>
 			}

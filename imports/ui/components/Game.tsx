@@ -23,9 +23,10 @@ interface GameProps {
 	advanceRound: Function;
 	renderNewCards: boolean;
 	newCardsRendered: Function;
+	exitGame: Function;
 }
 
-export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered }: GameProps) => {
+export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered, exitGame }: GameProps) => {
 	// State
 	const [cardsData, setCardsData] = useState<CardType[]>([]);
 	const [playCards, setPlayCards] = useState<React.JSX.Element[]>([]);
@@ -406,6 +407,7 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered }: G
 								keys={keys} 
 								playerReady={readyForNextRound} 
 								round={game.round}
+								exitGame={exitGame}
 							/>
 							<SortableContext 
 								items={cogCards.map((card) => card.key || "")} 
@@ -423,8 +425,10 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered }: G
 								</div>
 							</SortableContext>
 						</div>
-						<div className="draw-container">
-							{ playCards }
+						<div className="draw-container-flex">
+							<div className="draw-container">
+								{ playCards }
+							</div>
 						</div>
 					</DndContext>
 					{readyForNextRound() &&
