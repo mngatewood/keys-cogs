@@ -134,7 +134,7 @@ export const Play = () => {
 		const playerToRenderName = fullName(playerToRenderData);
 
 		if (game.completed) {
-			return "Game Over"
+			return ""
 		} else if (playerToRenderId === Meteor.userId()) {
 			return "Set Your Cog & Keys"
 		} else {
@@ -188,6 +188,7 @@ export const Play = () => {
 					<GamePanel puzzleTitle={getPuzzleTitle()} />
 					<GameResults
 						game={game}
+						exitGame={exitGame}
 					/>
 				</>
 			}
