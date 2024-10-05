@@ -341,6 +341,10 @@ Meteor.methods({
 			throw new Meteor.Error('game-not-found', 'Game not found.  Please try again.');
 		}
 
+		if (game?.players.length > 5) {
+			throw new Meteor.Error('game-already-full', 'Game is already full.  Please try again.');
+		}
+
 		const playerIds = game?.players.map((player: PlayerType) => player._id) || [];
 		if (playerIds.includes(playerId)) {
 			throw new Meteor.Error('player-already-in-game', 'An error occurred.  You are already in this game.');

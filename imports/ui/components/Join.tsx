@@ -31,6 +31,9 @@ export const Join:React.FC<JoinProps> = ({joinGame}) => {
 		completed: false,
 		isDemo: false,
 		players: {
+			$size: {
+				$lt: 6
+			},
 			$elemMatch: {
 				_id: {
 					$ne: Meteor.userId()
