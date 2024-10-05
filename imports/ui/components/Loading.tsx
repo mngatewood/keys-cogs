@@ -2,7 +2,7 @@ import React from "react";
 
 export const Loading = () => {
 	return (
-		<div className="loading">
+		<div className="h-min-medium flex items-center justify-center">
 			<div className="min-h-full flex items-center justify-center w-full">
 				<div className="grid min-h-[140px] w-full place-items-center overflow-x-scroll rounded-lg p-6 lg:overflow-visible">
 					<svg className="w-16 h-16 animate-spin text-gray-900/50" viewBox="0 0 64 64" fill="none"

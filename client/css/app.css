@@ -33,3 +33,11 @@ a {
 	color: -webkit-link;
 	text-decoration: underline;
 }
+
+.h-min-small {
+	min-height: 20rem;
+}
+
+.h-min-medium {
+	min-height: 40rem;
+}

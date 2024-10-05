@@ -31,6 +31,9 @@ export const Join:React.FC<JoinProps> = ({joinGame}) => {
 		completed: false,
 		isDemo: false,
 		players: {
+			$size: {
+				$lt: 6
+			},
 			$elemMatch: {
 				_id: {
 					$ne: Meteor.userId()
@@ -99,8 +102,8 @@ export const Join:React.FC<JoinProps> = ({joinGame}) => {
 	}
 
 	return (
-		<div className="join-container flex items-center justify-center w-full">
-			<div className="join-games-container bg-white shadow-lg overflow-hidden border border-gray-300 rounded-lg px-8 py-6 max-w-md w-5/6 mx-w-md">
+		<div className="overflow-scroll flex items-center justify-center w-full h-full">
+			<div className="bg-beige-1 shadow-lg border border-gray-300 rounded-lg px-8 py-6 m-auto max-w-md w-5/6">
 				<h1 className="text-2xl font-bold text-center mb-4">Join a Game</h1>
 				{isLoading() ? <Loading /> :
 					<>
@@ -113,7 +116,7 @@ export const Join:React.FC<JoinProps> = ({joinGame}) => {
 											<p className="mt-1 max-w-2xl text-sm text-gray-500">Number of Players: {game.playerCount}</p>
 										</div>
 										<div className="flex flex-col justify-center items-end w-1/4">
-											<button onClick={handleJoinGame} className="button w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-1 disabled:bg-gray-200 disabled:text-gray-400 hover:bg-blue-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-1">
+											<button onClick={handleJoinGame} className="button w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-1 disabled:bg-rosegold-2 disabled:text-gray-400 hover:bg-blue-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-1">
 												Join
 											</button>
 										</div>
@@ -129,7 +132,7 @@ export const Join:React.FC<JoinProps> = ({joinGame}) => {
 											<p className="mb-4">No pending games.</p>
 											<p>
 												<span>Please try again later or </span>
-											<button onClick={handleHostGame} className="underline inline border border-transparent text-sm font-medium bg-transparent text-blue-1  hover:text-blue-2 focus:outline-none">
+											<button onClick={handleHostGame} className="underline inline border border-transparent text-sm font-medium bg-transparent text-blue-2  hover:text-blue-1 focus:outline-none">
 												host 
 											</button>
 											<span> a new game.</span> 

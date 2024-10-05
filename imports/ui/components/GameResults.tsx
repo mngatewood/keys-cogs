@@ -110,7 +110,7 @@ export const GameResults: React.FC<GameResultsProps> = ({game, exitGame}) => {
 									)
 								})}
 							</ul>
-							<button onClick={handleExitGame} className='w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-1 disabled:bg-gray-200 disabled:text-gray-400 hover:bg-blue-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-1'>Exit</button>
+							<button onClick={handleExitGame} className='w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-1 disabled:bg-rosegold-2 disabled:text-gray-400 hover:bg-blue-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-1'>Exit</button>
 						</div>
 					</div>
 				</>

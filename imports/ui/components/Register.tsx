@@ -1,7 +1,8 @@
 import { Meteor } from "meteor/meteor";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom'
 import { validateName, validateEmail, validatePassword } from '../../helpers/registerValidation';
+import { logoutDemoUser } from "/imports/helpers/utils";
 
 export const Register = () => {
 	const [firstName, setFirstName] = useState("");
@@ -16,9 +17,12 @@ export const Register = () => {
 	const [confirmPasswordError, setConfirmPasswordError] = useState("*Required");
 	const navigate = useNavigate();
 
-	if (Meteor.user()) {
-		navigate("/");
-	}
+	useEffect(() => {
+		if (Meteor.user()) {
+			logoutDemoUser();
+			navigate("/");
+		}
+	}, [Meteor.user()]);
 
 	const handleChangeFirstName = (e: React.ChangeEvent<HTMLInputElement>) => {
 		e.preventDefault();
@@ -111,8 +115,8 @@ export const Register = () => {
 	return (
 		<>
 			{!Meteor.user() &&
-				<div className="min-h-screen flex items-center justify-center w-full">
-					<div className="max-w-md mx-auto bg-white rounded-lg shadow-md border border-gray-300 px-8 py-6 w-5/6 flex flex-col items-center">
+				<div className="h-full overflow-scroll flex items-center justify-center w-full">
+					<div className="max-w-md m-auto bg-beige-1 rounded-lg shadow-md border border-gray-300 px-8 py-6 w-5/6 flex flex-col items-center">
 						<h1 className="text-xl font-bold text-center text-gray-700 mb-8">Register</h1>
 						<form action="#" className="w-full flex flex-col gap-4">
 							<div className="flex items-start flex-col justify-start">
@@ -146,11 +150,11 @@ export const Register = () => {
 							</div>
 
 							<button onClick={handleSubmit}
-								type="submit" disabled={disableSubmit()} className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 disabled:bg-gray-200 disabled:text-gray-400 rounded-md shadow-sm">Register</button>
+								type="submit" disabled={disableSubmit()} className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-1 disabled:bg-rosegold-2 disabled:text-gray-400 hover:bg-blue-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-1">Register</button>
 						</form>
 						<div className="mt-4 text-center">
 							<span className="text-sm mx-2 text-gray-500">Already have an account? </span>
-							<a href="/login" className="text-blue-500 hover:text-blue-600">Log In</a>
+							<a href="/login" className="text-blue-2 hover:text-blue-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-2 underline">Log In</a>
 						</div>
 						<div className="error mt-4 text-red-500 text-sm text-center whitespace-pre-line">
 							{registerError}

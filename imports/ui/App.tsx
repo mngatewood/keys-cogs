@@ -60,11 +60,11 @@ export const App = () => {
 					<main style={style}>
 						<Routes>
 							<Route element={<PrivateRoutes />}>
+								<Route path="/account" element={<Account />} />
 								<Route path="/play" element={<Play />} />
 							</Route>
 							<Route path="/login" element={<Login />} />
 							<Route path="/register" element={<Register />} />
-							<Route path="/account" element={<Account />} />
 							<Route path="/" element={<Home />} />
 						</Routes>
 					</main>

@@ -134,7 +134,7 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGam
 			</div>
 			<div className="cog-panel">
 				<button className='cog-button' onClick={handleResetCards}>
-					<img className='cog-img' src='/reset-icon.png' />
+					<img className='cog-img' src='/reset-icon.png' title="Remove all cards from the cog" />
 				</button>
 			</div>
 			<div className="cog-exit">
@@ -147,9 +147,9 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGam
 				<div className="cog-save">
 					<button className="save-button">
 						<img className='save-img' src='/save-icon.png' />
-						<a onClick={handleSaveGame} className="button-text" role="button" tabIndex={0} >
-							{ round === 0 ? "Save Cog" : "Solve Cog" }
-						</a>
+							<a onClick={handleSaveGame} className="button-text" role="button" tabIndex={0} >
+								{ round === 0 ? "Save Cog" : "Solve Cog" }
+							</a>
 					</button>
 				</div>
 			}
