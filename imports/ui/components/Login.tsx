@@ -2,6 +2,7 @@ import { Meteor } from "meteor/meteor";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom'
 import { validateEmail } from '../../helpers/registerValidation';
+import { logoutDemoUser } from "/imports/helpers/utils";
 
 export const Login = () => {
 	const [email, setEmail] = useState("");
@@ -13,6 +14,7 @@ export const Login = () => {
 
 	useEffect(() => {
 		if (Meteor.user()) {
+			logoutDemoUser();
 			navigate("/");
 		}
 	}, [Meteor.user()]);

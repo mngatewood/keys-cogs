@@ -1,12 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTracker } from 'meteor/react-meteor-data';
 import { Meteor } from 'meteor/meteor';
 import { useNavigate } from 'react-router-dom';
+import { logoutDemoUser } from '/imports/helpers/utils';
 
 export const Home = () => {
 
 	const user = useTracker(() => Meteor.user());
 	const navigate = useNavigate();
+
+	useEffect(() => {
+		if (Meteor.user()) {
+			logoutDemoUser();
+		}
+	}, [])
 
 	const logout = () => {
 		Meteor.logout();

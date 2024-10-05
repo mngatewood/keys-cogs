@@ -1,7 +1,8 @@
 import { Meteor } from "meteor/meteor";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom'
 import { validateName, validateEmail, validatePassword } from '../../helpers/registerValidation';
+import { logoutDemoUser } from "/imports/helpers/utils";
 
 export const Register = () => {
 	const [firstName, setFirstName] = useState("");
@@ -16,9 +17,12 @@ export const Register = () => {
 	const [confirmPasswordError, setConfirmPasswordError] = useState("*Required");
 	const navigate = useNavigate();
 
-	if (Meteor.user()) {
-		navigate("/");
-	}
+	useEffect(() => {
+		if (Meteor.user()) {
+			logoutDemoUser();
+			navigate("/");
+		}
+	}, [Meteor.user()]);
 
 	const handleChangeFirstName = (e: React.ChangeEvent<HTMLInputElement>) => {
 		e.preventDefault();
