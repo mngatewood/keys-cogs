@@ -195,13 +195,3 @@ export const Play = () => {
 		</>
 	);
 }
-
-
-// Add tooltips for all icons and buttons
-// Add picture of correct puzzle at end of each round
-// Update home page with brief overview of rules
-// Limit to six players
-// Finish account page
-// Hide play button when on play route
-
-
