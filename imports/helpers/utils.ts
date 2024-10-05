@@ -15,3 +15,14 @@ export const logoutDemoUser = async () => {
 		Meteor.logout();
 	}
 }
+
+export const getDemo = async () => {
+	if (Meteor.user()) {
+		Meteor.logout();
+	}
+
+	const demoPlayer = await Meteor.callAsync("accounts.getDemoPlayer");
+	const demoGame = await Meteor.callAsync("games.getDemo");
+
+	return { demoPlayer, demoGame };
+}

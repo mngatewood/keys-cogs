@@ -1,14 +1,32 @@
 /* Home */
 
 .home-container {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	gap: 5rem;
-	height: 100%;
-	width: 100%;
 	padding: 2rem;
+}
+
+.home-container p {
+	margin: 1rem 0;
+}
+
+.home-container a {
+	color: theme('colors.blue.2');
+	text-decoration: underline;
+}
+
+.home-container a:hover {
+	color: theme('colors.blue.1');
+}
+
+.home-container img {
+	width: 100%;
+	max-width: 400px;
+	margin: 0 auto;
+}
+
+.home-container img.small-img {
+	width: 20%;
+	max-width: 100px;
+	margin: 0 auto;
 }
 
 /* Login */
