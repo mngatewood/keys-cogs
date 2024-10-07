@@ -507,7 +507,9 @@ Meteor.methods({
 			incorrectPositions: incorrectPositions,
 			attempts: attempts,
 			score: score,
-			roundComplete: false
+			roundComplete: false,
+			solution: [],
+			keys: []
 		}
 
 		if (attempts >= 2 || incorrectPositions.length === 0) {
@@ -518,6 +520,10 @@ Meteor.methods({
 
 			await finalizePlayerRound(game, playerId, attempts, score).then((result) => {
 				if (result === 1) {
+					const puzzleAuthorId = getPlayerToRender(game, playerId);
+					const puzzleAuthor = game.players.find((player: PlayerType) => player._id === puzzleAuthorId);
+					response.solution = puzzleAuthor?.cards.filter((card: CardType) => [1, 2, 3, 4].includes(card.position)); 
+					response.keys = puzzleAuthor?.keys;
 					response.roundComplete = true;
 				}
 			});
