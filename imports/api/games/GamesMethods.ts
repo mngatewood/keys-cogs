@@ -582,10 +582,10 @@ Meteor.methods({
 		}
 	},
 
-	async "game.resetDemo"(gameId: string, playerId: string) {
-		check(gameId, String);
+	async "game.resetDemo"(playerId: string) {
 		check(playerId, String);
-		const response = await resetDemoGame(gameId, playerId);
+		const game = await GamesCollection.findOneAsync({ isDemo: true }) as GameType;
+		const response = await resetDemoGame(game._id, playerId);
 		return response
 	},
 
