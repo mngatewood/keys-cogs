@@ -44,9 +44,18 @@ export const RoundResults: React.FC<RoundResultsProps> = ({roundResults}) => {
 			</div>
 			{roundResults.roundComplete && roundResults.incorrectPositions &&
 				<>
-					<h3 className="text-2xl font-bold text-center mb-4">Correct Cards: { 4 - roundResults.incorrectPositions?.length }</h3>
-					<h3 className="text-2xl font-bold text-center mb-4">Number of Attempts: {roundResults.attempts }</h3>
-					<h3 className="text-2xl font-bold text-center mb-4">Round Score: {roundResults.score}</h3>
+					<div className="flex justify-between items-center w-full font-bold">
+						<div className="flex flex-col items-start">
+							<h3 className="my-2">Correct Cards:</h3>
+							<h3 className="my-2">Number of Attempts:</h3>
+							<h3 className="my-2">Round Score:</h3>
+						</div>
+						<div className="flex flex-col items-end">
+							<h3 className="my-2">{4 - roundResults.incorrectPositions?.length}</h3>
+							<h3 className="my-2">{roundResults.attempts}</h3>
+							<h3 className="my-2">{roundResults.score}</h3>
+						</div>
+					</div>
 				</>
 			}
 		</div>
