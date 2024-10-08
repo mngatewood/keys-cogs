@@ -183,6 +183,7 @@ const resetDemoGame = async (gameId: string, playerId: string) => {
 			"players.$[player].ready": false,
 			"players.$[player].round": 0,
 			"players.$[player].keys": ["", "", "", ""],
+			"players.$[player].cogBonus": 0,
 			"players.$[player].cards.$[].position": 5,
 			"players.$[player].cards.$[].rotation": 0,
 			"players.$[player].results": []
