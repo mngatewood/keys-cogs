@@ -29,6 +29,12 @@
 	margin: 0 auto;
 }
 
+.home-container img.inline-img {
+	display: inline-block;
+	width: 1.5rem;
+	margin: 0 auto;
+}
+
 /* Login */
 
 .error {

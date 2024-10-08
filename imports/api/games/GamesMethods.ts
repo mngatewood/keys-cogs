@@ -74,6 +74,7 @@ const getGameResults = async (game: GameType) => {
 		return {
 			_id: player._id,
 			name: name,
+			cogBonus: player.cogBonus,
 			totalAttempts: totals.find((total) => total.playerId === player._id)?.totalAttempts ?? 0,
 			totalScore: totals.find((total) => total.playerId === player._id)?.totalScore ?? 0,
 			bonusScores: totals.find((total) => total.playerId === player._id)?.bonusScores ?? 0,
@@ -197,6 +198,22 @@ const resetDemoGame = async (gameId: string, playerId: string) => {
 	return await GamesCollection.updateAsync(gameId, update, options);
 }
 
+const incrementCogBonus = async (game: GameType, coplayerId: string) => {
+	const update = {
+		$inc: {
+			"players.$[player].cogBonus": 1,
+		}
+	}
+
+	const options = {
+		arrayFilters: [
+			{ "player._id": coplayerId },
+		]
+	}
+
+	return await GamesCollection.updateAsync(game._id, update, options);
+}
+
 Meteor.methods({
 	async 'games.insert'(hostId: string) {
 		check(hostId, String);
@@ -216,6 +233,7 @@ Meteor.methods({
 					_id: hostId,
 					ready: false,
 					round: 0,
+					cogBonus: 0,
 					keys: ["", "", "", ""],
 					cards: [],
 					results: []
@@ -508,11 +526,16 @@ Meteor.methods({
 			attempts: attempts,
 			score: score,
 			roundComplete: false,
+			finalRound: game.round >= game.players.length - 1,
 			solution: [],
 			keys: []
 		}
 
 		if (attempts >= 2 || incorrectPositions.length === 0) {
+
+			if (response.score >= 4) {
+				incrementCogBonus(game, coplayerId);
+			}
 
 			if (allOtherPlayersReady(game, playerId)) {
 				await advanceRound(game);
