@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import type { RoundResultsType, CardType } from "../../api/types";
+import type { RoundResultsType } from "../../api/types";
 import { Droppable } from "./Droppable";
 import { WordCardSolution } from "./WordCardSolution";
 
