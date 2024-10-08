@@ -16,7 +16,7 @@ import { WaitingOverlay } from './WaitingOverlay';
 import { getCardsToRender, getKeysToRender } from '/imports/helpers/gameplay';
 
 // Types
-import type { CardType, GameType, PlayerType, RoundResults } from '../../api/types';
+import type { CardType, GameType, PlayerType, RoundResultsType } from '../../api/types';
 
 interface GameProps {
 	game: GameType;
@@ -32,7 +32,7 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered, exi
 	const [playCards, setPlayCards] = useState<React.JSX.Element[]>([]);
 	const [cogCards, setCogCards] = useState<React.JSX.Element[]>([]);
 	const [keys, setKeys] = useState<string[]>(["", "", "", ""]);
-	const [roundResults, setRoundResults] = useState<RoundResults>({message: "Waiting for other players..."});
+	const [roundResults, setRoundResults] = useState<RoundResultsType>({message: "Waiting for other players..."});
 
 	// Hooks
 	const pointerSensor = useSensor(PointerSensor, { activationConstraint: { distance: 5 }});
@@ -319,7 +319,7 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered, exi
 			Meteor.callAsync("game.checkCog", game._id, Meteor.userId(), cardsData).then((result) => {
 				if (result?.roundComplete) {
 					const roundResults = {
-						message: "Round complete.  Waiting for other players...",
+						message: "Round Complete",
 						...result
 					}
 					setRoundResults(roundResults);
@@ -346,16 +346,14 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered, exi
 		};
 		
 		const allCardsPlaced = () => {
-			// cog position values: 1, 2, 3, 4
-			let placedPositions = [1, 2, 3, 4]
 			let playedCards: CardType[] = [];
 
 			// filter out placeholder cards
-			const playableCards = cardsData.filter((card) => !placedPositions.includes(parseInt(card._id)));
+			const playableCards = cardsData.filter((card) => !cogContainerIds.includes(card._id));
 
 			// push cards to playedCards if they are in a valid cog position
 			playableCards.forEach((card) => {
-				if (placedPositions.includes(card.position)) {
+				if (cogContainers.includes(card.position)) {
 					playedCards.push(card);
 				}
 			})
@@ -366,7 +364,6 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered, exi
 			
 			return (playedCards.length === 4 && duplicatedPositions.length === 0) ? true : false
 		}
-		
 		return allKeysCompleted() && allCardsPlaced();
 	}
 

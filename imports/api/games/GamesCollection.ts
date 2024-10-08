@@ -56,6 +56,10 @@ export const GamesCollectionSchema = new SimpleSchema({
 		defaultValue: 0,
 		min: 0,
 	},
+	"players.$.cogBonus": {
+		type: Number,
+		defaultValue: 0,
+	},
 
 	"players.$.keys": {
 		type: Array

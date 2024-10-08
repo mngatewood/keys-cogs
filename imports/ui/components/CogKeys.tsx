@@ -40,7 +40,7 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGam
 
 		saveGame().then((result: boolean) => {
 			if (!result) {
-
+				
 				const cogCards = document.querySelectorAll(".droppable");
 				cogCards?.forEach((card) => {
 					if (["1", "2", "3", "4"].includes(card.id)) {
@@ -146,10 +146,22 @@ export const CogKeys: React.FC<CogKeysProps> = ({updateKeys, resetCards, saveGam
 			{ !playerReady() &&
 				<div className="cog-save">
 					<button className="save-button">
-						<img className='save-img' src='/save-icon.png' />
-							<a onClick={handleSaveGame} className="button-text" role="button" tabIndex={0} >
-								{ round === 0 ? "Save Cog" : "Solve Cog" }
-							</a>
+						{ round === 0
+							?
+								<>
+									<img className='save-img' src='/save-icon.png' />
+										<a onClick={handleSaveGame} className="button-text" role="button" tabIndex={0} >
+											Save Cog
+										</a>
+								</>
+							:
+								<>
+									<img className='save-img' src='/check-icon.png' />
+										<a onClick={handleSaveGame} className="button-text" role="button" tabIndex={0} >
+											Solve Cog
+										</a>
+								</>
+						}
 					</button>
 				</div>
 			}

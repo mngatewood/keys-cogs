@@ -31,23 +31,29 @@ export const Home = () => {
 		<>
 			<div className="home-container">
 				<h1 className="text-2xl font-bold text-center mb-4">Welcome to Keys & Cogs!</h1>
-				<p><em><strong>Keys and Cogs</strong></em> is a digital reimplementation of the popular game <em>So Clover!</em>  &nbsp;The rules are simple:</p>
-				<p>All players are dealt five cards, each containing four common words (one on each side of the card). In the initial round, everyone will simultaneously arrange four of their the cards in a 2 x 2 grid, known as the <em>cog</em>.  The goal is to put words with a common feature, known as the <em>key</em>, together next to each other.</p>
+				<p><em><strong>Keys and Cogs</strong></em> is a digital reimplementation of the popular cooperative tabletop game <em>So Clover!</em>  The major difference is that now it's competitive! You'll still be scoring points by solving the puzzles, but this time without the help of your friends.  &nbsp;The rules remain simple:</p>
+				<p>All players are dealt five cards, each containing four common words (one on each side of the card). In the initial round, everyone will simultaneously arrange four of their the cards in a 2 x 2 grid, known as the <em>cog</em>.  The goal is to put words with a common feature&mdash;known as the <em>key</em>&mdash; next to each other.</p>
+
 				<img src="/figure-1.png" alt="overview-figure-1" />
-				{/* figure */}
+
 				<p>For example, in the figure below, the player has placed two cards with the words <em>Sheep</em> and <em>Clothing</em> next to each other.</p>
+
 				<img src="/figure-2.png" alt="overview-figure-2" />
-				{/* figure */}
+
 				<p>The player then enters a one-word clue that reflects the relationship between the two words.  Here, the player has chosen the word <em>Wool</em>.</p>
+
 				<img src="/figure-3.png" alt="overview-figure-3" />
-				{/* figure */}
+
 				<p>Players continue arranging their cards in this manner until four cards have been placed in the cog and each side of the cog contains a key.</p>
+
 				<img src="/figure-4.png" alt="overview-figure-4" />
+
+				<p>Click the <em>Save</em> button <img src="/save-icon.png" alt="overview-figure-5" className="inline-img" /> to save the position and rotation of your cards.</p>
 				<p>Once all players have completed the initial round, your cog and cards are passed to another player.  The other player will see the keys you entered, but the cards will be shuffled.  Everyone scores points by arranging the cards in the correct slots, using the keys as clues.</p>
-				<p>When you think you have solved the cog, click the <em>Solve</em> button.</p>
-				<img src="/figure-5.png" alt="overview-figure-5" className="small-img"/>
+				<p>When you think you have solved the cog, click the <em>Solve</em> button <img src="/check-icon.png" alt="overview-figure-6" className="inline-img" /> to see how you did.</p>
 				<p>The app will remove any incorrect cards (due either to the wrong position or wrong rotation).  If you didn't get it perfect on the first try, don't worry.  You will be given a second opportunity to place the correct cards in the empty slots.</p>
 				<p>Players score one point for each correctly positioned card, for a maximum score of four.  However, if you guess correctly on the first attempt, you will also score two bonus points.</p>
+				<p>But here's where things get interesting.  When anyone correctly solves your cog, you also score a bonus point!  So do your best to make your cog as good as possible.</p>
 				<p>Once all players have either solved the cog or made two attempts, your score for the round will be displayed and another round begins.  Every player will have an opportunity to try to solve every other player's cog.</p>
 				<p>Once all rounds have been completed, the final scores will be displayed, the winner will be declared, and the game will end.</p>
 				<p>When you've gathered 2-6 total players (including yourself), <a href="/register">create an account</a> and <a href="/login">log in</a>.  Once you're logged in, you'll see a play button in the header, which can be clicked to begin.  If you just want to check it out without the fuss, you can play the demo alone without creating an account.</p>

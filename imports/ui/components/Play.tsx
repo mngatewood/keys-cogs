@@ -118,7 +118,7 @@ export const Play = () => {
 
 	const resetDemo = () => {
 		if (game?.isDemo) {
-			Meteor.callAsync("game.resetDemo", gameId, Meteor.userId());
+			Meteor.callAsync("game.resetDemo", Meteor.userId());
 			Meteor.logout();
 		}
 	};
