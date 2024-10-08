@@ -18,6 +18,7 @@ export const GameResults: React.FC<GameResultsProps> = ({game, exitGame}) => {
 			results.sort((a: any, b: any) => {
 				return b.totalScore - a.totalScore || 
 				a.totalAttempts - b.totalAttempts || 
+				b.cogBonus - a.cogBonus ||
 				b.bonusScores - a.bonusScores
 			})
 			setPlayerResults(results);
@@ -76,7 +77,7 @@ export const GameResults: React.FC<GameResultsProps> = ({game, exitGame}) => {
 								{playerResults.map((player: any) => {
 									return (
 										<li key={player._id} id={player._id} data-medal={getMyMedal(player._id)} className="game-card rounded-lg bg-white border border-gray-300 shadow-md my-4">
-											<div className="flex flex-col px-4 pb-5 sm:px-6">
+											<div className="flex flex-col px-4 pb-4 sm:px-6">
 												<div className="flex items-start justify-between">
 													<h3 className="mt-2 w-5/6 text-xl font-bold text-gray-900">{player.name}</h3>
 													{getMyMedal(player._id) &&
@@ -104,6 +105,18 @@ export const GameResults: React.FC<GameResultsProps> = ({game, exitGame}) => {
 														<h3>{player.totalAttempts}</h3>
 														<h3>{player.totalScore}</h3>
 													</div>
+												</div>
+												<hr className="my-2" />
+												<div className="flex items-center justify-between">
+													<div className="flex justify-start items-center text-sm">
+														<h3 className="font-bold">Score</h3>
+														<span>&nbsp;({player.totalScore})&nbsp;</span>
+														<h3 className="font-bold">+&nbsp;</h3>
+														<h3 className="font-bold">Cog Bonus</h3>
+														<span>&nbsp;({player.cogBonus})&nbsp;</span>
+														<h3 className="font-bold">=</h3>
+													</div>
+													<h3 className="font-bold text-lg">{player.totalScore + player.cogBonus}</h3>
 												</div>
 											</div>
 										</li>

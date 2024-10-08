@@ -136,6 +136,7 @@ Meteor.startup(async() => {
 					_id: demoAccounts.demoPlayerId,
 					ready: false,
 					round: 0,
+					cogBonus: 0,
 					keys: ["", "", "", ""],
 					cards: [],
 					results: []
@@ -144,6 +145,7 @@ Meteor.startup(async() => {
 					_id: demoAccounts.demoOpponentId,
 					ready: true,
 					round: 0,
+					cogBonus: 0,
 					keys: ["", "", "", ""],
 					cards: [],
 					results: [
@@ -171,8 +173,8 @@ Meteor.startup(async() => {
 
 		if (demoGame && allCardsSeeded) {
 			console.log("demo game inserted, updating game")
-			const playerCard1 = await CardsCollection.findOneAsync({ words: "Airport" })
-			const playerCard2 = await CardsCollection.findOneAsync({ words: "Bag" })
+			const playerCard1 = await CardsCollection.findOneAsync({ words: "Sheep" })
+			const playerCard2 = await CardsCollection.findOneAsync({ words: "Clothing" })
 			const playerCard3 = await CardsCollection.findOneAsync({ words: "Bakery" })
 			const playerCard4 = await CardsCollection.findOneAsync({ words: "Boxing" })
 			const playerCard5 = await CardsCollection.findOneAsync({ words: "Card" })
