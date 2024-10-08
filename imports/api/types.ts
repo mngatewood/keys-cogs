@@ -27,6 +27,7 @@ export type GameType = {
 
 export type RoundResultsType = {
 	message: string,
+	finalRound?: boolean,
 	roundComplete?: boolean,
 	incorrectPositions?: string[],
 	correctPositions?: string[],
