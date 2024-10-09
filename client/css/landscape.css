@@ -5,6 +5,7 @@
 		flex-direction: row;
 		justify-content: space-around;
 		align-items: center;
+		height: 100%;
 	}
 
 	.game-panel {
@@ -26,6 +27,16 @@
 		margin: 0 1vmin;
 		overflow: scroll;
 		flex-grow: 0;
+	}
+
+	.exit-button .button-text {
+		left: 2vmin;
+		top: 1.5vmin;
+	}
+
+	.save-button .button-text {
+		right: 2.3vmin;
+		top: 1.5vmin;
 	}
 
 }
