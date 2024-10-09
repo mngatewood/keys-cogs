@@ -1,0 +1,31 @@
+@media screen and (orientation:landscape) {
+
+	.game-container {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-around;
+		align-items: center;
+	}
+
+	.game-panel {
+		width: calc(100vh - 10vmin);
+		margin: 0;
+	}
+
+	.cog-container {
+		height: calc(100vh - 20vmin);
+		width: unset;
+		margin: 0 5vmin;
+		padding: 0;
+		aspect-ratio: 1 / 1;
+	}
+
+	.draw-container-flex {
+		height: calc(100vh - 20vmin);
+		width: 35%;
+		margin: 0 1vmin;
+		overflow: scroll;
+		flex-grow: 0;
+	}
+
+}

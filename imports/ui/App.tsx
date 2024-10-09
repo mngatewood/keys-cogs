@@ -44,7 +44,7 @@ export const App = () => {
 		return size.height > size.width ? size.width * 0.01 : size.height * 0.01;
 	}
 
-	let headerHeight = minvh() * 8.5;
+	let headerHeight = minvh() * 12;
 
 	// set main element height to window height minus header height
 	let style: React.CSSProperties = { 

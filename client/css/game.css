@@ -490,7 +490,6 @@
 }
 
 .save-img, .exit-img {
-	height: 5vmin;
 	opacity: 1;
 	transition: opacity 500ms 300ms;
 }

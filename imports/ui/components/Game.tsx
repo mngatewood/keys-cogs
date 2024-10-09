@@ -389,7 +389,7 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered, exi
 	return (
 		<>
 			{isLoading() ? <Loading /> :
-				<>
+				<div className="game-container">
 					<DndContext 
 						sensors={sensors} 
 						collisionDetection={rectIntersection} 
@@ -435,7 +435,7 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered, exi
 							roundResults={roundResults}
 						/>
 					}
-				</>
+				</div>
 			}
 		</>
 	)

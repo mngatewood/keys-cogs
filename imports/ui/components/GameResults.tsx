@@ -78,8 +78,9 @@ export const GameResults: React.FC<GameResultsProps> = ({game, exitGame}) => {
 									return (
 										<li key={player._id} id={player._id} data-medal={getMyMedal(player._id)} className="game-card rounded-lg bg-white border border-gray-300 shadow-md my-4">
 											<div className="flex flex-col px-4 pb-4 sm:px-6">
-												<div className="flex items-start justify-between">
-													<h3 className="mt-2 w-5/6 text-xl font-bold text-gray-900">{player.name}</h3>
+												<div className="flex items-start justify-between text-xl font-bold text-gray-900">
+													<h3 className="mt-2">{player.name}:</h3>
+													<h3 className="mt-2 text-center">{player.totalScore + player.cogBonus} points</h3>
 													{getMyMedal(player._id) &&
 														<img className="h-8 w-8" src={`/${getMyMedal(player._id)}-medal-icon.png`} />
 													}
@@ -108,15 +109,8 @@ export const GameResults: React.FC<GameResultsProps> = ({game, exitGame}) => {
 												</div>
 												<hr className="my-2" />
 												<div className="flex items-center justify-between">
-													<div className="flex justify-start items-center text-sm">
-														<h3 className="font-bold">Score</h3>
-														<span>&nbsp;({player.totalScore})&nbsp;</span>
-														<h3 className="font-bold">+&nbsp;</h3>
-														<h3 className="font-bold">Cog Bonus</h3>
-														<span>&nbsp;({player.cogBonus})&nbsp;</span>
-														<h3 className="font-bold">=</h3>
-													</div>
-													<h3 className="font-bold text-lg">{player.totalScore + player.cogBonus}</h3>
+													<h3 className="font-bold">Cog Bonus</h3>
+													<h3 className="font-bold text-lg">{player.cogBonus}</h3>
 												</div>
 											</div>
 										</li>
