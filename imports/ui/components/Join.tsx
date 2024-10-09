@@ -30,21 +30,13 @@ export const Join:React.FC<JoinProps> = ({joinGame}) => {
 		started: false,
 		completed: false,
 		isDemo: false,
-		players: {
-			$size: {
-				$lt: 6
-			},
-			$elemMatch: {
-				_id: {
-					$ne: Meteor.userId()
-				}
-			}
-		}
+		$where: "this.players.length < 6",
 	};
 
 	const gamesOptions = {
 		sort: { createdAt: -1 },
 	}
+
 	const pendingGames = useTracker(() => GamesCollection.find(gamesQuery, gamesOptions).fetch() as GameType[]);
 
 	useEffect(() => {
@@ -109,7 +101,7 @@ export const Join:React.FC<JoinProps> = ({joinGame}) => {
 					<>
 						<ul className="overflow-auto">
 							{games.map((game) => (
-								<li key={game._id} id={game._id} className="game-card border border-gray-300 shadow-md my-4">
+								<li key={game._id} id={game._id} className="bg-white border border-gray-300 shadow-md my-4">
 									<div className="flex px-4 py-5 sm:px-6">
 										<div className="flex flex-col items-start justify-between w-3/4">
 											<h3 className="text-lg leading-6 font-medium text-gray-900">{game.hostName}</h3>
