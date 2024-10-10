@@ -307,7 +307,7 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered, exi
 		if (game.round === 0) {			
 			return await Meteor.callAsync("game.saveCog", game._id, Meteor.userId() as string, cardsData, keys).then(() => {
 				const roundResults = {
-					message: "Saved.  Waiting for other players...",
+					message: "Cog Saved.<br>Waiting for other players...",
 				}
 				setRoundResults(roundResults);
 				return true;

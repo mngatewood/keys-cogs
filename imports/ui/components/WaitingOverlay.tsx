@@ -14,11 +14,19 @@ export const WaitingOverlay = ({allPlayersReady, advanceRound, roundResults}: Wa
 		advanceRound();
 	}
 
+	const renderedMessage = () => {
+		if (roundResults.message) {
+			return roundResults.message.split("<br>")
+		}
+	}
+
 	return (
 		<div className="full-screen w-full fixed top-0 left-0 flex items-center justify-center z-50 bg-blue-1 bg-opacity-50 ">
-			<div className="waiting-overlay-container flex flex-col justify-evenly items-center bg-white shadow-lg border border-gray-300 rounded-lg px-8 py-6 m-auto w-5/6 max-w-md">
+			<div className="waiting-overlay-container flex flex-col justify-evenly items-center bg-beige-1 shadow-lg border border-gray-300 rounded-lg px-8 py-6 m-auto w-5/6 max-w-md">
 				<h1 className="text-2xl font-bold text-center mb-4">
-					{ allPlayersReady() ? "All players ready" : roundResults.message }
+					{ allPlayersReady() ? "All players ready" : 
+						renderedMessage()?.map((message, index) => <p key={{index}+ "-" + {message}}>{message}</p>)
+					}
 				</h1>
 				{roundResults.roundComplete && roundResults.incorrectPositions &&
 					<RoundResults roundResults={roundResults} />

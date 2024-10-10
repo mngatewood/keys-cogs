@@ -78,7 +78,7 @@ export const GameResults: React.FC<GameResultsProps> = ({game, exitGame}) => {
 									return (
 										<li key={player._id} id={player._id} data-medal={getMyMedal(player._id)} className="game-card rounded-lg bg-white border border-gray-300 shadow-md my-4">
 											<div className="flex flex-col px-4 pb-4 sm:px-6">
-												<div className="flex items-start justify-between text-xl font-bold text-gray-900">
+												<div className="flex items-start justify-between text-base font-bold text-gray-900">
 													<h3 className="mt-2">{player.name}:</h3>
 													<h3 className="mt-2 text-center">{player.totalScore + player.cogBonus} points</h3>
 													{getMyMedal(player._id) &&
@@ -108,9 +108,9 @@ export const GameResults: React.FC<GameResultsProps> = ({game, exitGame}) => {
 													</div>
 												</div>
 												<hr className="my-2" />
-												<div className="flex items-center justify-between">
-													<h3 className="font-bold">Cog Bonus</h3>
-													<h3 className="font-bold text-lg">{player.cogBonus}</h3>
+												<div className="flex items-center justify-between text-sm font-bold">
+													<h3>Cog Bonus</h3>
+													<h3>{player.cogBonus}</h3>
 												</div>
 											</div>
 										</li>

@@ -414,26 +414,29 @@ Meteor.methods({
 			return true 
 		}
 
-		const updatedPlayers = game?.players.filter((player: PlayerType) => player._id !== playerId) || [];
-		if (updatedPlayers?.length > 0) {
-			const update = {
-				$pull: {
-					players: {
-							_id: playerId
-					}
-				}
+		const updatedPlayers = game?.players.filter((player: PlayerType) => player.ready) || [];
+		const update = {
+			$set: {
+				"players.$[player].ready": false,
 			}
-			const response = await GamesCollection.updateAsync({_id: gameId}, update);
-			if (response === 1) {
-				game.players = updatedPlayers;
-				return game;
+		}
+		const options: any = {
+			arrayFilters: [
+				{ "player._id": playerId },
+			]
+		};
+
+		const response = await GamesCollection.updateAsync({_id: gameId}, update, options);
+		if (response === 1) {
+			if (updatedPlayers?.length <= 1) {
+				Meteor.callAsync('game.complete', gameId).then((result) => {
+					return result;
+				});
 			} else {
-				throw new Meteor.Error('unable-to-leave-game', 'An error occurred.  Please try again.');
+				return game
 			}
 		} else {
-			Meteor.callAsync('game.complete', gameId).then((result) => {
-				return result;
-			});
+			throw new Meteor.Error('unable-to-leave-game', 'An error occurred.  Please try again.');
 		}
 	},
 

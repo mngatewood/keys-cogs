@@ -25,6 +25,13 @@
 	margin-bottom: 1rem;
 }
 
+.game-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	height: 100%;
+}
+
 .droppable-container, .solved-cards-container {
 	display: flex;
 	justify-content: center;
@@ -40,6 +47,7 @@
 	height: 100%;
 	background-color: rgba(185,113,113, 0.7);
 	border: 1vmin solid rgba(185,113,113, 0.7);
+	box-shadow: 1vmin 1vmin 2vmin black;
 	border-radius: 12%;
 	overflow: hidden;
 	z-index: 10;
@@ -204,17 +212,18 @@
 
 .word-card {
 	display: grid;
-	/* aspect-ratio: 1 / 1; */
 	grid-template-columns: 20% 60% 20%;
 	grid-template-rows: 20% 60% 20%;
-	/* text-align: center; */
 	font-size: 3vmin;
 	background-color: theme('colors.blue.2');
 	color: theme('colors.beige.2');
 	border-radius: 20%;
 	transform: rotate(0turn);
 	transition: transform 100ms;
-	/* animation: fade-in 100ms; */
+}
+
+.draw-container .word-card {
+	box-shadow: 0.5vmin 0.5vmin 1vmin black;
 }
 
 .word-card-placeholder {
@@ -299,7 +308,7 @@
 	margin: 0;
 	padding: 0;
 	text-align: center;
-	font-size: 5vmin;
+	font-size: 4vmin;
 	font-family: "Permanent Marker", cursive;
 	cursor: pointer;
 }
@@ -473,7 +482,7 @@
 }
 
 .save-button, .exit-button {
-	width: 6vmin;
+	width: 6.5vmin;
 	margin: 0;
 	border-radius: 50px;
 	border: 2px solid red;
@@ -490,6 +499,7 @@
 }
 
 .save-img, .exit-img {
+	height: 6vmin;
 	opacity: 1;
 	transition: opacity 500ms 300ms;
 }
@@ -510,18 +520,18 @@
 	opacity: 0;
 	transition: opacity 500ms;
 	position: absolute;
-	font-size: 4vmin;
+	font-size: 3.5vmin;
 	color: theme('colors.rosegold.1');
 	text-decoration: underline;
 }
 
 .exit-button .button-text {
-	left: 5vmin;
+	left: 6vmin;
 	top: 4vmin;
 }
 
 .save-button .button-text {
-	right: 5vmin;
+	right: 6vmin;
 	top: 4vmin;
 }
 

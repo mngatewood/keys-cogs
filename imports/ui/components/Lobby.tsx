@@ -90,13 +90,13 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 
 	return (
 		<div className="h-full overflow-scroll flex items-center justify-center w-full">
-			<div className="bg-white shadow-lg border border-gray-300 rounded-lg px-8 py-6 m-auto w-5/6 mx-w-md">
+			<div className="bg-beige-1 shadow-lg border border-gray-300 rounded-lg px-8 py-6 m-auto w-5/6 mx-w-md">
 				<h1 className="text-2xl font-bold text-center">Lobby</h1>
 				{ isLoading() ? <Loading /> : 
 					<>
 						<ul className="overflow-scroll">
 							{players.map((player) => (
-								<li key={player._id} id={player._id} className="player-card border border-gray-300 my-4 shadow-md">
+								<li key={player._id} id={player._id} className="player-card bg-white border border-gray-300 my-4 shadow-md">
 									<div className="px-4 py-5 sm:px-6">
 										<div className="flex items-center justify-between h-6">
 											<h3 className="text-lg leading-6 font-bold text-gray-900">{player.fullName}</h3>
