@@ -97,9 +97,7 @@ export const Play = () => {
 
 	const removePlayer = (gameId: string, playerId: string) => {
 		Meteor.callAsync("game.leave", gameId, playerId).then(() => {
-			if (!game?.players.map((player) => player._id).includes(Meteor.userId())) {
-				resetGameState();
-			}
+			resetGameState();
 		}).catch((error) => {
 			console.log("error", error)
 		})
