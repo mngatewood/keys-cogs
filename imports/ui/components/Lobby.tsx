@@ -90,7 +90,7 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 
 	return (
 		<div className="h-full overflow-scroll flex items-center justify-center w-full">
-			<div className="bg-beige-1 shadow-lg border border-gray-300 rounded-lg px-8 py-6 m-auto w-5/6 mx-w-md">
+			<div className="bg-beige-1 shadow-lg border border-gray-300 rounded-lg px-8 py-6 m-auto w-5/6 max-w-md">
 				<h1 className="text-2xl font-bold text-center">Lobby</h1>
 				{ isLoading() ? <Loading /> : 
 					<>

@@ -67,7 +67,6 @@ export const GameResults: React.FC<GameResultsProps> = ({game, exitGame}) => {
 
 	return (
 		<div className="flex flex-col items-center justify-evenly w-full h-full">
-			<h1 className="game-panel-title">Game Summary</h1>
 			{ playerResults.length &&
 				<>
 					<div className="flex items-center justify-center w-full">
@@ -81,8 +80,9 @@ export const GameResults: React.FC<GameResultsProps> = ({game, exitGame}) => {
 												<div className="flex items-start justify-between text-base font-bold text-gray-900">
 													<h3 className="mt-2">{player.name}:</h3>
 													<h3 className="mt-2 text-center">{player.totalScore + player.cogBonus} points</h3>
-													{getMyMedal(player._id) &&
-														<img className="h-8 w-8" src={`/${getMyMedal(player._id)}-medal-icon.png`} />
+													{getMyMedal(player._id)
+														? <img className="h-8 w-8" src={`/${getMyMedal(player._id)}-medal-icon.png`} />
+														: <div className="h-8 w-8"></div>
 													}
 												</div>
 												<hr className="my-2" />

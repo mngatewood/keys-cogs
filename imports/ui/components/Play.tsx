@@ -132,7 +132,7 @@ export const Play = () => {
 		const playerToRenderName = fullName(playerToRenderData);
 
 		if (game.completed) {
-			return ""
+			return "Game Summary"
 		} else if (playerToRenderId === Meteor.userId()) {
 			return "Set Your Cog & Keys"
 		} else {
