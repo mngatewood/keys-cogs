@@ -557,7 +557,7 @@ Meteor.methods({
 			throw new Meteor.Error('game-not-found', 'Game not found.  Please try again.');
 		}
 
-\		if (allPlayersReadyForEndGame(game)) {
+		if (allPlayersReadyForEndGame(game)) {
 			const response = await advanceToGameSummary(game);
 			return response;
 		}
