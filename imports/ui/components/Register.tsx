@@ -115,7 +115,7 @@ export const Register = () => {
 	return (
 		<>
 			{!Meteor.user() &&
-				<div className="h-full overflow-scroll flex items-center justify-center w-full">
+				<div className="h-full overflow-scroll flex items-center justify-center w-full fade-in">
 					<div className="max-w-md m-auto bg-beige-1 rounded-lg shadow-md border border-gray-300 px-8 py-6 w-5/6 flex flex-col items-center">
 						<h1 className="text-xl font-bold text-center text-gray-700 mb-8">Register</h1>
 						<form action="#" className="w-full flex flex-col gap-4">

@@ -21,7 +21,7 @@ export const Account = () => {
 	}
 
 	return (
-		<div className="account-container flex items-center justify-center w-full h-full">
+		<div className="account-container flex items-center justify-center w-full h-full fade-in">
 			<div className="account-games-container bg-beige-1 shadow-lg border border-gray-300 rounded-lg px-8 py-6 m-auto max-w-md w-5/6 mx-w-md">
 				<h1 className="text-2xl font-bold text-center mb-4">Account</h1>
 				<h2 className="text-xl font-bold text-center mb-4">Email: {user?.emails?.[0].address}</h2>

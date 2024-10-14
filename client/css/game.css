@@ -30,6 +30,7 @@
 	flex-direction: column;
 	justify-content: space-between;
 	height: 100%;
+	animation: fadeIn 500ms;
 }
 
 .droppable-container, .solved-cards-container {

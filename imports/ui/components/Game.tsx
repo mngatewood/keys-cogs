@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Meteor } from 'meteor/meteor';
-import { useSubscribe } from 'meteor/react-meteor-data';
+import { useSubscribe, useTracker } from 'meteor/react-meteor-data';
 import { DndContext, rectIntersection, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, rectSwappingStrategy } from '@dnd-kit/sortable';
 
@@ -13,10 +13,10 @@ import { Loading } from './Loading';
 import { WaitingOverlay } from './WaitingOverlay';
 
 // Helpers
-import { getCardsToRender, getKeysToRender } from '/imports/helpers/gameplay';
+import { getCardsToRender, getKeysToRender, getReadyForNextRound } from '/imports/helpers/gameplay';
 
 // Types
-import type { CardType, GameType, PlayerType, RoundResultsType } from '../../api/types';
+import type { CardType, GameType, RoundResultsType } from '../../api/types';
 
 interface GameProps {
 	game: GameType;
@@ -38,6 +38,7 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered, exi
 	const pointerSensor = useSensor(PointerSensor, { activationConstraint: { distance: 5 }});
 	const keyboardSensor = useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates });
 	const sensors = useSensors( pointerSensor, keyboardSensor);
+	const user = useTracker(() => Meteor.user() as Meteor.User);
 	
 	
 	const cogContainers = [1, 2, 3, 4];
@@ -45,7 +46,7 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered, exi
 	const isLoading = useSubscribe("games");
 
 	useEffect(() => {
-		console.log("useEffect Game setCardsData and setKeys");
+		// console.log("useEffect Game setCardsData and setKeys");
 
 		const cardsToRender = getCardsToRender(game, Meteor.userId() ?? "");
 		const keysToRender = getKeysToRender(game, Meteor.userId() ?? "");
@@ -60,7 +61,7 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered, exi
 	}, [renderNewCards]);
 
 	useEffect(() => {
-		console.log("useEffect Game setPlayCards and setCogCards");
+		// console.log("useEffect Game setPlayCards and setCogCards");
 
 		if (!cardsData) return;
 
@@ -72,6 +73,7 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered, exi
 		const cogCardElements = cogCardsData?.map(card => sortableElement(card));
 		if (cogCardElements) setCogCards(sortByPosition(cogCardElements));
 
+		resetPlaceholders(cardsData);
 		validateCardsState();
 
 	}, [cardsData]);
@@ -82,7 +84,11 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered, exi
 			const cardInSlot = playerCards.find((card) => card.position === position);
 			return cardInSlot ? false : true;
 		});
-		const placeholderCards = cogContainerIds.map(id => playerCards.find((card) => card._id === id));
+		const placeholderCards = cogContainerIds.map((id) => {
+			return cards.find((card) => {
+				return card._id === id
+			})
+		});
 		unoccupiedSlots.forEach((position) => {
 			const placeholder = placeholderCards.find((card) => parseInt(card?._id as string) === position);
 			if (placeholder) {
@@ -376,14 +382,7 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered, exi
 	}
 
 	const readyForNextRound = () => {
-		const player = game.players.find((player: PlayerType) => player._id === Meteor.userId());
-		return (player && player.ready) ? true : false
-	}
-
-	const allPlayersReady = () => {
-		const playerRound = game.players.find((player: PlayerType) => player._id === Meteor.userId()).round;
-		const playersInRound = game.players.filter((player: PlayerType) => player.round === playerRound);
-		return playersInRound.every((player: PlayerType) => player.ready);
+		return getReadyForNextRound(game, user._id);
 	}
 
 	return (
@@ -430,7 +429,7 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered, exi
 					</DndContext>
 					{readyForNextRound() &&
 						<WaitingOverlay 
-							allPlayersReady={allPlayersReady} 
+							game={game}
 							advanceRound={advanceRound}
 							roundResults={roundResults}
 						/>

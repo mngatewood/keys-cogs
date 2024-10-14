@@ -8,30 +8,20 @@ import type { CardType } from '../types';
 import { getPlayerToRender } from '/imports/helpers/gameplay';
 import { fullName } from '/imports/helpers/reducers';
 
-const allOtherPlayersReady = (game: GameType, playerId: string) => {
+const allPlayersReady = (game: GameType) => {
 	if (game.isDemo) return true;
 	return game.players.reduce((accumulator, player) => {
-		if (player._id !== playerId) {
-			return accumulator && player.ready;
-		}
-		return accumulator;
+		return accumulator && player.ready;
 	}, true as boolean);
 };
 
-const advanceRound = async (game: GameType) => {
-	if (game.completed) {
-		throw new Meteor.Error('game-already-completed', 'Game has already been completed.  Please try again.');
-	}
+const allPlayersReadyForEndGame = (game: GameType) => {
+	const roundIsFinal = game.round === game.players.length -1;
+	const allPlayersInFinalRound = game.players.every((player) => player.round === game.players.length -1);
+	if (game.isDemo && roundIsFinal) return true;
 
-	const update = {
-		$set: {
-			round: game.round + 1
-		}
-	};
-
-	const response = await GamesCollection.updateAsync(game._id, update);
-	if (response) return game.round + 1;
-};
+	return roundIsFinal && allPlayersReady(game) && allPlayersInFinalRound
+}
 
 const advanceToGameSummary = async (game: GameType) => {
 	const update = {
@@ -376,6 +366,7 @@ Meteor.methods({
 						_id: playerId,
 						ready: false,
 						round: 0,
+						cogBonus: 0,
 						keys: ["", "", "", ""],
 						cards: [],
 						results: [],
@@ -473,10 +464,6 @@ Meteor.methods({
 		
 		if (response === 1) {
 
-			if (allOtherPlayersReady(game, playerId)) {
-				await advanceRound(game);
-			}
-
 			const updatedGame = await GamesCollection.findOneAsync({ _id: gameId }) as GameType;
 			return updatedGame;
 		} else {
@@ -541,10 +528,6 @@ Meteor.methods({
 				incrementCogBonus(game, coplayerId);
 			}
 
-			if (allOtherPlayersReady(game, playerId)) {
-				await advanceRound(game);
-			}
-
 			await finalizePlayerRound(game, playerId, attempts, score).then((result) => {
 				if (result === 1) {
 					const puzzleAuthorId = getPlayerToRender(game, playerId);
@@ -574,14 +557,27 @@ Meteor.methods({
 			throw new Meteor.Error('game-not-found', 'Game not found.  Please try again.');
 		}
 
-		if (game.round >= game.players.length) {
+		if (allPlayersReadyForEndGame(game)) {
 			const response = await advanceToGameSummary(game);
 			return response;
 		}
 
+		let gameRound = game.round
+		let playerRound = game.round;
+
+		const advanceRound = game.players.reduce((acc: boolean, player: PlayerType) => {
+			return player.round < game.round ? false : acc
+		}, true)
+
+		if (advanceRound) {
+			gameRound = game.round + 1;
+			playerRound = game.round + 1;
+		}
+
 		const update = {
 			$set: {
-				"players.$[player].round": game.round,
+				"round": gameRound,
+				"players.$[player].round": playerRound,
 				"players.$[player].ready": false,
 			}
 		};

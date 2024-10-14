@@ -37,3 +37,16 @@
 .card-container {
 	background-color: transparent;
 }
+
+.fade-in {
+	animation: fadeIn 500ms;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}

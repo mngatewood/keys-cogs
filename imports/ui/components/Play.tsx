@@ -28,11 +28,11 @@ export const Play = () => {
 	
 	const game = useTracker(() => GamesCollection.findOne(gameId) as GameType, [gameId]);
 	const isLoading = useSubscribe("games");
-	console.log("game", Date(), game ?? "null");
+	// console.log("game", Date(), game ?? "null");
 	const userSub = useSubscribe("users.all");
 
 	useEffect(() => {
-		console.log("useEffect Play");
+		// console.log("useEffect Play");
 		const localStorageGameId = localStorage.getItem("gameId") as string;
 		if (localStorageGameId) {
 			Meteor.callAsync("game.get", localStorageGameId).then((result) => {
@@ -132,7 +132,7 @@ export const Play = () => {
 		const playerToRenderName = fullName(playerToRenderData);
 
 		if (game.completed) {
-			return ""
+			return "Game Summary"
 		} else if (playerToRenderId === Meteor.userId()) {
 			return "Set Your Cog & Keys"
 		} else {

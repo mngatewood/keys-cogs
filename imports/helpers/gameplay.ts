@@ -1,9 +1,11 @@
 import { Meteor } from 'meteor/meteor';
 import type { GameType, CardType, PlayerType } from '../api/types';
 
-export const placeholderCards = [1, 2, 3, 4].map((position) => {
-	return { _id: position.toString(), words: ["", "", "", ""], position: position }
-});
+export const getPlaceholderCards = () => {
+	return [1, 2, 3, 4].map((position) => {
+		return { _id: position.toString(), words: ["", "", "", ""], position: position };
+	});
+};
 
 // return the id of the player whose cards will be rendered
 export const getPlayerToRender = (game: GameType, playerId: string) => {
@@ -29,7 +31,7 @@ export const getCardsToRender = (game: GameType, userId: string) => {
 
 	// if showing player their own cards, render as-is
 	if (playerCards && playerToRenderId === userId) {
-		return [...filteredPlayerCards, ...placeholderCards];
+		return [...filteredPlayerCards, ...getPlaceholderCards()];
 
 	// otherwise, strip position and rotation from cards on first render
 	} else if (playerCards && playerToRenderId !== userId) {
@@ -39,7 +41,7 @@ export const getCardsToRender = (game: GameType, userId: string) => {
 			return card
 		})
 
-		const resetPlaceholderCards = placeholderCards.map((card: CardType) => {
+		const resetPlaceholderCards = getPlaceholderCards().map((card: CardType) => {
 			card.position = parseInt(card._id);
 			return card
 		})
@@ -55,3 +57,14 @@ export const getKeysToRender = (game: GameType, playerId: string) => {
 	return playerToRender.keys
 }
 
+export const getReadyForNextRound = (game: GameType, playerId: string) => {
+	const player = game.players.find((player: PlayerType) => player._id === playerId);
+	return (player && player.ready) ? true : false
+}
+
+export const getAllPlayersInPlayerRoundReady = (game: GameType, playerId: string) => {
+	const player = game.players.find((player: PlayerType) => player._id === playerId);
+	const playersInPlayerRound = game.players.filter((gamePlayer: PlayerType) => gamePlayer.round === player.round);
+	const allPlayersInPlayerRoundReady = playersInPlayerRound.every((player: PlayerType) => player.ready);
+	return allPlayersInPlayerRoundReady;
+}

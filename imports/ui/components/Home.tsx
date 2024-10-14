@@ -31,6 +31,7 @@ export const Home = () => {
 		<>
 			<div className="home-container">
 				<h1 className="text-2xl font-bold text-center mb-4">Welcome to Keys & Cogs!</h1>
+				<button onClick={playDemo} className="w-full mx-auto max-w-sm flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-1 hover:bg-blue-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-1">Play the Demo</button>
 				<p><em><strong>Keys and Cogs</strong></em> is a digital reimplementation of the popular cooperative tabletop game <em>So Clover!</em>  The major difference is that now it's competitive! You'll still be scoring points by solving the puzzles, but this time without the help of your friends.  &nbsp;The rules remain simple:</p>
 				<p>All players are dealt five cards, each containing four common words (one on each side of the card). In the initial round, everyone will simultaneously arrange four of their the cards in a 2 x 2 grid, known as the <em>cog</em>.  The goal is to put words with a common feature&mdash;known as the <em>key</em>&mdash; next to each other.</p>
 
