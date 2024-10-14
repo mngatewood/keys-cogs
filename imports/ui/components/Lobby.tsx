@@ -25,7 +25,7 @@ export const Lobby:React.FC<LobbyProps> = ({game, endGame, startGame, removePlay
 	const isLoading = useSubscribe("users.all");
 
 	useEffect(() => {
-		console.log("useEffect Lobby");
+		// console.log("useEffect Lobby");
 
 		const playerIds = game.players.map((player: PlayerType) => player._id);
 		const inGame = playerIds.includes(Meteor.userId() ?? "");

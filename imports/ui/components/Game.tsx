@@ -46,7 +46,7 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered, exi
 	const isLoading = useSubscribe("games");
 
 	useEffect(() => {
-		console.log("useEffect Game setCardsData and setKeys");
+		// console.log("useEffect Game setCardsData and setKeys");
 
 		const cardsToRender = getCardsToRender(game, Meteor.userId() ?? "");
 		const keysToRender = getKeysToRender(game, Meteor.userId() ?? "");
@@ -61,7 +61,7 @@ export const Game = ({ game, advanceRound, renderNewCards, newCardsRendered, exi
 	}, [renderNewCards]);
 
 	useEffect(() => {
-		console.log("useEffect Game setPlayCards and setCogCards");
+		// console.log("useEffect Game setPlayCards and setCogCards");
 
 		if (!cardsData) return;
 

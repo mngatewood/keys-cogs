@@ -11,12 +11,10 @@ export const RoundResults: React.FC<RoundResultsProps> = ({roundResults}) => {
 	const [solutionCards, setSolutionCards] = useState<React.JSX.Element[]>([]);
 	
 	useEffect(() => {
-		console.log("roundResults", roundResults)
 		const sortedCards = roundResults.solution?.sort((a, b) => a.position - b.position);
 		if (!sortedCards) return;
 		setSolutionCards(sortedCards.map((card) => {
 			const correct = !roundResults.incorrectPositions?.includes(card.position.toString());
-			console.log("correct positions", roundResults.incorrectPositions, card.position)
 			return <WordCardSolution key={card._id} card={card} correct={correct}/>
 		}));
 	}, [roundResults]);
