@@ -43,17 +43,6 @@ export const Menu: React.FC<MenuProps> = ({joinGame, showGames}) => {
 		showGames();
 	}
 
-	const playDemo = async () => {
-		const demo = await getDemo();
-		Meteor.loginWithPassword(demo.demoPlayer.username, demo.demoPlayer.password, (error) => {
-			if (error) {
-				console.log(error);
-			} else if (demo.demoGame.players.map((player: { _id: string }) => player._id).includes(demo.demoPlayer._id)) {
-				localStorage.setItem("gameId", demo.demoGame._id);
-			}
-		})
-	}
-
 	const handleExitDemo = async () => {
 		const reset = await Meteor.callAsync("game.resetDemo", Meteor.userId());
 		if (reset) {
@@ -77,9 +66,6 @@ export const Menu: React.FC<MenuProps> = ({joinGame, showGames}) => {
 								</button>
 								<button className="button w-full flex justify-center my-4 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-1 disabled:bg-rosegold-2 disabled:text-gray-400 hover:bg-blue-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-1" onClick={handleListGames}>
 									Join a Game
-								</button>
-								<button className="button w-full flex justify-center my-4 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-1 disabled:bg-rosegold-2 disabled:text-gray-400 hover:bg-blue-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-1" onClick={playDemo}>
-									Play the Demo
 								</button>
 							</>
 						:

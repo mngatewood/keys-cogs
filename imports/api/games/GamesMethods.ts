@@ -16,9 +16,9 @@ const allPlayersReady = (game: GameType) => {
 };
 
 const allPlayersReadyForEndGame = (game: GameType) => {
-	if (game.isDemo) return true;
 	const roundIsFinal = game.round === game.players.length -1;
 	const allPlayersInFinalRound = game.players.every((player) => player.round === game.players.length -1);
+	if (game.isDemo && roundIsFinal) return true;
 
 	return roundIsFinal && allPlayersReady(game) && allPlayersInFinalRound
 }

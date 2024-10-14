@@ -27,6 +27,7 @@ export const WaitingOverlay = ({game, advanceRound, roundResults}: WaitingOverla
 
 	const disableAdvanceButton = () => {
 		if (!user) return true;
+		if (game.isDemo) return false;
 		const player = game.players.find((player) => player._id === user?._id);
 		const allPlayersInPlayerRoundReady = getAllPlayersInPlayerRoundReady(game, user?._id);
 		const playersInPreviousRounds = game.players.reduce((acc: PlayerType[], gamePlayer: PlayerType) => {
