@@ -22,7 +22,7 @@ export const RoundResults: React.FC<RoundResultsProps> = ({roundResults}) => {
 	}, [roundResults]);
 
 	return (
-		<div className="flex flex-col justify-evenly items-center bg-white shadow-lg border border-gray-300 rounded-lg px-4 py-6 mb-4 w-full max-w-md">
+		<div className="flex flex-col justify-evenly items-center bg-white shadow-lg border border-gray-300 rounded-lg px-4 py-6 mb-4 w-full max-w-md fade-in">
 			<h1 className="text-2xl font-bold text-center mb-4">
 				{ roundResults.message }
 			</h1>

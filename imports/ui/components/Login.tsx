@@ -60,7 +60,7 @@ export const Login = () => {
 	return (
 		<>
 			{!Meteor.user() &&
-				<div className="h-full overflow-scroll flex items-center justify-center w-full">
+				<div className="h-full overflow-scroll flex items-center justify-center w-full fade-in">
 					<div className="bg-beige-1 shadow-lg border border-gray-300 rounded-lg m-auto px-8 py-6 w-5/6 max-w-md">
 						<h1 className="text-2xl font-bold text-center mb-4">Login</h1>
 						<form action="#">

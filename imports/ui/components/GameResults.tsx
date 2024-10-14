@@ -66,7 +66,7 @@ export const GameResults: React.FC<GameResultsProps> = ({game, exitGame}) => {
 	}
 
 	return (
-		<div className="flex flex-col items-center justify-evenly w-full h-full">
+		<div className="flex flex-col items-center justify-evenly w-full h-full fade-in">
 			{ playerResults.length &&
 				<>
 					<div className="flex items-center justify-center w-full">

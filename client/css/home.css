@@ -4,6 +4,7 @@
 	padding: 2rem;
 	max-width: 768px;
 	margin: 0 auto;
+	animation: fadeIn 500ms;
 }
 
 .home-container p {
@@ -54,6 +55,7 @@
 	max-width: 768px;
 	margin: 1vmin auto;
 	padding: 0 2vmin;
+	animation: fadeIn 500ms;
 }
 
 .game-panel-title {

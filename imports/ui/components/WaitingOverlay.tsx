@@ -42,7 +42,7 @@ export const WaitingOverlay = ({game, advanceRound, roundResults}: WaitingOverla
 	}
 
 	return (
-		<div className="full-screen w-full fixed top-0 left-0 flex items-center justify-center z-50 bg-blue-1 bg-opacity-50 ">
+		<div className="full-screen w-full fixed top-0 left-0 flex items-center justify-center z-50 bg-blue-1 bg-opacity-50 fade-in">
 			<div className="waiting-overlay-container flex flex-col justify-evenly items-center bg-beige-1 shadow-lg border border-gray-300 rounded-lg px-8 py-6 m-auto w-5/6 max-w-md">
 				<h1 className="text-2xl font-bold text-center mb-4">
 					{ !disableAdvanceButton() ? "All players ready" : 

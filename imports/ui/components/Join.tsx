@@ -94,7 +94,7 @@ export const Join:React.FC<JoinProps> = ({joinGame}) => {
 	}
 
 	return (
-		<div className="overflow-scroll flex items-center justify-center w-full h-full">
+		<div className="overflow-scroll flex items-center justify-center w-full h-full fade-in">
 			<div className="bg-beige-1 shadow-lg border border-gray-300 rounded-lg px-8 py-6 m-auto max-w-md w-5/6">
 				<h1 className="text-2xl font-bold text-center mb-4">Join a Game</h1>
 				{isLoading() ? <Loading /> :

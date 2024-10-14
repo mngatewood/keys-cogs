@@ -54,7 +54,7 @@ export const Menu: React.FC<MenuProps> = ({joinGame, showGames}) => {
 
 	return (
 		<>
-			<div className="flex items-center justify-center overflow-scroll w-full h-full">
+			<div className="flex items-center justify-center overflow-scroll w-full h-full fade-in">
 				<div className="bg-beige-1 shadow-lg border border-gray-300 rounded-lg px-8 py-6 m-auto max-w-md w-5/6">
 					{!isDemo 
 						?
