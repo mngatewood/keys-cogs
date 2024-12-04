@@ -28,7 +28,7 @@
 <!-- About -->
 <h2 id="about">About the Project</h2>
 
-<img src="https://www.mngatewood.com/screenshot-portfolio-website-hires.png" alt="project screenshot">
+<img src="https://raw.githubusercontent.com/mngatewood/keys-cogs/refs/heads/main/public/screenshot-keys-cogs-hires.png" alt="project screenshot">
 <br>
 
 <p>Keys and Cogs is a digital reimplementation of the popular cooperative tabletop game, So Clover! The major difference is that now it's competitive! You'll still be scoring points by solving the puzzles, but this time without the help of your friends.</p>
