@@ -4,23 +4,28 @@ FROM geoffreybooth/meteor-base:3.0.2 as builder
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 ENV METEOR_ALLOW_SUPERUSER=true
 
+# Ensure Node.js is available in the PATH
+ENV PATH="/usr/local/bin:$PATH"
+
+# Install Node.js explicitly to ensure the binary is available
+RUN apt-get update && apt-get install -y nodejs
+
 # Copy meteor app
 COPY . /app
 WORKDIR /app
 
-# Clean cache and install dependencies
-RUN rm -rf node_modules .meteor/local && \
-	meteor npm cache clean --force && \
-	meteor npm install --omit=dev
+# Fix permissions for .meteor/local
+RUN chown -R root:root .meteor/local || true
 
-# Build the app outside the source tree
-RUN cp package.json package.json.orig && \
-	cp package.build.json package.json && \
-	mkdir /build && \
-	METEOR_DISABLE_AUTOMIGRATION=1 \
-	meteor build --directory /build --server-only --allow-superuser \
-	--architecture os.linux.x86_64 && \
-	mv package.json.orig package.json
+# Install project dependencies, including Tailwind CSS and PostCSS
+RUN meteor npm install
+
+# Run Tailwind CSS using the locally installed binary
+RUN ./node_modules/.bin/tailwindcss -i ./client/css/main.css -o ./client/css/output.css
+
+# Build the app
+RUN meteor build --directory /build --server-only --allow-superuser \
+	--architecture os.linux.x86_64
 
 # Start new image
 FROM node:20-slim
@@ -30,7 +35,7 @@ COPY --from=builder /build/bundle /app
 
 WORKDIR /app/programs/server
 
-# Install app dependencies
+# Install production dependencies
 RUN npm install --omit=dev
 
 WORKDIR /app
@@ -40,5 +45,5 @@ ENV PORT=3000
 
 EXPOSE 3000
 
-# Start the app without a settings file (use environment variables in production)
+# Start the app
 CMD ["node", "main.js"]
