@@ -1,5 +1,26 @@
 import { Meteor } from 'meteor/meteor';
 
+const isProduction = process.env.NODE_ENV === 'production';
+
+const settings = isProduction
+	? {
+		public: {},
+		private: {
+			DEMO_PLAYER_FIRST_NAME: process.env.DEMO_PLAYER_FIRST_NAME,
+			DEMO_PLAYER_LAST_NAME: process.env.DEMO_PLAYER_LAST_NAME,
+			DEMO_PLAYER_EMAIL: process.env.DEMO_PLAYER_EMAIL,
+			DEMO_PLAYER_PASSWORD: process.env.DEMO_PLAYER_PASSWORD,
+			OPPONENT_PLAYER_FIRST_NAME: process.env.OPPONENT_PLAYER_FIRST_NAME,
+			OPPONENT_PLAYER_LAST_NAME: process.env.OPPONENT_PLAYER_LAST_NAME,
+			OPPONENT_PLAYER_EMAIL: process.env.OPPONENT_PLAYER_EMAIL,
+			OPPONENT_PLAYER_PASSWORD: process.env.OPPONENT_PLAYER_PASSWORD,
+		},
+	}
+	: Meteor.settings;
+
+Meteor.settings = settings;
+
+
 // Meteor methods
 import "../imports/startup/server/index";
 
@@ -11,17 +32,6 @@ import { AccountsSchema } from '/imports/api/accounts/AccountsSchema';
 
 // Seed Data
 import { words, cards } from '/server/seedData';
-
-const settings = Meteor.settings.private;
-
-const playerFirstName = settings.DEMO_PLAYER_FIRST_NAME;
-const playerLastName = settings.DEMO_PLAYER_LAST_NAME;
-const playerEmail = settings.DEMO_PLAYER_EMAIL;
-const playerPassword = settings.DEMO_PLAYER_PASSWORD;
-const opponentFirstName = settings.OPPONENT_PLAYER_FIRST_NAME;
-const opponentLastName = settings.OPPONENT_PLAYER_LAST_NAME;
-const opponentEmail = settings.OPPONENT_PLAYER_EMAIL;
-const opponentPassword = settings.OPPONENT_PLAYER_PASSWORD;
 
 const insertWord = (word: string) => WordsCollection.insertAsync({ text: word });
 const insertCard = (card: Array<string>) => CardsCollection.insertAsync({ words: card });
@@ -57,17 +67,17 @@ Meteor.startup(async() => {
 
 		let demoPlayerId, demoOpponentId;
 
-		const existingDemoPlayer = await Meteor.users.findOneAsync({ username: playerEmail });
+		const existingDemoPlayer = await Meteor.users.findOneAsync({ username: Meteor.settings.private.DEMO_PLAYER_EMAIL });
 
 		if (existingDemoPlayer) {
 			demoPlayerId = existingDemoPlayer._id;
 		} else {
 			const newDemoPlayerData = {
-				firstName: playerFirstName,
-				lastName: playerLastName,
-				username: playerEmail,
-				password: playerPassword,
-				email: playerEmail
+				firstName: Meteor.settings.private.DEMO_PLAYER_FIRST_NAME,
+				lastName: Meteor.settings.private.DEMO_PLAYER_LAST_NAME,
+				username: Meteor.settings.private.DEMO_PLAYER_EMAIL,
+				password: Meteor.settings.private.DEMO_PLAYER_PASSWORD,
+				email: Meteor.settings.private.DEMO_PLAYER_EMAIL
 			}
 
 			AccountsSchema.validate(newDemoPlayerData);
@@ -83,17 +93,17 @@ Meteor.startup(async() => {
 			}
 		}
 
-		const existingDemoOpponent = await Meteor.users.findOneAsync({ username: opponentEmail });
+		const existingDemoOpponent = await Meteor.users.findOneAsync({ username: Meteor.settings.private.OPPONENT_PLAYER_EMAIL });
 
 		if (existingDemoOpponent) {
 			demoOpponentId = existingDemoOpponent._id;
 		} else {
 			const newDemoOpponentData = {
-				firstName: opponentFirstName,
-				lastName: opponentLastName,
-				username: opponentEmail,
-				password: opponentPassword,
-				email: opponentEmail
+				firstName: Meteor.settings.private.OPPONENT_PLAYER_FIRST_NAME,
+				lastName: Meteor.settings.private.OPPONENT_PLAYER_LAST_NAME,
+				username: Meteor.settings.private.OPPONENT_PLAYER_EMAIL,
+				password: Meteor.settings.private.OPPONENT_PLAYER_PASSWORD,
+				email: Meteor.settings.private.OPPONENT_PLAYER_EMAIL,
 			}
 
 			AccountsSchema.validate(newDemoOpponentData);

@@ -1,0 +1,10 @@
+{
+  "name": "meteor-app",
+  "private": true,
+  "meteor": {
+    "mainModule": {
+      "client": "client/main.tsx",
+      "server": "server/main.ts"
+    }
+  }
+}
